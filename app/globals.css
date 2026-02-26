@@ -1,0 +1,297 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --terminal-bg:      #0d1117;
+  --terminal-surface: #161b22;
+  --terminal-border:  #30363d;
+  --terminal-green:   #00ff41;
+  --terminal-green2:  #39d353;
+  --terminal-green3:  #4ade80;
+  --terminal-muted:   #7ee787;
+  --terminal-dim:     #3fb950;
+  --terminal-comment: #8b949e;
+  --terminal-white:   #e6edf3;
+  --terminal-yellow:  #e3b341;
+  --terminal-red:     #f85149;
+  --terminal-blue:    #58a6ff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--terminal-bg);
+  color: var(--terminal-green3);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--terminal-bg); }
+::-webkit-scrollbar-thumb { background: var(--terminal-dim); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--terminal-green); }
+
+/* Selection */
+::selection { background: var(--terminal-green); color: var(--terminal-bg); }
+
+/* Focus rings */
+:focus-visible { outline: 1px solid var(--terminal-green); outline-offset: 2px; }
+
+/* Terminal window chrome dots */
+.window-chrome {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--terminal-border);
+}
+.window-chrome::before {
+  content: '● ● ●';
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: transparent;
+  text-shadow:
+    0 0 0 #f85149,
+    14px 0 0 #e3b341,
+    28px 0 0 #3fb950;
+}
+
+/* Line numbers */
+.line-num {
+  color: var(--terminal-comment);
+  user-select: none;
+  min-width: 2.5rem;
+  text-align: right;
+  padding-right: 1.5rem;
+  border-right: 1px solid var(--terminal-border);
+  margin-right: 1.5rem;
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+/* Prompt symbol */
+.prompt::before {
+  content: '> ';
+  color: var(--terminal-green);
+}
+
+/* Subtle accent on important green text */
+.glow {
+  color: var(--terminal-green);
+}
+
+/* Terminal card */
+.term-card {
+  background: var(--terminal-surface);
+  border: 1px solid var(--terminal-border);
+  border-radius: 0;
+}
+
+.term-card:hover {
+  border-color: var(--terminal-dim);
+}
+
+/* Blinking cursor */
+.cursor::after {
+  content: '▋';
+  color: var(--terminal-green);
+  animation: blink 1s step-end infinite;
+}
+
+/* Fade up reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+
+/* ======= Retro Desktop OS Theme (Hero only) ======= */
+:root {
+  --os-bg: #0b4aa6;           /* GEM-ish / old OS blue */
+  --os-bg2: #0a3f90;
+  --os-panel: #d9d9d9;        /* classic gray */
+  --os-panel2: #cfcfcf;
+  --os-border-dark: #3a3a3a;
+  --os-border-light: #ffffff;
+  --os-title: #0b3b8f;        /* titlebar blue */
+  --os-title-text: #ffffff;
+  --os-text: #101010;
+
+  --crt-glow: rgba(120, 255, 170, 0.10);
+  --crt-vignette: rgba(0,0,0,0.35);
+
+  --bezel: #d6c9a7;           /* beige computer plastic */
+  --bezel2: #c9bb98;
+  --bezel-shadow: rgba(0,0,0,0.55);
+}
+
+/* Only for hero computer */
+.computer-shell {
+  background: linear-gradient(180deg, var(--bezel), var(--bezel2));
+  box-shadow:
+    0 30px 120px var(--bezel-shadow),
+    inset 0 2px 0 rgba(255,255,255,0.35),
+    inset 0 -3px 0 rgba(0,0,0,0.18);
+  border: 1px solid rgba(0,0,0,0.25);
+  border-radius: 28px;
+  padding: 22px;
+}
+
+.computer-inset {
+  background: #2a2a2a;
+  border-radius: 18px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.65);
+}
+
+.crt-screen {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.55);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,0.08),
+    inset 0 0 35px rgba(0,0,0,0.75);
+}
+
+/* Wallpaper */
+.crt-wallpaper {
+  background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.08), transparent 40%),
+              radial-gradient(circle at 70% 60%, rgba(0,0,0,0.18), transparent 55%),
+              linear-gradient(180deg, var(--os-bg), var(--os-bg2));
+}
+
+/* CRT effects */
+.crt-screen::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.05) 0px,
+      rgba(255,255,255,0.05) 1px,
+      transparent 3px,
+      transparent 6px
+    );
+  opacity: 0.10;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.crt-screen::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at center, transparent 45%, var(--crt-vignette) 100%);
+  pointer-events: none;
+  z-index: 6;
+}
+
+/* OS panel bevel (Win3.x / classic) */
+.os-bevel {
+  background: var(--os-panel);
+  border-top: 1px solid var(--os-border-light);
+  border-left: 1px solid var(--os-border-light);
+  border-right: 1px solid var(--os-border-dark);
+  border-bottom: 1px solid var(--os-border-dark);
+}
+
+.os-titlebar {
+  background: linear-gradient(180deg, #1a56c9, var(--os-title));
+  color: var(--os-title-text);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.os-window {
+  box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+}
+
+.os-btn {
+  width: 16px;
+  height: 16px;
+  background: var(--os-panel2);
+  border-top: 1px solid var(--os-border-light);
+  border-left: 1px solid var(--os-border-light);
+  border-right: 1px solid var(--os-border-dark);
+  border-bottom: 1px solid var(--os-border-dark);
+  display: grid;
+  place-items: center;
+  color: #111;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.os-menubar {
+  background: var(--os-panel);
+  color: var(--os-text);
+  font-size: 12px;
+  padding: 4px 8px;
+  display: flex;
+  gap: 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.25);
+}
+
+.os-taskbar {
+  background: var(--os-panel);
+  border-top: 1px solid rgba(0,0,0,0.25);
+  padding: 6px 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--os-text);
+}
+
+/* Desktop icon label */
+.os-icon-label {
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  max-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
