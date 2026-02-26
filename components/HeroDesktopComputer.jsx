@@ -245,6 +245,7 @@ const ICON_VIEW_MODES = {
   large: { tileW: 94, tileH: 112, glyphScale: 1.2, labelSize: 12, cellX: 108, cellY: 126, maxLabel: 100 },
 };
 const MENU_TEXT_COLOR = "#162133";
+const FULLSCREEN_WINDOW_IDS = new Set(["about", "skills", "experience", "projects", "github", "contact"]);
 const snapIconToGrid = (x, y, mode = "medium", marginX = 12, marginY = 8) => {
   const grid = ICON_VIEW_MODES[mode] || ICON_VIEW_MODES.medium;
   const gx = Math.round((x - marginX) / grid.cellX);
@@ -349,11 +350,11 @@ function TitleBar({ title, isActive, onClose, onMinimize, onMaximize, onPointerD
         fontWeight: 700,
         fontSize: "12px",
         letterSpacing: "0.3px",
-        padding: "4px 4px 4px 8px",
+        padding: "5px 5px 5px 8px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        cursor: "grab",
+        cursor: "default",
         userSelect: "none",
       }}
     >
@@ -370,8 +371,8 @@ function TitleBar({ title, isActive, onClose, onMinimize, onMaximize, onPointerD
             key={btn.label}
             onClick={(e) => { e.stopPropagation(); btn.action(); }}
             style={{
-              width: 16,
-              height: 14,
+              width: 20,
+              height: 16,
               background: "#c0c0c0",
               border: "none",
               borderTop: "1px solid #fff",
@@ -381,7 +382,7 @@ function TitleBar({ title, isActive, onClose, onMinimize, onMaximize, onPointerD
               display: "grid",
               placeItems: "center",
               color: "#111",
-              fontSize: "11px",
+              fontSize: "12px",
               lineHeight: 1,
               cursor: "pointer",
               fontFamily: "inherit",
@@ -850,7 +851,7 @@ function TerminalApp() {
   }, [history]);
 
   const commands = {
-    help: () => "Available commands: help, whoami, skills, contact, projects, clear, neofetch, echo [text], date, uptime, cat resume",
+    help: () => "Available commands: help, whoami, skills, contact, projects, experience, clear, neofetch, echo [text], date, uptime, cat resume",
     whoami: () => `${PERSONAL.name} — ${PERSONAL.title}\n${PERSONAL.location}`,
     skills: () => Object.entries(SKILLS).map(([cat, items]) => `${cat}: ${items.join(", ")}`).join("\n"),
     contact: () => `Email: ${PERSONAL.email}\nGitHub: ${PERSONAL.github}\nLinkedIn: ${PERSONAL.linkedin}`,
@@ -867,8 +868,22 @@ function TerminalApp() {
                    CPU: Intel 80486DX
                    Memory: 4096 KB
                    Uptime: way too long`,
-    "cat resume": () => `${PERSONAL.name}\n${PERSONAL.title}\n${PERSONAL.school}\nGPA: ${PERSONAL.gpa} | Graduating: ${PERSONAL.gradDate}\n\nRun "skills" or "projects" for more details.`,
+    "cat resume": () => `${PERSONAL.name}\n${PERSONAL.title}\n${PERSONAL.school}\nGPA: ${PERSONAL.gpa} | Graduating: ${PERSONAL.gradDate}\n\nRun "skills", "projects", or "experience" for more details.`,
   };
+
+  const formatProjectsDetails = () => PROJECTS.map((p, idx) => [
+    `${idx + 1}. ${p.title} (${p.date}) ${p.status === "IN_PROGRESS" ? "[WIP]" : "[COMPLETE]"}`,
+    `   ${p.subtitle}`,
+    `   ${p.desc}`,
+    ...p.impact.map((line) => `   - ${line}`),
+  ].join("\n")).join("\n\n");
+
+  const formatExperienceDetails = () => EXPERIENCE.map((exp, idx) => [
+    `${idx + 1}. ${exp.role} @ ${exp.company} (${exp.period})`,
+    `   ${exp.type}`,
+    `   ${exp.desc}`,
+    ...exp.bullets.map((line) => `   - ${line}`),
+  ].join("\n")).join("\n\n");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -879,6 +894,10 @@ function TerminalApp() {
       setHistory(newHistory);
     } else if (cmd.startsWith("echo ")) {
       setHistory([...newHistory, { type: "output", text: input.slice(5) }]);
+    } else if (cmd === "projects") {
+      setHistory([...newHistory, { type: "output", text: formatProjectsDetails() }]);
+    } else if (cmd === "experience") {
+      setHistory([...newHistory, { type: "output", text: formatExperienceDetails() }]);
     } else if (commands[cmd]) {
       const result = commands[cmd]();
       if (result === "__CLEAR__") {
@@ -1116,8 +1135,6 @@ function DesktopIcon({
   const movedRef = useRef(false);
   const lastPosRef = useRef(position);
   const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
-  const labelText = isRenaming ? renameValue : icon.title;
-  const labelWidth = Math.min(view.maxLabel, Math.max(40, Math.ceil(((labelText?.length || 1) * view.labelSize * 0.62) + 10)));
 
   useEffect(() => {
     lastPosRef.current = position;
@@ -1214,18 +1231,22 @@ function DesktopIcon({
             position: "absolute",
             left: 4,
             top: 4,
-            width: 11,
-            height: 11,
-            border: "1px solid #fff",
-            background: selected ? "#0060bf" : "rgba(255,255,255,0.1)",
-            color: "#fff",
-            fontSize: 8,
-            lineHeight: "10px",
+            width: 12,
+            height: 12,
+            border: "none",
+            borderTop: "1px solid #ffffff",
+            borderLeft: "1px solid #ffffff",
+            borderRight: "1px solid #3a3a3a",
+            borderBottom: "1px solid #3a3a3a",
+            background: selected ? "#c0c0c0" : "#e7e7e7",
+            color: "#000080",
+            fontSize: 9,
+            lineHeight: "11px",
             textAlign: "center",
             fontWeight: 700,
           }}
         >
-          {selected ? "✓" : ""}
+          {selected ? "x" : ""}
         </div>
       )}
       <div
@@ -1257,7 +1278,8 @@ function DesktopIcon({
             }
           }}
           style={{
-            width: labelWidth,
+            display: "inline-block",
+            width: "auto",
             maxWidth: view.maxLabel,
             background: "rgba(0,0,0,0.45)",
             color: "#fff",
@@ -1277,7 +1299,8 @@ function DesktopIcon({
             color: "#fff",
             fontSize: view.labelSize,
             padding: "1px 5px",
-            width: labelWidth,
+            display: "inline-block",
+            width: "auto",
             maxWidth: view.maxLabel,
             textAlign: "center",
             whiteSpace: "nowrap",
@@ -1320,7 +1343,7 @@ function TopMenuBar({
       { label: "View Resume", action: () => window.open("/Jacob_Rushinski_Resume.pdf", "_blank") },
     ],
     File: [
-      { label: "Open About Me", action: () => openWindow("about") },
+      { label: "Open About", action: () => openWindow("about") },
       { label: "Open Skills", action: () => openWindow("skills") },
       { label: "Open Experience", action: () => openWindow("experience") },
       { label: "Open Projects", action: () => openWindow("projects") },
@@ -1463,7 +1486,12 @@ export default function HeroDesktopComputerComponent() {
 
   // Clock
   useEffect(() => {
-    const tick = () => setClock(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+    const tick = () => {
+      const now = new Date();
+      const date = now.toLocaleDateString([], { month: "2-digit", day: "2-digit", year: "2-digit" });
+      const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      setClock(`${date} ${time}`);
+    };
     tick();
     const id = setInterval(tick, 10000);
     return () => clearInterval(id);
@@ -1500,7 +1528,7 @@ export default function HeroDesktopComputerComponent() {
 
   const systemDesktopIcons = [
     { id: "welcome", title: "Welcome", glyph: Icons.welcome, windowId: "welcome", itemType: "app", system: true },
-    { id: "about", title: "About Me", glyph: Icons.about, windowId: "about", itemType: "app", system: true },
+    { id: "about", title: "About", glyph: Icons.about, windowId: "about", itemType: "app", system: true },
     { id: "skills", title: "Skills", glyph: Icons.skills, windowId: "skills", itemType: "app", system: true },
     { id: "experience", title: "Experience", glyph: Icons.experience, windowId: "experience", itemType: "app", system: true },
     { id: "projects", title: "Projects", glyph: Icons.projects, windowId: "projects", itemType: "app", system: true },
@@ -1520,14 +1548,14 @@ export default function HeroDesktopComputerComponent() {
 
   // ─── Windows state (Welcome + About open by default) ───
   const [windows, setWindows] = useState({
-    welcome:    { id: "welcome",    title: "Welcome to JacobOS",       x: 120, y: 20,  w: 460, h: 400, isOpen: true,  isMinimized: false, isMaximized: false, z: 11 },
-    about:      { id: "about",      title: "About — Jacob Rushinski",  x: 200, y: 60,  w: 520, h: 420, isOpen: true,  isMinimized: false, isMaximized: false, z: 10 },
-    skills:     { id: "skills",     title: "Skills.exe",               x: 200, y: 60,  w: 480, h: 400, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
-    experience: { id: "experience", title: "Experience.exe",           x: 180, y: 50,  w: 560, h: 480, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
-    projects:   { id: "projects",   title: "Projects.exe",             x: 140, y: 30,  w: 540, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
-    github:     { id: "github",     title: "GitHub Stats",             x: 220, y: 70,  w: 460, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 6 },
-    contact:    { id: "contact",    title: "Contact.exe",              x: 260, y: 80,  w: 400, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
-    terminal:   { id: "terminal",   title: "JacobOS Terminal",         x: 120, y: 50,  w: 500, h: 350, isOpen: false, isMinimized: false, isMaximized: false, z: 4 },
+    welcome:    { id: "welcome",    title: "Welcome",                  x: 120, y: 20,  w: 460, h: 400, isOpen: true,  isMinimized: false, isMaximized: false, z: 11 },
+    about:      { id: "about",      title: "About",                    x: 200, y: 60,  w: 520, h: 420, isOpen: true,  isMinimized: false, isMaximized: false, z: 10 },
+    skills:     { id: "skills",     title: "Skills",                   x: 200, y: 60,  w: 480, h: 400, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
+    experience: { id: "experience", title: "Experience",               x: 180, y: 50,  w: 560, h: 480, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
+    projects:   { id: "projects",   title: "Projects",                 x: 140, y: 30,  w: 540, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
+    github:     { id: "github",     title: "GitHub",                   x: 220, y: 70,  w: 460, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 6 },
+    contact:    { id: "contact",    title: "Contact",                  x: 260, y: 80,  w: 400, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
+    terminal:   { id: "terminal",   title: "Terminal",                 x: 120, y: 50,  w: 500, h: 350, isOpen: false, isMinimized: false, isMaximized: false, z: 4 },
     trash:      { id: "trash",      title: "Recycle Bin",              x: 300, y: 100, w: 320, h: 260, isOpen: false, isMinimized: false, isMaximized: false, z: 3 },
     explorer:   { id: "explorer",   title: "File Explorer",            x: 260, y: 90,  w: 460, h: 360, isOpen: false, isMinimized: false, isMaximized: false, z: 2 },
     settings:   { id: "settings",   title: "Settings",                 x: 300, y: 120, w: 380, h: 280, isOpen: false, isMinimized: false, isMaximized: false, z: 1 },
@@ -1816,17 +1844,43 @@ export default function HeroDesktopComputerComponent() {
     alignIconsToGrid();
   }, [iconSizeMode]);
 
-  const openIconMenuAt = useCallback((id, clientX, clientY, modifiers = {}) => {
-    const point = toDesktopPoint(clientX, clientY);
+  const selectDesktopIcon = useCallback((id) => {
     setSelectedIcon(id);
-    if (modifiers.ctrlKey || modifiers.shiftKey) {
-      setIconMenu(null);
-    } else {
-      setIconMenu({ id, x: point.x, y: point.y });
-    }
+    setIconMenu(null);
     setDesktopMenu(null);
     setDesktopViewMenuOpen(false);
-  }, [toDesktopPoint]);
+  }, []);
+
+  const openIconMenuAt = useCallback((id, clientX, clientY) => {
+    const rect = desktopRef.current?.getBoundingClientRect();
+    const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
+    const iconPos = iconPositions[id];
+    const menuW = 188;
+    const menuH = 196;
+
+    setSelectedIcon(id);
+    setDesktopMenu(null);
+    setDesktopViewMenuOpen(false);
+
+    if (rect && iconPos) {
+      let menuX = iconPos.x + view.tileW + 6;
+      if (menuX + menuW > rect.width - 4) {
+        menuX = Math.max(4, iconPos.x - menuW - 6);
+      }
+      let menuY = clamp(iconPos.y + 4, 4, Math.max(4, rect.height - menuH - 4));
+      if (menuX <= iconPos.x + view.tileW && menuX + menuW >= iconPos.x) {
+        menuX = clamp(iconPos.x + view.tileW + 6, 4, Math.max(4, rect.width - menuW - 4));
+        if (menuX <= iconPos.x + view.tileW && menuX + menuW >= iconPos.x) {
+          menuX = clamp(iconPos.x - menuW - 6, 4, Math.max(4, rect.width - menuW - 4));
+        }
+      }
+      setIconMenu({ id, x: menuX, y: menuY });
+      return;
+    }
+
+    const point = toDesktopPoint(clientX, clientY);
+    setIconMenu({ id, x: point.x, y: point.y });
+  }, [iconPositions, iconSizeMode, toDesktopPoint]);
 
   const openDesktopMenuAt = useCallback((clientX, clientY) => {
     const point = toDesktopPoint(clientX, clientY);
@@ -2261,7 +2315,7 @@ export default function HeroDesktopComputerComponent() {
                     onDragStart={handleIconDragStart}
                     onDragMove={handleIconDragMove}
                     onDrop={handleIconDrop}
-                    onSingleClick={(id, clientX, clientY, modifiers) => openIconMenuAt(id, clientX, clientY, modifiers)}
+                    onSingleClick={(id) => selectDesktopIcon(id)}
                     onContextMenu={openIconMenuAt}
                     onHoverChange={setHoveredIcon}
                     isRenaming={renamingItem?.id === icon.id}
@@ -2608,13 +2662,22 @@ export default function HeroDesktopComputerComponent() {
                   borderLeft: "1px solid #404040",
                   borderRight: "1px solid #fff",
                   borderBottom: "1px solid #fff",
-                  padding: "3px 10px",
+                  padding: "3px 8px",
                   fontSize: 11,
                   fontWeight: 500,
                   color: "#111",
                   whiteSpace: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
                 }}>
-                  {clock}
+                  <span style={{ display: "inline-flex", alignItems: "flex-end", gap: 1, height: 10 }}>
+                    <span style={{ width: 3, height: 3, background: "#0b3b8f" }} />
+                    <span style={{ width: 3, height: 5, background: "#0b3b8f" }} />
+                    <span style={{ width: 3, height: 7, background: "#0b3b8f" }} />
+                    <span style={{ width: 3, height: 9, background: "#0b3b8f" }} />
+                  </span>
+                  <span>{clock}</span>
                 </div>
 
                 {/* Start Menu Popup */}
@@ -2734,6 +2797,8 @@ export default function HeroDesktopComputerComponent() {
     </>
   );
 }
+
+
 
 
 
