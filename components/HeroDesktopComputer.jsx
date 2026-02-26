@@ -240,9 +240,9 @@ const GRID = 1;
 const snap = (n) => Math.round(n / GRID) * GRID;
 const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
 const ICON_VIEW_MODES = {
-  small: { tileW: 68, tileH: 80, glyphScale: 0.85, labelSize: 10, cellX: 78, cellY: 90, maxLabel: 72 },
-  medium: { tileW: 76, tileH: 90, glyphScale: 1, labelSize: 11, cellX: 90, cellY: 96, maxLabel: 84 },
-  large: { tileW: 94, tileH: 112, glyphScale: 1.2, labelSize: 12, cellX: 108, cellY: 118, maxLabel: 100 },
+  small: { tileW: 68, tileH: 80, glyphScale: 0.85, labelSize: 10, cellX: 78, cellY: 94, maxLabel: 72 },
+  medium: { tileW: 76, tileH: 90, glyphScale: 1, labelSize: 11, cellX: 90, cellY: 102, maxLabel: 84 },
+  large: { tileW: 94, tileH: 112, glyphScale: 1.2, labelSize: 12, cellX: 108, cellY: 126, maxLabel: 100 },
 };
 const MENU_TEXT_COLOR = "#162133";
 const snapIconToGrid = (x, y, mode = "medium", marginX = 12, marginY = 8) => {
@@ -256,7 +256,7 @@ const snapIconToGrid = (x, y, mode = "medium", marginX = 12, marginY = 8) => {
 };
 
 // ── Boot Sequence Component ─────────────────────────────
-function BootSequence({ onComplete }) {
+function BootSequence({ onComplete, embedded = false }) {
   const [lines, setLines] = useState([]);
   const [phase, setPhase] = useState("bios");
 
@@ -277,28 +277,31 @@ function BootSequence({ onComplete }) {
   ];
 
   useEffect(() => {
-    let timeout;
+    const timeouts = [];
     let currentDelay = 0;
     bootLines.forEach((line, i) => {
       currentDelay += line.delay;
-      timeout = setTimeout(() => {
+      const lineTimeout = setTimeout(() => {
         setLines((prev) => [...prev, line.text]);
         if (i === bootLines.length - 1) {
-          setTimeout(() => setPhase("fade"), 200);
-          setTimeout(onComplete, 700);
+          timeouts.push(setTimeout(() => setPhase("fade"), 200));
+          timeouts.push(setTimeout(onComplete, 700));
         }
       }, currentDelay);
+      timeouts.push(lineTimeout);
     });
-    return () => clearTimeout(timeout);
-  }, []);
+    return () => {
+      timeouts.forEach((id) => clearTimeout(id));
+    };
+  }, [onComplete]);
 
   return (
     <div
       style={{
-        position: "fixed",
+        position: embedded ? "absolute" : "fixed",
         inset: 0,
         background: "#000",
-        zIndex: 9999,
+        zIndex: embedded ? 100 : 9999,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -929,9 +932,9 @@ function SystemAlertModal({ message, onClose }) {
           System Error
         </div>
         <div style={{ padding: "20px 16px", display: "flex", alignItems: "flex-start", gap: 12 }}>
-          <span style={{ fontSize: 24 }}>!</span>
+          <span style={{ fontSize: 24, color: "#8b1f1f" }}>!</span>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Access Denied</div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: "#111" }}>Access Denied</div>
             <div style={{ fontSize: 12, color: "#444" }}>{message}</div>
           </div>
         </div>
@@ -1113,6 +1116,8 @@ function DesktopIcon({
   const movedRef = useRef(false);
   const lastPosRef = useRef(position);
   const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
+  const labelText = isRenaming ? renameValue : icon.title;
+  const labelWidth = Math.min(view.maxLabel, Math.max(40, Math.ceil(((labelText?.length || 1) * view.labelSize * 0.62) + 10)));
 
   useEffect(() => {
     lastPosRef.current = position;
@@ -1126,7 +1131,10 @@ function DesktopIcon({
 
   const handlePointerDown = (e) => {
     if (isRenaming) return;
-    if (e.button !== 0) return;
+    if (e.button !== 0) {
+      e.stopPropagation();
+      return;
+    }
     e.stopPropagation();
     movedRef.current = false;
     onDragStart?.(icon.id, position);
@@ -1174,6 +1182,7 @@ function DesktopIcon({
         left: position.x,
         top: position.y,
         width: view.tileW,
+        minHeight: view.tileH,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -1248,15 +1257,16 @@ function DesktopIcon({
             }
           }}
           style={{
-            width: view.maxLabel + 10,
-            maxWidth: view.maxLabel + 10,
-            background: "#fff",
-            color: "#111",
-            border: "1px solid #000080",
+            width: labelWidth,
+            maxWidth: view.maxLabel,
+            background: "rgba(0,0,0,0.45)",
+            color: "#fff",
+            border: "none",
             outline: "none",
             fontSize: view.labelSize,
             fontFamily: "inherit",
-            padding: "1px 4px",
+            padding: "1px 5px",
+            textAlign: "center",
             lineHeight: 1.3,
           }}
         />
@@ -1267,6 +1277,7 @@ function DesktopIcon({
             color: "#fff",
             fontSize: view.labelSize,
             padding: "1px 5px",
+            width: labelWidth,
             maxWidth: view.maxLabel,
             textAlign: "center",
             whiteSpace: "nowrap",
@@ -1321,7 +1332,7 @@ function TopMenuBar({
       { label: "---------------", action: null },
       { label: "New Folder", action: createFolder },
       { label: "New Text Document", action: createTextDocument },
-      { label: "Paste", action: pasteDesktopItem, disabled: !hasClipboard },
+      ...(hasClipboard ? [{ label: "Paste", action: pasteDesktopItem }] : []),
     ],
     View: [
       { label: (iconSizeMode === "large" ? "* " : "") + "Large icons", action: () => setIconSizeMode("large") },
@@ -1554,16 +1565,20 @@ export default function HeroDesktopComputerComponent() {
     const maxW = rect?.width ?? 1200;
     const maxH = rect?.height ?? 700;
     const snapped = snapIconToGrid(x, y, iconSizeMode, 12, 8);
+    const maxCol = Math.max(0, Math.floor((maxW - 12 - view.tileW) / view.cellX));
+    const maxRow = Math.max(0, Math.floor((maxH - 8 - view.tileH) / view.cellY));
+    const col = clamp(Math.round((snapped.x - 12) / view.cellX), 0, maxCol);
+    const row = clamp(Math.round((snapped.y - 8) / view.cellY), 0, maxRow);
     return {
-      x: clamp(snapped.x, 12, Math.max(12, maxW - view.tileW - 4)),
-      y: clamp(snapped.y, 8, Math.max(8, maxH - view.tileH - 4)),
+      x: 12 + col * view.cellX,
+      y: 8 + row * view.cellY,
     };
   }, [iconSizeMode]);
 
   const getNextDesktopSlot = useCallback(() => {
     const rect = desktopRef.current?.getBoundingClientRect();
     const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
-    const rows = Math.max(1, Math.floor(((rect?.height ?? 700) - 20) / view.cellY));
+    const rows = Math.max(1, Math.floor(((rect?.height ?? 700) - 8 - view.tileH) / view.cellY) + 1);
     const index = desktopItems.length;
     const col = Math.floor(index / rows);
     const row = index % rows;
@@ -1573,32 +1588,35 @@ export default function HeroDesktopComputerComponent() {
   const findFreeGridPosition = useCallback((targetX, targetY, excludeId = null, positions = iconPositions) => {
     const rect = desktopRef.current?.getBoundingClientRect();
     const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
-    const maxCols = Math.max(1, Math.floor(((rect?.width ?? 1200) - 12) / view.cellX) + 1);
-    const maxRows = Math.max(1, Math.floor(((rect?.height ?? 700) - 8) / view.cellY) + 1);
+    const maxCol = Math.max(0, Math.floor(((rect?.width ?? 1200) - 12 - view.tileW) / view.cellX));
+    const maxRow = Math.max(0, Math.floor(((rect?.height ?? 700) - 8 - view.tileH) / view.cellY));
 
     const desired = normalizeIconPosition(targetX, targetY);
-    const startCol = Math.max(0, Math.round((desired.x - 12) / view.cellX));
-    const startRow = Math.max(0, Math.round((desired.y - 8) / view.cellY));
+    const startCol = clamp(Math.round((desired.x - 12) / view.cellX), 0, maxCol);
+    const startRow = clamp(Math.round((desired.y - 8) / view.cellY), 0, maxRow);
     const occupied = new Set();
 
     desktopItems.forEach((item) => {
       if (item.id === excludeId) return;
       const pos = positions[item.id];
       if (!pos) return;
-      const col = Math.max(0, Math.round((pos.x - 12) / view.cellX));
-      const row = Math.max(0, Math.round((pos.y - 8) / view.cellY));
+      const col = clamp(Math.round((pos.x - 12) / view.cellX), 0, maxCol);
+      const row = clamp(Math.round((pos.y - 8) / view.cellY), 0, maxRow);
       occupied.add(`${col}:${row}`);
     });
 
-    const cellToPosition = (col, row) => normalizeIconPosition(12 + col * view.cellX, 8 + row * view.cellY);
+    const cellToPosition = (col, row) => ({
+      x: 12 + col * view.cellX,
+      y: 8 + row * view.cellY,
+    });
     if (!occupied.has(`${startCol}:${startRow}`)) {
       return cellToPosition(startCol, startRow);
     }
 
-    const maxRadius = Math.max(maxCols, maxRows);
+    const maxRadius = Math.max(maxCol + 1, maxRow + 1);
     for (let radius = 1; radius <= maxRadius; radius++) {
-      for (let row = Math.max(0, startRow - radius); row <= Math.min(maxRows - 1, startRow + radius); row++) {
-        for (let col = Math.max(0, startCol - radius); col <= Math.min(maxCols - 1, startCol + radius); col++) {
+      for (let row = Math.max(0, startRow - radius); row <= Math.min(maxRow, startRow + radius); row++) {
+        for (let col = Math.max(0, startCol - radius); col <= Math.min(maxCol, startCol + radius); col++) {
           if (occupied.has(`${col}:${row}`)) continue;
           return cellToPosition(col, row);
         }
@@ -2101,10 +2119,6 @@ export default function HeroDesktopComputerComponent() {
     textdoc: <TextDocumentApp item={activeTextDoc} onChangeContent={updateTextContent} />,
   };
 
-  if (!booted) {
-    return <BootSequence onComplete={() => setBooted(true)} />;
-  }
-
   return (
     <>
       <style>{`
@@ -2114,14 +2128,22 @@ export default function HeroDesktopComputerComponent() {
         body { background: #1a1a1a; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 13px; }
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
         @keyframes fadeIn { from{opacity:0;transform:scale(0.97)} to{opacity:1;transform:scale(1)} }
-        ::-webkit-scrollbar { width: 14px; height: 14px; background: #8b8b8b; }
-        ::-webkit-scrollbar-track { background: #8b8b8b; border-left: 1px solid #404040; border-right: 1px solid #d8d8d8; }
+        ::-webkit-scrollbar { width: 14px; height: 14px; background: #d7d7d7; }
+        ::-webkit-scrollbar-track { background: #d7d7d7; border-left: 2px solid #f3f3f3; border-right: 2px solid #b8b8b8; }
         ::-webkit-scrollbar-thumb { 
-          background: #c0c0c0; 
-          border-top: 1px solid #fff; 
-          border-left: 1px solid #fff; 
-          border-right: 1px solid #404040; 
-          border-bottom: 1px solid #404040; 
+          background: #5f5f5f; 
+          border-top: 1px solid #9a9a9a; 
+          border-left: 1px solid #9a9a9a; 
+          border-right: 1px solid #2a2a2a; 
+          border-bottom: 1px solid #2a2a2a; 
+          min-height: 24px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #1a56c9;
+          border-top: 1px solid #7ea6ff;
+          border-left: 1px solid #7ea6ff;
+          border-right: 1px solid #0b3b8f;
+          border-bottom: 1px solid #0b3b8f;
         }
         ::selection { background: #000080; color: #fff; }
       `}</style>
@@ -2192,24 +2214,28 @@ export default function HeroDesktopComputerComponent() {
               }} />
 
               {/* ─── OS Menu Bar with functional dropdowns ─── */}
-              <TopMenuBar
-                openWindow={openWindow}
-                closeAllWindows={closeAllWindows}
-                tileWindows={tileWindows}
-                cascadeWindows={cascadeWindows}
-                iconSizeMode={iconSizeMode}
-                setIconSizeMode={setIconSizeMode}
-                createFolder={createFolder}
-                createTextDocument={createTextDocument}
-                pasteDesktopItem={pasteDesktopItem}
-                hasClipboard={!!clipboardState}
-              />
+              {booted ? (
+                <>
+                  <TopMenuBar
+                    openWindow={openWindow}
+                    closeAllWindows={closeAllWindows}
+                    tileWindows={tileWindows}
+                    cascadeWindows={cascadeWindows}
+                    iconSizeMode={iconSizeMode}
+                    setIconSizeMode={setIconSizeMode}
+                    createFolder={createFolder}
+                    createTextDocument={createTextDocument}
+                    pasteDesktopItem={pasteDesktopItem}
+                    hasClipboard={!!clipboardState}
+                  />
 
               {/* ─── Desktop Area ─── */}
               <div
                 ref={desktopRef}
                 style={{ flex: 1, position: "relative", overflow: "hidden" }}
-                onClick={() => {
+                onPointerDown={(e) => {
+                  if (e.button !== 0) return;
+                  if (e.target !== e.currentTarget) return;
                   setSelectedIcon(null);
                   setStartOpen(false);
                   setIconMenu(null);
@@ -2282,6 +2308,8 @@ export default function HeroDesktopComputerComponent() {
                           cursor: "pointer",
                         }}
                         onClick={() => setDesktopViewMenuOpen((prev) => !prev)}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MENU_TEXT_COLOR; }}
                       >
                         View  &gt;
                       </button>
@@ -2325,6 +2353,8 @@ export default function HeroDesktopComputerComponent() {
                                 fontFamily: "inherit",
                                 cursor: "pointer",
                               }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MENU_TEXT_COLOR; }}
                             >
                               {(iconSizeMode === opt.key ? "* " : "") + opt.label}
                             </button>
@@ -2338,6 +2368,8 @@ export default function HeroDesktopComputerComponent() {
                         setDesktopMenu(null);
                       }}
                       style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MENU_TEXT_COLOR; }}
                     >
                       Sort by Grid
                     </button>
@@ -2347,6 +2379,8 @@ export default function HeroDesktopComputerComponent() {
                         setDesktopMenu(null);
                       }}
                       style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MENU_TEXT_COLOR; }}
                     >
                       Refresh
                     </button>
@@ -2354,36 +2388,42 @@ export default function HeroDesktopComputerComponent() {
                     <button
                       onClick={() => createFolder()}
                       style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MENU_TEXT_COLOR; }}
                     >
                       New Folder
                     </button>
                     <button
                       onClick={() => createTextDocument()}
                       style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MENU_TEXT_COLOR; }}
                     >
                       New Text Document
                     </button>
-                    <button
-                      onClick={() => {
-                        pasteDesktopItem();
-                        setDesktopMenu(null);
-                      }}
-                      disabled={!clipboardState}
-                      style={{
-                        width: "100%",
-                        border: "none",
-                        background: "transparent",
-                        color: MENU_TEXT_COLOR,
-                        textAlign: "left",
-                        padding: "6px 14px",
-                        fontSize: 12,
-                        fontFamily: "inherit",
-                        cursor: clipboardState ? "pointer" : "not-allowed",
-                        opacity: clipboardState ? 1 : 0.65,
-                      }}
-                    >
-                      Paste
-                    </button>
+                    {clipboardState && (
+                      <button
+                        onClick={() => {
+                          pasteDesktopItem();
+                          setDesktopMenu(null);
+                        }}
+                        style={{
+                          width: "100%",
+                          border: "none",
+                          background: "transparent",
+                          color: MENU_TEXT_COLOR,
+                          textAlign: "left",
+                          padding: "6px 14px",
+                          fontSize: 12,
+                          fontFamily: "inherit",
+                          cursor: "pointer",
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MENU_TEXT_COLOR; }}
+                      >
+                        Paste
+                      </button>
+                    )}
                   </div>
                 )}
 
@@ -2409,14 +2449,13 @@ export default function HeroDesktopComputerComponent() {
                       { key: "open", label: "Open" },
                       { key: "cut", label: "Cut" },
                       { key: "copy", label: "Copy" },
-                      { key: "paste", label: "Paste" },
+                      ...(clipboardState ? [{ key: "paste", label: "Paste" }] : []),
                       { key: "rename", label: "Rename" },
                       { key: "delete", label: "Delete" },
                     ].map((opt) => (
                       <button
                         key={opt.key}
                         onClick={() => handleIconAction(opt.key, iconMenu.id)}
-                        disabled={opt.key === "paste" && !clipboardState}
                         style={{
                           width: "100%",
                           border: "none",
@@ -2426,9 +2465,10 @@ export default function HeroDesktopComputerComponent() {
                           padding: "6px 14px",
                           fontSize: 12,
                           fontFamily: "inherit",
-                          cursor: opt.key === "paste" && !clipboardState ? "not-allowed" : "pointer",
-                          opacity: opt.key === "paste" && !clipboardState ? 0.65 : 1,
+                          cursor: "pointer",
                         }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MENU_TEXT_COLOR; }}
                       >
                         {opt.label}
                       </button>
@@ -2672,6 +2712,10 @@ export default function HeroDesktopComputerComponent() {
                   </div>
                 )}
               </div>
+                </>
+              ) : (
+                <BootSequence embedded onComplete={() => setBooted(true)} />
+              )}
             </div>
           </div>
         </div>
