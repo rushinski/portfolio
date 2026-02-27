@@ -254,6 +254,8 @@ const ICON_VIEW_MODES = {
 };
 const MENU_TEXT_COLOR = "#162133";
 const FULLSCREEN_WINDOW_IDS = new Set(["about", "skills", "experience", "projects", "github", "contact"]);
+const DEFAULT_PINNED_TASKBAR_IDS = ["about", "skills", "experience", "projects", "contact"];
+const canPinItemToTaskbar = (item) => item?.itemType === "app" && !!item.windowId;
 const snapIconToGrid = (x, y, mode = "medium", marginX = 12, marginY = 8) => {
   const grid = ICON_VIEW_MODES[mode] || ICON_VIEW_MODES.medium;
   const gx = Math.round((x - marginX) / grid.cellX);
@@ -991,29 +993,72 @@ function SystemAlertModal({ message, onClose }) {
     </div>
   );
 }
-function TrashApp({ onProtectedDelete }) {
+function TrashApp({ items, onRestoreItem, onDeleteItem, onEmpty }) {
   return (
-    <div style={{ padding: "16px 20px", textAlign: "center" }}>
-      <div style={{ fontSize: 40, marginBottom: 8 }}>TRASH</div>
-      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Recycle Bin</div>
-      <div style={{ fontSize: 12, color: "#777", marginBottom: 16 }}>0 items</div>
-      <button
-        onClick={onProtectedDelete}
-        style={{
-          background: "#c0c0c0",
-          border: "none",
-          borderTop: "2px solid #fff",
-          borderLeft: "2px solid #fff",
-          borderRight: "2px solid #404040",
-          borderBottom: "2px solid #404040",
-          padding: "6px 16px",
-          fontSize: 12,
-          cursor: "pointer",
-          fontFamily: "inherit",
-        }}
-      >
-        Empty Recycle Bin
-      </button>
+    <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, height: "100%" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#111" }}>Recycle Bin</div>
+          <div style={{ fontSize: 12, color: "#555" }}>{items.length} item{items.length === 1 ? "" : "s"}</div>
+        </div>
+        <button
+          onClick={onEmpty}
+          disabled={items.length === 0}
+          style={{
+            background: "#c0c0c0",
+            border: "none",
+            borderTop: "2px solid #fff",
+            borderLeft: "2px solid #fff",
+            borderRight: "2px solid #404040",
+            borderBottom: "2px solid #404040",
+            padding: "4px 10px",
+            fontSize: 11,
+            cursor: items.length === 0 ? "not-allowed" : "pointer",
+            fontFamily: "inherit",
+            opacity: items.length === 0 ? 0.55 : 1,
+          }}
+        >
+          Empty Bin
+        </button>
+      </div>
+
+      <div style={{ border: "2px inset #c0c0c0", background: "#fff", flex: 1, minHeight: 180, overflow: "auto", padding: 8 }}>
+        {items.length === 0 ? (
+          <div style={{ fontSize: 12, color: "#666" }}>Recycle Bin is empty.</div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {items.map((entry) => (
+              <div
+                key={entry.item.id}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr auto",
+                  gap: 8,
+                  alignItems: "center",
+                  fontSize: 12,
+                  color: "#222",
+                  border: "1px solid #d0d0d0",
+                  background: "#f7f7f7",
+                  padding: "6px 8px",
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontWeight: 600 }}>
+                    {entry.item.title}
+                  </div>
+                  <div style={{ color: "#666", fontSize: 10 }}>
+                    Deleted {new Date(entry.deletedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                  <button onClick={() => onRestoreItem?.(entry.item.id)} style={{ fontSize: 10, padding: "2px 6px" }}>Restore</button>
+                  <button onClick={() => onDeleteItem?.(entry.item.id)} style={{ fontSize: 10, padding: "2px 6px" }}>Delete</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -1306,7 +1351,7 @@ function DesktopIcon({
             fontWeight: 700,
           }}
         >
-          {selected ? "v" : ""}
+          {selected ? "\u2713" : ""}
         </div>
       )}
       <div
@@ -1388,8 +1433,6 @@ function TopMenuBar({
   setIconSizeMode,
   createFolder,
   createTextDocument,
-  pasteDesktopItem,
-  hasClipboard,
 }) {
   const [openMenu, setOpenMenu] = useState(null);
   const menuRef = useRef(null);
@@ -1418,7 +1461,6 @@ function TopMenuBar({
       { label: "---------------", action: null },
       { label: "New Folder", action: createFolder },
       { label: "New Text Document", action: createTextDocument },
-      ...(hasClipboard ? [{ label: "Paste", action: pasteDesktopItem }] : []),
     ],
     View: [
       { label: (iconSizeMode === "large" ? "* " : "") + "Large icons", action: () => setIconSizeMode("large") },
@@ -1584,8 +1626,12 @@ export default function HeroDesktopComputerComponent() {
   const [clipboardState, setClipboardState] = useState(null);
   const [renamedSystemIcons, setRenamedSystemIcons] = useState({});
   const [customItems, setCustomItems] = useState([]);
+  const [recycleBinItems, setRecycleBinItems] = useState([]);
   const [activeTextDocId, setActiveTextDocId] = useState(null);
   const [renamingItem, setRenamingItem] = useState(null);
+  const [pinnedTaskbarAppIds, setPinnedTaskbarAppIds] = useState(DEFAULT_PINNED_TASKBAR_IDS);
+  const [taskbarMenu, setTaskbarMenu] = useState(null);
+  const lastDesktopCursorRef = useRef(null);
 
   const [iconPositions, setIconPositions] = useState({
     welcome: { x: 12, y: 8 },
@@ -1689,6 +1735,20 @@ export default function HeroDesktopComputerComponent() {
     };
   }, []);
 
+  const rememberDesktopCursor = useCallback((clientX, clientY) => {
+    if (typeof clientX !== "number" || typeof clientY !== "number") return;
+    lastDesktopCursorRef.current = { clientX, clientY };
+  }, []);
+
+  const toDesktopCursorPoint = useCallback((clientX, clientY) => {
+    const rect = desktopRef.current?.getBoundingClientRect();
+    if (!rect) return null;
+    return {
+      x: clamp(clientX - rect.left, 0, Math.max(0, rect.width - 1)),
+      y: clamp(clientY - rect.top, 0, Math.max(0, rect.height - 1)),
+    };
+  }, []);
+
   const normalizeIconPosition = useCallback((x, y) => {
     const rect = desktopRef.current?.getBoundingClientRect();
     const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
@@ -1784,20 +1844,36 @@ export default function HeroDesktopComputerComponent() {
     createDesktopItem("text", clientX, clientY);
   }, [createDesktopItem]);
 
+  const resolvePasteBasePosition = useCallback((clientX, clientY) => {
+    if (typeof clientX === "number" && typeof clientY === "number") {
+      const explicitPoint = toDesktopCursorPoint(clientX, clientY);
+      if (explicitPoint) return normalizeIconPosition(explicitPoint.x, explicitPoint.y);
+    }
+
+    if (lastDesktopCursorRef.current) {
+      const trackedPoint = toDesktopCursorPoint(
+        lastDesktopCursorRef.current.clientX,
+        lastDesktopCursorRef.current.clientY,
+      );
+      if (trackedPoint) return normalizeIconPosition(trackedPoint.x, trackedPoint.y);
+    }
+
+    return getNextDesktopSlot();
+  }, [getNextDesktopSlot, normalizeIconPosition, toDesktopCursorPoint]);
+
   const pasteDesktopItem = useCallback((clientX, clientY) => {
     if (!clipboardState) return;
     const source = desktopItems.find((item) => item.id === clipboardState.id);
     if (!source) return;
 
-    const basePosition = (typeof clientX === "number" && typeof clientY === "number")
-      ? normalizeIconPosition(toDesktopPoint(clientX, clientY).x, toDesktopPoint(clientX, clientY).y)
-      : getNextDesktopSlot();
+    const basePosition = resolvePasteBasePosition(clientX, clientY);
 
     if (clipboardState.mode === "cut") {
       setIconPositions((prev) => {
         const position = findFreeGridPosition(basePosition.x, basePosition.y, source.id, prev);
         return { ...prev, [source.id]: position };
       });
+      setSelectedIcon(source.id);
       setClipboardState(null);
       return;
     }
@@ -1816,7 +1892,7 @@ export default function HeroDesktopComputerComponent() {
       return { ...prev, [cloneId]: position };
     });
     setSelectedIcon(cloneId);
-  }, [clipboardState, desktopItems, findFreeGridPosition, getNextDesktopSlot, normalizeIconPosition, toDesktopPoint]);
+  }, [clipboardState, desktopItems, findFreeGridPosition, resolvePasteBasePosition]);
 
   const renameDesktopItem = useCallback((id) => {
     const item = desktopItems.find((entry) => entry.id === id);
@@ -1853,7 +1929,7 @@ export default function HeroDesktopComputerComponent() {
     setRenamingItem(null);
   }, []);
 
-  const deleteDesktopItem = useCallback((id) => {
+  const moveItemToRecycleBin = useCallback((id, originalPosition = null) => {
     const item = desktopItems.find((entry) => entry.id === id);
     if (!item) return;
 
@@ -1861,6 +1937,16 @@ export default function HeroDesktopComputerComponent() {
       showProtectedDeleteAlert();
       return;
     }
+
+    const fallbackPosition = originalPosition || iconPositions[id] || getNextDesktopSlot();
+    setRecycleBinItems((prev) => [
+      ...prev.filter((entry) => entry.item.id !== id),
+      {
+        item: { ...item },
+        originalPosition: fallbackPosition,
+        deletedAt: Date.now(),
+      },
+    ]);
 
     setCustomItems((prev) => prev.filter((entry) => entry.id !== id));
     setIconPositions((prev) => {
@@ -1875,13 +1961,57 @@ export default function HeroDesktopComputerComponent() {
     if (selectedIcon === id) {
       setSelectedIcon(null);
     }
-  }, [desktopItems, activeTextDocId, selectedIcon, showProtectedDeleteAlert]);
+    if (clipboardState?.id === id) {
+      setClipboardState(null);
+    }
+  }, [desktopItems, showProtectedDeleteAlert, iconPositions, getNextDesktopSlot, activeTextDocId, selectedIcon, clipboardState]);
+
+  const deleteDesktopItem = useCallback((id) => {
+    moveItemToRecycleBin(id);
+  }, [moveItemToRecycleBin]);
+
+  const restoreRecycleBinItem = useCallback((id) => {
+    const entry = recycleBinItems.find((candidate) => candidate.item.id === id);
+    if (!entry) return;
+
+    setRecycleBinItems((prev) => prev.filter((candidate) => candidate.item.id !== id));
+    setCustomItems((prev) => (
+      prev.some((item) => item.id === id)
+        ? prev
+        : [...prev, { ...entry.item, system: false }]
+    ));
+    setIconPositions((prev) => {
+      const anchor = entry.originalPosition || getNextDesktopSlot();
+      const restoredPos = findFreeGridPosition(anchor.x, anchor.y, id, prev);
+      return { ...prev, [id]: restoredPos };
+    });
+    setSelectedIcon(id);
+  }, [recycleBinItems, findFreeGridPosition, getNextDesktopSlot]);
+
+  const permanentlyDeleteRecycleBinItem = useCallback((id) => {
+    setRecycleBinItems((prev) => prev.filter((entry) => entry.item.id !== id));
+  }, []);
+
+  const emptyRecycleBin = useCallback(() => {
+    setRecycleBinItems([]);
+  }, []);
+
+  const pinTaskbarItem = useCallback((id) => {
+    const item = desktopItems.find((entry) => entry.id === id);
+    if (!canPinItemToTaskbar(item)) return;
+    setPinnedTaskbarAppIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  }, [desktopItems]);
+
+  const unpinTaskbarItem = useCallback((id) => {
+    setPinnedTaskbarAppIds((prev) => prev.filter((entryId) => entryId !== id));
+  }, []);
 
   const openDesktopItem = useCallback((item) => {
     if (!item) return;
     setIconMenu(null);
     setDesktopMenu(null);
     setDesktopViewMenuOpen(false);
+    setTaskbarMenu(null);
 
     if (item.itemType === "text") {
       setActiveTextDocId(item.id);
@@ -1974,6 +2104,7 @@ export default function HeroDesktopComputerComponent() {
     if (e.target !== e.currentTarget) return;
     const rect = desktopRef.current?.getBoundingClientRect();
     if (!rect) return;
+    rememberDesktopCursor(e.clientX, e.clientY);
 
     const startX = clamp(e.clientX - rect.left, 0, rect.width);
     const startY = clamp(e.clientY - rect.top, 0, rect.height);
@@ -1985,11 +2116,13 @@ export default function HeroDesktopComputerComponent() {
     setIconMenu(null);
     setDesktopMenu(null);
     setDesktopViewMenuOpen(false);
+    setTaskbarMenu(null);
     setMarqueePreviewIds([]);
     setDesktopSelectionBox(initialBox);
     selectionBoxRef.current = initialBox;
 
     const handleMove = (ev) => {
+      rememberDesktopCursor(ev.clientX, ev.clientY);
       const currentX = clamp(ev.clientX - rect.left, 0, rect.width);
       const currentY = clamp(ev.clientY - rect.top, 0, rect.height);
       const box = {
@@ -2024,7 +2157,7 @@ export default function HeroDesktopComputerComponent() {
 
     window.addEventListener("pointermove", handleMove);
     window.addEventListener("pointerup", handleUp);
-  }, [getIconsInSelectionBox]);
+  }, [getIconsInSelectionBox, rememberDesktopCursor]);
 
   const selectDesktopIcon = useCallback((id) => {
     setSelectedIcon(id);
@@ -2032,9 +2165,11 @@ export default function HeroDesktopComputerComponent() {
     setIconMenu(null);
     setDesktopMenu(null);
     setDesktopViewMenuOpen(false);
+    setTaskbarMenu(null);
   }, []);
 
   const openIconMenuAt = useCallback((id, clientX, clientY) => {
+    rememberDesktopCursor(clientX, clientY);
     const rect = desktopRef.current?.getBoundingClientRect();
     const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
     const iconPos = iconPositions[id];
@@ -2045,6 +2180,7 @@ export default function HeroDesktopComputerComponent() {
     setDesktopMenu(null);
     setDesktopViewMenuOpen(false);
     setCalendarOpen(false);
+    setTaskbarMenu(null);
 
     if (rect && iconPos) {
       let menuX = iconPos.x + view.tileW + 6;
@@ -2064,15 +2200,17 @@ export default function HeroDesktopComputerComponent() {
 
     const point = toDesktopPoint(clientX, clientY);
     setIconMenu({ id, x: point.x, y: point.y });
-  }, [iconPositions, iconSizeMode, toDesktopPoint]);
+  }, [rememberDesktopCursor, iconPositions, iconSizeMode, toDesktopPoint]);
 
   const openDesktopMenuAt = useCallback((clientX, clientY) => {
+    rememberDesktopCursor(clientX, clientY);
     const point = toDesktopPoint(clientX, clientY);
     setDesktopMenu({ x: point.x, y: point.y });
     setDesktopViewMenuOpen(false);
     setIconMenu(null);
     setCalendarOpen(false);
-  }, [toDesktopPoint]);
+    setTaskbarMenu(null);
+  }, [rememberDesktopCursor, toDesktopPoint]);
 
   const handleIconAction = useCallback((action, id) => {
     const item = desktopItems.find((entry) => entry.id === id);
@@ -2082,22 +2220,22 @@ export default function HeroDesktopComputerComponent() {
     if (action === "open") openDesktopItem(item);
     if (action === "cut") setClipboardState({ mode: "cut", id });
     if (action === "copy") setClipboardState({ mode: "copy", id });
-    if (action === "paste") {
-      const iconPos = iconPositions[id] || getNextDesktopSlot();
-      const rect = desktopRef.current?.getBoundingClientRect();
-      pasteDesktopItem((rect?.left ?? 0) + iconPos.x + 20, (rect?.top ?? 0) + iconPos.y + 20);
-    }
+    if (action === "paste") pasteDesktopItem();
     if (action === "rename") renameDesktopItem(id);
     if (action === "delete") deleteDesktopItem(id);
+    if (action === "pinTaskbar") pinTaskbarItem(id);
+    if (action === "unpinTaskbar") unpinTaskbarItem(id);
 
     setIconMenu(null);
-  }, [desktopItems, iconPositions, getNextDesktopSlot, pasteDesktopItem, openDesktopItem, renameDesktopItem, deleteDesktopItem]);
+    setTaskbarMenu(null);
+  }, [desktopItems, pasteDesktopItem, openDesktopItem, renameDesktopItem, deleteDesktopItem, pinTaskbarItem, unpinTaskbarItem]);
 
   const handleIconDragStart = useCallback((id, position) => {
     dragStartRef.current[id] = position;
     setSelectedIcon(id);
     setIconMenu(null);
     setDesktopMenu(null);
+    setTaskbarMenu(null);
   }, []);
 
   const handleIconDragMove = useCallback((id, x, y) => {
@@ -2123,19 +2261,7 @@ export default function HeroDesktopComputerComponent() {
         showProtectedDeleteAlert();
         return;
       }
-      setCustomItems((prev) => prev.filter((entry) => entry.id !== id));
-      setIconPositions((prev) => {
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      });
-      if (activeTextDocId === id) {
-        setActiveTextDocId(null);
-        setWindows((prev) => ({ ...prev, textdoc: { ...prev.textdoc, isOpen: false } }));
-      }
-      if (selectedIcon === id) {
-        setSelectedIcon(null);
-      }
+      moveItemToRecycleBin(id, dragStartRef.current[id] || snapped);
       return;
     }
 
@@ -2143,7 +2269,7 @@ export default function HeroDesktopComputerComponent() {
       const freePos = findFreeGridPosition(snapped.x, snapped.y, id, prev);
       return { ...prev, [id]: freePos };
     });
-  }, [desktopItems, iconSizeMode, iconPositions.trash, normalizeIconPosition, activeTextDocId, selectedIcon, showProtectedDeleteAlert, findFreeGridPosition]);
+  }, [desktopItems, iconSizeMode, iconPositions.trash, normalizeIconPosition, showProtectedDeleteAlert, moveItemToRecycleBin, findFreeGridPosition]);
 
   const nudgeSelectedIcon = useCallback((dxCells, dyCells) => {
     if (!selectedIcon) return;
@@ -2184,6 +2310,7 @@ export default function HeroDesktopComputerComponent() {
         setDesktopMenu(null);
         setDesktopViewMenuOpen(false);
         setCalendarOpen(false);
+        setTaskbarMenu(null);
         cancelRenameDesktopItem();
         return;
       }
@@ -2197,9 +2324,7 @@ export default function HeroDesktopComputerComponent() {
       if (ctrl && (e.key === "v" || e.key === "V")) {
         e.preventDefault();
         if (!clipboardState) return;
-        const pos = selectedIcon ? (iconPositions[selectedIcon] || getNextDesktopSlot()) : getNextDesktopSlot();
-        const rect = desktopRef.current?.getBoundingClientRect();
-        pasteDesktopItem((rect?.left ?? 0) + pos.x + 20, (rect?.top ?? 0) + pos.y + 20);
+        pasteDesktopItem();
         return;
       }
 
@@ -2237,7 +2362,13 @@ export default function HeroDesktopComputerComponent() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [cancelRenameDesktopItem, clipboardState, createFolder, deleteDesktopItem, getNextDesktopSlot, iconPositions, nudgeSelectedIcon, pasteDesktopItem, renameDesktopItem, selectedIcon]);
+  }, [cancelRenameDesktopItem, clipboardState, createFolder, deleteDesktopItem, nudgeSelectedIcon, pasteDesktopItem, renameDesktopItem, selectedIcon]);
+
+  useEffect(() => {
+    const closeTaskbarContext = () => setTaskbarMenu(null);
+    window.addEventListener("pointerdown", closeTaskbarContext);
+    return () => window.removeEventListener("pointerdown", closeTaskbarContext);
+  }, []);
 
   const closeWindow = useCallback((id) => {
     setWindows((prev) => ({
@@ -2333,6 +2464,79 @@ export default function HeroDesktopComputerComponent() {
 
   const openWindows = Object.values(windows).filter((w) => w.isOpen);
   const activeWindowId = openWindows.filter((w) => !w.isMinimized).sort((a, b) => b.z - a.z)[0]?.id;
+  const desktopAppsById = new Map(
+    desktopItems
+      .filter((item) => canPinItemToTaskbar(item))
+      .map((item) => [item.id, item]),
+  );
+  const normalizedPinnedIds = pinnedTaskbarAppIds.filter((id) => desktopAppsById.has(id));
+  const taskbarWindowIds = [...new Set([...normalizedPinnedIds, ...openWindows.map((w) => w.id)])]
+    .filter((id) => !!windows[id]);
+  const taskbarEntries = taskbarWindowIds.map((id) => {
+    const appItem = desktopAppsById.get(id);
+    const win = windows[id];
+    return {
+      id,
+      appItem,
+      win,
+      isPinned: normalizedPinnedIds.includes(id),
+      isOpen: !!win?.isOpen,
+      title: appItem?.title || win?.title || id,
+    };
+  });
+
+  const activateTaskbarEntry = useCallback((id) => {
+    const win = windows[id];
+    if (!win) return;
+
+    setIconMenu(null);
+    setDesktopMenu(null);
+    setDesktopViewMenuOpen(false);
+    setStartOpen(false);
+    setCalendarOpen(false);
+    setTaskbarMenu(null);
+
+    if (!win.isOpen) {
+      openWindow(id);
+      return;
+    }
+
+    if (win.isMinimized) {
+      setWindows((prev) => ({ ...prev, [id]: { ...prev[id], isMinimized: false, z: nextZ() } }));
+      return;
+    }
+
+    if (id === activeWindowId) {
+      minimizeWindow(id);
+      return;
+    }
+
+    focusWindow(id);
+  }, [windows, activeWindowId, minimizeWindow, focusWindow, openWindow]);
+
+  const openTaskbarMenuAt = useCallback((id, clientX, clientY) => {
+    const menuW = 170;
+    const menuH = 110;
+    const maxX = Math.max(8, window.innerWidth - menuW - 8);
+    const maxY = Math.max(8, window.innerHeight - menuH - 8);
+    setTaskbarMenu({
+      id,
+      x: clamp(clientX, 8, maxX),
+      y: clamp(clientY, 8, maxY),
+    });
+    setIconMenu(null);
+    setDesktopMenu(null);
+    setDesktopViewMenuOpen(false);
+    setStartOpen(false);
+    setCalendarOpen(false);
+  }, []);
+
+  const handleTaskbarMenuAction = useCallback((action, id) => {
+    if (action === "close") closeWindow(id);
+    if (action === "pinTaskbar") pinTaskbarItem(id);
+    if (action === "unpinTaskbar") unpinTaskbarItem(id);
+    setTaskbarMenu(null);
+  }, [closeWindow, pinTaskbarItem, unpinTaskbarItem]);
 
   //  Start menu 
 
@@ -2346,7 +2550,14 @@ export default function HeroDesktopComputerComponent() {
     contact: <ContactApp />,
     location: <LocationApp />,
     terminal: <TerminalApp />,
-    trash: <TrashApp onProtectedDelete={showProtectedDeleteAlert} />,
+    trash: (
+      <TrashApp
+        items={recycleBinItems}
+        onRestoreItem={restoreRecycleBinItem}
+        onDeleteItem={permanentlyDeleteRecycleBinItem}
+        onEmpty={emptyRecycleBin}
+      />
+    ),
     explorer: (
       <ExplorerApp
         items={desktopItems}
@@ -2375,6 +2586,13 @@ export default function HeroDesktopComputerComponent() {
     && today.getMonth() === monthStart.getMonth()
     && today.getDate() === day
   );
+  const iconMenuItem = iconMenu ? desktopItems.find((item) => item.id === iconMenu.id) : null;
+  const iconMenuIsPinnable = canPinItemToTaskbar(iconMenuItem);
+  const iconMenuPinned = iconMenuItem ? normalizedPinnedIds.includes(iconMenuItem.id) : false;
+  const taskbarMenuWindow = taskbarMenu ? windows[taskbarMenu.id] : null;
+  const taskbarMenuAppItem = taskbarMenu ? desktopAppsById.get(taskbarMenu.id) : null;
+  const taskbarMenuIsPinnable = canPinItemToTaskbar(taskbarMenuAppItem);
+  const taskbarMenuPinned = !!taskbarMenuAppItem && normalizedPinnedIds.includes(taskbarMenuAppItem.id);
 
   return (
     <>
@@ -2484,8 +2702,6 @@ export default function HeroDesktopComputerComponent() {
                     setIconSizeMode={setIconSizeMode}
                     createFolder={createFolder}
                     createTextDocument={createTextDocument}
-                    pasteDesktopItem={pasteDesktopItem}
-                    hasClipboard={!!clipboardState}
                   />
 
               {/*  Desktop Area  */}
@@ -2493,6 +2709,7 @@ export default function HeroDesktopComputerComponent() {
                 ref={desktopRef}
                 style={{ flex: 1, position: "relative", overflow: "hidden" }}
                 onPointerDown={handleDesktopPointerDown}
+                onPointerMove={(e) => rememberDesktopCursor(e.clientX, e.clientY)}
                 onContextMenu={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -2718,6 +2935,9 @@ export default function HeroDesktopComputerComponent() {
                       { key: "cut", label: "Cut" },
                       { key: "copy", label: "Copy" },
                       ...(clipboardState ? [{ key: "paste", label: "Paste" }] : []),
+                      ...(iconMenuIsPinnable
+                        ? [{ key: iconMenuPinned ? "unpinTaskbar" : "pinTaskbar", label: iconMenuPinned ? "Unpin from Taskbar" : "Pin to Taskbar" }]
+                        : []),
                       { key: "rename", label: "Rename" },
                       { key: "delete", label: "Delete" },
                     ].map((opt) => (
@@ -2779,7 +2999,7 @@ export default function HeroDesktopComputerComponent() {
               }}>
                 {/* Explore Button (was Start) */}
                 <button
-                  onClick={(e) => { e.stopPropagation(); setCalendarOpen(false); setStartOpen((p) => !p); }}
+                  onClick={(e) => { e.stopPropagation(); setCalendarOpen(false); setTaskbarMenu(null); setStartOpen((p) => !p); }}
                   style={{
                     background: startOpen ? "#a0a0a0" : "#c0c0c0",
                     border: "none",
@@ -2804,33 +3024,32 @@ export default function HeroDesktopComputerComponent() {
                 {/* Divider */}
                 <div style={{ width: 1, height: 20, background: "#808080", marginLeft: 2, marginRight: 2 }} />
 
-                {/* Open App Buttons in Taskbar with close X */}
+                {/* Pinned/Open App Buttons */}
                 <div style={{ display: "flex", gap: 2, flex: 1, overflow: "hidden" }}>
-                  {openWindows.map((w) => (
+                  {taskbarEntries.map((entry) => {
+                    const { id, win, isPinned, isOpen, title } = entry;
+                    const isActive = isOpen && id === activeWindowId && !win.isMinimized;
+                    return (
                     <div
-                      key={w.id}
+                      key={id}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openTaskbarMenuAt(id, e.clientX, e.clientY);
+                      }}
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        background: w.id === activeWindowId && !w.isMinimized ? "#d0d0d0" : "#c0c0c0",
-                        borderTop: w.id === activeWindowId && !w.isMinimized ? "1px solid #404040" : "1px solid #fff",
-                        borderLeft: w.id === activeWindowId && !w.isMinimized ? "1px solid #404040" : "1px solid #fff",
-                        borderRight: w.id === activeWindowId && !w.isMinimized ? "1px solid #fff" : "1px solid #404040",
-                        borderBottom: w.id === activeWindowId && !w.isMinimized ? "1px solid #fff" : "1px solid #404040",
+                        background: isActive ? "#d0d0d0" : "#c0c0c0",
+                        borderTop: isActive ? "1px solid #404040" : "1px solid #fff",
+                        borderLeft: isActive ? "1px solid #404040" : "1px solid #fff",
+                        borderRight: isActive ? "1px solid #fff" : "1px solid #404040",
+                        borderBottom: isActive ? "1px solid #fff" : "1px solid #404040",
                         maxWidth: 160,
                       }}
                     >
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (w.isMinimized) {
-                            setWindows((prev) => ({ ...prev, [w.id]: { ...prev[w.id], isMinimized: false, z: nextZ() } }));
-                          } else if (w.id === activeWindowId) {
-                            minimizeWindow(w.id);
-                          } else {
-                            focusWindow(w.id);
-                          }
-                        }}
+                        onClick={(e) => { e.stopPropagation(); activateTaskbarEntry(id); }}
                         style={{
                           background: "transparent",
                           border: "none",
@@ -2844,29 +3063,93 @@ export default function HeroDesktopComputerComponent() {
                           textAlign: "left",
                           flex: 1,
                           color: "#111",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
                         }}
                       >
-                        {w.title}
+                        <span
+                          style={{
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            borderBottom: isOpen ? "2px solid #0b2f6b" : "2px solid transparent",
+                            lineHeight: 1.2,
+                            paddingBottom: 1,
+                            minWidth: 0,
+                            flex: 1,
+                          }}
+                        >
+                          {title}
+                        </span>
+                        {isPinned && (
+                          <span style={{ width: 6, height: 6, background: "#0b2f6b", flexShrink: 0 }} title="Pinned" />
+                        )}
                       </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); closeWindow(w.id); }}
-                        style={{
-                          background: "transparent",
-                          border: "none",
-                          cursor: "pointer",
-                          fontSize: 11,
-                          fontFamily: "inherit",
-                          padding: "2px 5px",
-                          color: "#555",
-                          lineHeight: 1,
-                          flexShrink: 0,
-                        }}
-                      >
-                        x
-                      </button>
+                      {isOpen && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
+                          style={{
+                            background: "transparent",
+                            border: "none",
+                            cursor: "pointer",
+                            fontSize: 11,
+                            fontFamily: "inherit",
+                            padding: "2px 5px",
+                            color: "#555",
+                            lineHeight: 1,
+                            flexShrink: 0,
+                          }}
+                        >
+                          x
+                        </button>
+                      )}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
+
+                {taskbarMenu && (
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    style={{
+                      position: "fixed",
+                      left: taskbarMenu.x,
+                      top: taskbarMenu.y,
+                      minWidth: 160,
+                      background: "#c0c0c0",
+                      borderTop: "2px solid #fff",
+                      borderLeft: "2px solid #fff",
+                      borderRight: "2px solid #404040",
+                      borderBottom: "2px solid #404040",
+                      boxShadow: "3px 3px 10px rgba(0,0,0,0.4)",
+                      zIndex: 9500,
+                      padding: "2px 0",
+                    }}
+                  >
+                    {taskbarMenuWindow?.isOpen && (
+                      <button
+                        onClick={() => handleTaskbarMenuAction("close", taskbarMenu.id)}
+                        style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 12px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MENU_TEXT_COLOR; }}
+                      >
+                        Close
+                      </button>
+                    )}
+                    {taskbarMenuIsPinnable && (
+                      <button
+                        onClick={() => handleTaskbarMenuAction(taskbarMenuPinned ? "unpinTaskbar" : "pinTaskbar", taskbarMenu.id)}
+                        style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 12px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = MENU_TEXT_COLOR; }}
+                      >
+                        {taskbarMenuPinned ? "Unpin from Taskbar" : "Pin to Taskbar"}
+                      </button>
+                    )}
+                  </div>
+                )}
 
                 {/* Network + Clock */}
                 <div style={{ display: "flex", alignItems: "stretch", gap: 4 }}>
@@ -2895,6 +3178,7 @@ export default function HeroDesktopComputerComponent() {
                     onClick={(e) => {
                       e.stopPropagation();
                       setStartOpen(false);
+                      setTaskbarMenu(null);
                       setCalendarOpen((prev) => !prev);
                     }}
                     style={{
@@ -2949,6 +3233,8 @@ export default function HeroDesktopComputerComponent() {
                           borderBottom: "1px solid #404040",
                           background: "#c0c0c0",
                           fontSize: 12,
+                          color: MENU_TEXT_COLOR,
+                          fontWeight: 700,
                           cursor: "pointer",
                           fontFamily: "inherit",
                           lineHeight: 1,
@@ -2969,6 +3255,8 @@ export default function HeroDesktopComputerComponent() {
                           borderBottom: "1px solid #404040",
                           background: "#c0c0c0",
                           fontSize: 12,
+                          color: MENU_TEXT_COLOR,
+                          fontWeight: 700,
                           cursor: "pointer",
                           fontFamily: "inherit",
                           lineHeight: 1,
