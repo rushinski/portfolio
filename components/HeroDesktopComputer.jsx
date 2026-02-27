@@ -3020,8 +3020,7 @@ export default function HeroDesktopComputerComponent() {
                   <div style={{ width: 1, height: 14, background: "#808080", flexShrink: 0 }} />
                   <div style={{ display: "flex", gap: 2, flex: 1, overflow: "hidden" }}>
                     {pinnedTaskbarEntries.map((entry) => {
-                      const { id, win, title } = entry;
-                      const isActive = win.isOpen && id === activeWindowId && !win.isMinimized;
+                      const { id, title } = entry;
                       return (
                         <button
                           key={id}
@@ -3033,11 +3032,11 @@ export default function HeroDesktopComputerComponent() {
                           }}
                           style={{
                             border: "none",
-                            borderTop: isActive ? "1px solid #404040" : "1px solid #fff",
-                            borderLeft: isActive ? "1px solid #404040" : "1px solid #fff",
-                            borderRight: isActive ? "1px solid #fff" : "1px solid #404040",
-                            borderBottom: isActive ? "1px solid #fff" : "1px solid #404040",
-                            background: isActive ? "#d4d4d4" : "#c0c0c0",
+                            borderTop: "1px solid #fff",
+                            borderLeft: "1px solid #fff",
+                            borderRight: "1px solid #404040",
+                            borderBottom: "1px solid #404040",
+                            background: "#c0c0c0",
                             padding: "2px 8px",
                             fontSize: 11,
                             color: "#222",
@@ -3145,7 +3144,6 @@ export default function HeroDesktopComputerComponent() {
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
-                            borderBottom: "2px solid #0b2f6b",
                             lineHeight: 1.2,
                             paddingBottom: 1,
                             minWidth: 0,
