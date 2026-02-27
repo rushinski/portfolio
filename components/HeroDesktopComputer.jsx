@@ -542,23 +542,6 @@ function Window({ win, isActive, onFocus, onClose, onMinimize, onMaximize, onMov
         >
           {children}
         </div>
-        {/* Status bar */}
-        <div
-          style={{
-            background: "#c0c0c0",
-            fontSize: "11px",
-            padding: "2px 8px",
-            borderTop: "1px solid #808080",
-            color: "#555",
-            display: "flex",
-            justifyContent: "space-between",
-            flexShrink: 0,
-          }}
-        >
-          <span>Ready</span>
-          <span>JacobOS</span>
-        </div>
-        
         {/* Resize handles (only when not maximized) */}
         {!win.isMaximized && (
           <>
