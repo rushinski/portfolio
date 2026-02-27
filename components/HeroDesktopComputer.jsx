@@ -1227,6 +1227,7 @@ function DesktopIcon({
   onContextMenu,
   onHoverChange,
   iconSizeMode = "medium",
+  isCutPending = false,
   isRenaming = false,
   renameValue = "",
   onRenameChange,
@@ -1315,6 +1316,9 @@ function DesktopIcon({
         padding: "2px 2px 1px",
         outline: (hovered || selected) ? "1px dotted rgba(255,255,255,0.8)" : "1px solid transparent",
         outlineOffset: -1,
+        opacity: isCutPending ? 0.5 : 1,
+        filter: isCutPending ? "grayscale(0.45) blur(0.6px) brightness(0.85)" : "none",
+        transition: "opacity 120ms linear, filter 120ms linear",
       }}
       onPointerDown={handlePointerDown}
       onDoubleClick={(e) => {
@@ -2732,6 +2736,7 @@ export default function HeroDesktopComputerComponent() {
                     onSingleClick={(id) => selectDesktopIcon(id)}
                     onContextMenu={openIconMenuAt}
                     onHoverChange={setHoveredIcon}
+                    isCutPending={clipboardState?.mode === "cut" && clipboardState.id === icon.id}
                     isRenaming={renamingItem?.id === icon.id}
                     renameValue={renamingItem?.id === icon.id ? renamingItem.value : icon.title}
                     onRenameChange={(value) => setRenamingItem((prev) => (prev?.id === icon.id ? { ...prev, value } : prev))}
@@ -3083,7 +3088,9 @@ export default function HeroDesktopComputerComponent() {
                           {title}
                         </span>
                         {isPinned && (
-                          <span style={{ width: 6, height: 6, background: "#0b2f6b", flexShrink: 0 }} title="Pinned" />
+                          <span style={{ fontSize: 9, color: "#5e5e5e", letterSpacing: 0.2, flexShrink: 0 }} title="Pinned">
+                            pin
+                          </span>
                         )}
                       </button>
                       {isOpen && (
