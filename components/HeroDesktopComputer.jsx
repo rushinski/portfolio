@@ -2474,18 +2474,27 @@ export default function HeroDesktopComputerComponent() {
       .map((item) => [item.id, item]),
   );
   const normalizedPinnedIds = pinnedTaskbarAppIds.filter((id) => desktopAppsById.has(id));
-  const taskbarWindowIds = [...new Set([...normalizedPinnedIds, ...openWindows.map((w) => w.id)])]
-    .filter((id) => !!windows[id]);
-  const taskbarEntries = taskbarWindowIds.map((id) => {
-    const appItem = desktopAppsById.get(id);
-    const win = windows[id];
+  const pinnedTaskbarEntries = normalizedPinnedIds
+    .filter((id) => !!windows[id])
+    .map((id) => {
+      const appItem = desktopAppsById.get(id);
+      const win = windows[id];
+      return {
+        id,
+        appItem,
+        win,
+        isOpen: !!win?.isOpen,
+        title: appItem?.title || win?.title || id,
+      };
+    });
+  const openTaskbarEntries = openWindows.map((win) => {
+    const appItem = desktopAppsById.get(win.id);
     return {
-      id,
+      id: win.id,
       appItem,
       win,
-      isPinned: normalizedPinnedIds.includes(id),
-      isOpen: !!win?.isOpen,
-      title: appItem?.title || win?.title || id,
+      isPinned: normalizedPinnedIds.includes(win.id),
+      title: appItem?.title || win.title || win.id,
     };
   });
 
@@ -2990,18 +2999,76 @@ export default function HeroDesktopComputerComponent() {
                   ))}
               </div>
 
-              {/*  Taskbar  */}
-              <div style={{
-                background: "#c0c0c0",
-                borderTop: "2px solid #fff",
-                padding: "3px 6px",
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-                position: "relative",
-                zIndex: 8000,
-                flexShrink: 0,
-              }}>
+              {/*  Taskbar Buckets  */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 1, flexShrink: 0 }}>
+                {/* Pinned Apps Bucket */}
+                <div style={{
+                  background: "#b9b9b9",
+                  borderTop: "1px solid #fff",
+                  borderBottom: "1px solid #707070",
+                  borderLeft: "1px solid #d6d6d6",
+                  borderRight: "1px solid #707070",
+                  padding: "2px 6px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  minHeight: 26,
+                }}>
+                  <span style={{ fontSize: 10, color: "#4a4a4a", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", flexShrink: 0 }}>
+                    Pinned
+                  </span>
+                  <div style={{ width: 1, height: 14, background: "#808080", flexShrink: 0 }} />
+                  <div style={{ display: "flex", gap: 2, flex: 1, overflow: "hidden" }}>
+                    {pinnedTaskbarEntries.map((entry) => {
+                      const { id, win, title } = entry;
+                      const isActive = win.isOpen && id === activeWindowId && !win.isMinimized;
+                      return (
+                        <button
+                          key={id}
+                          onClick={(e) => { e.stopPropagation(); activateTaskbarEntry(id); }}
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openTaskbarMenuAt(id, e.clientX, e.clientY);
+                          }}
+                          style={{
+                            border: "none",
+                            borderTop: isActive ? "1px solid #404040" : "1px solid #fff",
+                            borderLeft: isActive ? "1px solid #404040" : "1px solid #fff",
+                            borderRight: isActive ? "1px solid #fff" : "1px solid #404040",
+                            borderBottom: isActive ? "1px solid #fff" : "1px solid #404040",
+                            background: isActive ? "#d4d4d4" : "#c0c0c0",
+                            padding: "2px 8px",
+                            fontSize: 11,
+                            color: "#222",
+                            fontFamily: "inherit",
+                            cursor: "pointer",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            maxWidth: 140,
+                            lineHeight: 1.25,
+                          }}
+                        >
+                          {title}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/*  Main Taskbar  */}
+                <div style={{
+                  background: "#c0c0c0",
+                  borderTop: "2px solid #fff",
+                  padding: "3px 6px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  position: "relative",
+                  zIndex: 8000,
+                  flexShrink: 0,
+                }}>
                 {/* Explore Button (was Start) */}
                 <button
                   onClick={(e) => { e.stopPropagation(); setCalendarOpen(false); setTaskbarMenu(null); setStartOpen((p) => !p); }}
@@ -3029,11 +3096,11 @@ export default function HeroDesktopComputerComponent() {
                 {/* Divider */}
                 <div style={{ width: 1, height: 20, background: "#808080", marginLeft: 2, marginRight: 2 }} />
 
-                {/* Pinned/Open App Buttons */}
+                {/* Open App Buttons */}
                 <div style={{ display: "flex", gap: 2, flex: 1, overflow: "hidden" }}>
-                  {taskbarEntries.map((entry) => {
-                    const { id, win, isPinned, isOpen, title } = entry;
-                    const isActive = isOpen && id === activeWindowId && !win.isMinimized;
+                  {openTaskbarEntries.map((entry) => {
+                    const { id, win, title } = entry;
+                    const isActive = id === activeWindowId && !win.isMinimized;
                     return (
                     <div
                       key={id}
@@ -3078,7 +3145,7 @@ export default function HeroDesktopComputerComponent() {
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
-                            borderBottom: isOpen ? "2px solid #0b2f6b" : "2px solid transparent",
+                            borderBottom: "2px solid #0b2f6b",
                             lineHeight: 1.2,
                             paddingBottom: 1,
                             minWidth: 0,
@@ -3087,30 +3154,23 @@ export default function HeroDesktopComputerComponent() {
                         >
                           {title}
                         </span>
-                        {isPinned && (
-                          <span style={{ fontSize: 9, color: "#5e5e5e", letterSpacing: 0.2, flexShrink: 0 }} title="Pinned">
-                            pin
-                          </span>
-                        )}
                       </button>
-                      {isOpen && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
-                          style={{
-                            background: "transparent",
-                            border: "none",
-                            cursor: "pointer",
-                            fontSize: 11,
-                            fontFamily: "inherit",
-                            padding: "2px 5px",
-                            color: "#555",
-                            lineHeight: 1,
-                            flexShrink: 0,
-                          }}
-                        >
-                          x
-                        </button>
-                      )}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          cursor: "pointer",
+                          fontSize: 11,
+                          fontFamily: "inherit",
+                          padding: "2px 5px",
+                          color: "#555",
+                          lineHeight: 1,
+                          flexShrink: 0,
+                        }}
+                      >
+                        x
+                      </button>
                     </div>
                     );
                   })}
@@ -3393,6 +3453,7 @@ export default function HeroDesktopComputerComponent() {
                     </div>
                   </div>
                 )}
+              </div>
               </div>
                 </>
               ) : (
