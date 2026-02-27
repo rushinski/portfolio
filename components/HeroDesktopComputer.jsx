@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
-/* ═══════════════════════════════════════════════════════════
-   JacobOS — Retro Desktop Portfolio
+/* 
+   JacobOS  Retro Desktop Portfolio
    A complete retro operating system experience as a portfolio
-   ═══════════════════════════════════════════════════════════ */
+    */
 
-// ── Data ─────────────────────────────────────────────────
+//  Data 
 const PERSONAL = {
   name: "Jacob Rushinski",
   title: "Backend / Full-Stack Developer",
@@ -24,7 +24,7 @@ const PERSONAL = {
 
 const ABOUT_LINES = [
   `Software Engineering Student @ ${PERSONAL.school}`,
-  `Graduating ${PERSONAL.gradDate} — GPA ${PERSONAL.gpa}`,
+  `Graduating ${PERSONAL.gradDate} - GPA ${PERSONAL.gpa}`,
   "I build things that ship and hold up under pressure.",
   "Currently expanding a production e-commerce platform into multi-tenant SaaS.",
   "Interested in backend architecture, distributed systems, and automation.",
@@ -48,12 +48,12 @@ const EXPERIENCE = [
   {
     company: "Realdealkickzsc",
     role: "Contract Full-Stack Software Engineer",
-    period: "Nov 2025 — Present",
+    period: "Nov 2025 - Present",
     type: "Contract / Remote",
     desc: "Built a production e-commerce platform from scratch to replace Shopify.",
     bullets: [
       "Reduced infrastructure costs by 58% replacing Shopify with custom Next.js + Supabase + Upstash platform.",
-      "Designed 60+ API routes with transactional order processing — 100% order success rate, zero duplicate charges.",
+      "Designed 60+ API routes with transactional order processing - 100% order success rate, zero duplicate charges.",
       "Maintained 100% uptime during deployments with GitHub Actions CI/CD and post-deploy health checks.",
       "Built centralized proxy pipeline with CSRF protection, rate limiting, and MFA-based admin guardrails.",
       "Designed automated product title parser reducing publishing workflow steps by 33%.",
@@ -63,7 +63,7 @@ const EXPERIENCE = [
   {
     company: "Giant Food Stores",
     role: "Giant Direct Facilitator & Seafood Associate",
-    period: "May 2022 — Present",
+    period: "May 2022 - Present",
     type: "Part-time",
     desc: "Led high-volume fulfillment operations and trained new associates during peak demand.",
     bullets: [
@@ -77,8 +77,8 @@ const EXPERIENCE = [
 const PROJECTS = [
   {
     title: "RDK SaaS Platform",
-    subtitle: "Multi-tenant sneaker marketplace — in progress",
-    date: "2025 — Present",
+    subtitle: "Multi-tenant sneaker marketplace - in progress",
+    date: "2025 - Present",
     status: "IN_PROGRESS",
     desc: "Multi-tenant SaaS expansion of the Realdealkickzsc platform, enabling other sneaker retailers to spin up their own storefronts on shared infrastructure.",
     impact: [
@@ -92,11 +92,11 @@ const PROJECTS = [
   {
     title: "Discord Title Automation Bot",
     subtitle: "ADB automation pipeline with computer vision",
-    date: "Jan–Mar 2025",
+    date: "Jan-Mar 2025",
     status: "COMPLETE",
     desc: "Orchestrated a Discord-to-device automation pipeline that mapped Discord user IDs to MongoDB player records.",
     impact: [
-      "Reduced manual title assignment from 1 minute → 5 seconds",
+      "Reduced manual title assignment from 1 minute -> 5 seconds",
       "95% success rate via image-based UI state detection",
       "100% conflict-free processing with role-based bucket queue",
     ],
@@ -105,7 +105,7 @@ const PROJECTS = [
   {
     title: "Discord Moderation Bot",
     subtitle: "Modular event-driven bot for community management",
-    date: "Oct 2024–Jan 2025",
+    date: "Oct 2024-Jan 2025",
     status: "COMPLETE",
     desc: "Engineered a modular, event-driven Discord bot serving 8 servers and 900+ members.",
     impact: [
@@ -117,7 +117,7 @@ const PROJECTS = [
   },
 ];
 
-// ── Retro Pixel Icon SVGs ────────────────────────────────
+//  Retro Pixel Icon SVGs 
 // These are designed to look like classic Win3.1/95 16-color style icons
 const Icons = {
   folder: (
@@ -233,6 +233,14 @@ const Icons = {
       <rect x="7" y="22" width="3" height="2" transform="rotate(45 8.5 23)" fill="#606060"/>
     </svg>
   ),
+  location: (
+    <svg width="32" height="32" viewBox="0 0 32 32">
+      <rect x="1" y="1" width="30" height="30" fill="#008080" stroke="#004040" strokeWidth="1"/>
+      <ellipse cx="16" cy="24" rx="9" ry="4" fill="#004b4b" opacity="0.55"/>
+      <path d="M16 5 C11 5 8 8.6 8 13 c0 5.2 4.2 9.3 8 14 3.8-4.7 8-8.8 8-14 0-4.4-3-8-8-8z" fill="#f8f8f8" stroke="#004040" strokeWidth="1"/>
+      <circle cx="16" cy="13" r="3.2" fill="#d33535" stroke="#7a0000" strokeWidth="0.8"/>
+    </svg>
+  ),
 };
 
 // Helpers
@@ -256,7 +264,7 @@ const snapIconToGrid = (x, y, mode = "medium", marginX = 12, marginY = 8) => {
   };
 };
 
-// ── Boot Sequence Component ─────────────────────────────
+//  Boot Sequence Component 
 function BootSequence({ onComplete, embedded = false }) {
   const [lines, setLines] = useState([]);
   const [phase, setPhase] = useState("bios");
@@ -268,7 +276,7 @@ function BootSequence({ onComplete, embedded = false }) {
     { text: "  CPU: Intel 80486DX @ 33MHz", delay: 60 },
     { text: "  RAM: 4096 KB", delay: 50 },
     { text: "  VGA: 640x480 256 colors", delay: 50 },
-    { text: "  HDD: 120 MB — OK", delay: 80 },
+    { text: "  HDD: 120 MB - OK", delay: 80 },
     { text: "", delay: 40 },
     { text: "Loading JacobOS...", delay: 200 },
     { text: "Mounting filesystem...", delay: 120 },
@@ -324,18 +332,23 @@ function BootSequence({ onComplete, embedded = false }) {
           {lines.map((l, i) => (
             <div key={i}>{l}</div>
           ))}
-          <span style={{ animation: "blink 1s step-end infinite" }}>▋</span>
+          <span style={{ animation: "blink 1s step-end infinite" }}>_</span>
         </pre>
       </div>
     </div>
   );
 }
 
-// ── Window Title Bar (no File/Edit/View/Help) ───────────
-function TitleBar({ title, isActive, onClose, onMinimize, onMaximize, onPointerDown, onTitleDoubleClick }) {
+//  Window Title Bar (no File/Edit/View/Help) 
+function TitleBar({ title, isActive, isMaximized, onClose, onMinimize, onMaximize, onPointerDown, onTitleDoubleClick }) {
   const bg = isActive
     ? "linear-gradient(180deg, #1a56c9 0%, #0b3b8f 100%)"
     : "linear-gradient(180deg, #808080 0%, #606060 100%)";
+  const controls = [
+    { id: "min", glyph: "-", action: onMinimize },
+    { id: "max", glyph: isMaximized ? "\u2750" : "\u25A1", action: onMaximize },
+    { id: "close", glyph: "\u00D7", action: onClose },
+  ];
 
   return (
     <div
@@ -362,42 +375,39 @@ function TitleBar({ title, isActive, onClose, onMinimize, onMaximize, onPointerD
         {title}
       </span>
       <div style={{ display: "flex", gap: "2px", flexShrink: 0 }}>
-        {[
-          { label: "_", action: onMinimize },
-          { label: "□", action: onMaximize },
-          { label: "×", action: onClose },
-        ].map((btn) => (
+        {controls.map((btn) => (
           <button
-            key={btn.label}
+            key={btn.id}
             onClick={(e) => { e.stopPropagation(); btn.action(); }}
             style={{
-              width: 20,
-              height: 16,
+              width: 28,
+              height: 22,
               background: "#c0c0c0",
               border: "none",
               borderTop: "1px solid #fff",
               borderLeft: "1px solid #fff",
               borderRight: "1px solid #404040",
               borderBottom: "1px solid #404040",
-              display: "grid",
-              placeItems: "center",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               color: "#111",
-              fontSize: "12px",
+              fontSize: btn.id === "min" ? "16px" : "14px",
               lineHeight: 1,
               cursor: "pointer",
               fontFamily: "inherit",
               padding: 0,
             }}
           >
-            {btn.label}
+            <span style={{ transform: btn.id === "min" ? "translateY(-2px)" : "none" }}>
+              {btn.glyph}
+            </span>
           </button>
         ))}
       </div>
     </div>
   );
 }
-
-// ── Resizable + Draggable Window ────────────────────────
 function Window({ win, isActive, onFocus, onClose, onMinimize, onMaximize, onMove, onResize, children }) {
   const dragRef = useRef(null);
   const offsetRef = useRef({ x: 0, y: 0 });
@@ -507,6 +517,7 @@ function Window({ win, isActive, onFocus, onClose, onMinimize, onMaximize, onMov
         <TitleBar
           title={win.title}
           isActive={isActive}
+          isMaximized={win.isMaximized}
           onClose={onClose}
           onMinimize={onMinimize}
           onMaximize={onMaximize}
@@ -572,28 +583,28 @@ function Window({ win, isActive, onFocus, onClose, onMinimize, onMaximize, onMov
   );
 }
 
-// ── App Contents ────────────────────────────────────────
+//  App Contents 
 
 function WelcomeApp() {
   return (
     <div style={{ padding: "16px 20px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-        <span style={{ fontSize: 28 }}>🖥</span>
+        <span style={{ fontSize: 28 }}>OS</span>
         <div style={{ fontSize: 18, fontWeight: 800, color: "#000080" }}>Welcome to JacobOS</div>
       </div>
       <div style={{ fontSize: 13, color: "#333", marginBottom: 14, lineHeight: 1.7 }}>
-        This is the portfolio of <strong>Jacob Rushinski</strong> — a backend/full-stack developer.
+        This is the portfolio of <strong>Jacob Rushinski</strong> - a backend/full-stack developer.
         Navigate this retro desktop to explore my work, skills, and projects.
       </div>
       <div style={{ fontSize: 12, color: "#444", marginBottom: 10, fontWeight: 700 }}>How to navigate:</div>
       <div style={{ fontSize: 12, color: "#444", lineHeight: 1.8, paddingLeft: 8 }}>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>▸</span><strong>Double-click</strong> desktop icons to open apps</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>▸</span><strong>Drag</strong> window title bars to move them</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>▸</span><strong>Drag edges/corners</strong> of windows to resize</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>▸</span>Click <strong>□</strong> to maximize, <strong>_</strong> to minimize, <strong>×</strong> to close</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>▸</span>Use the <strong>Explore</strong> menu in the taskbar to find all apps</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>▸</span>Use <strong>Desk, File, View, Options</strong> at the top for extras</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>▸</span>Click the <strong>×</strong> on taskbar tabs to close windows quickly</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Double-click</strong> desktop icons to open apps</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Drag</strong> window title bars to move them</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Drag edges/corners</strong> of windows to resize</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>Click <strong>{"[]"}</strong> to maximize, <strong>_</strong> to minimize, <strong>x</strong> to close</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>Use the <strong>Explore</strong> menu in the taskbar to find all apps</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>Use <strong>Desk, File, View, Options</strong> at the top for extras</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>Click the <strong>x</strong> on taskbar tabs to close windows quickly</div>
       </div>
       <div style={{ marginTop: 16, padding: "10px 12px", background: "#ffffcc", border: "1px solid #e0d080", fontSize: 12, color: "#555" }}>
         <strong>Tip:</strong> Try the Terminal app for a command-line experience. Type &quot;help&quot; to see available commands!
@@ -616,7 +627,7 @@ function AboutApp() {
       <div style={{ marginBottom: 16 }}>
         {ABOUT_LINES.map((line, i) => (
           <div key={i} style={{ padding: "3px 0", fontSize: 13, color: "#333" }}>
-            <span style={{ color: "#000080", marginRight: 6 }}>▸</span>
+            <span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>
             {line}
           </div>
         ))}
@@ -676,7 +687,7 @@ function ExperienceApp() {
           <div style={{ fontSize: 12, color: "#555", marginBottom: 8 }}>{exp.desc}</div>
           {exp.bullets.map((b, j) => (
             <div key={j} style={{ fontSize: 12, color: "#444", padding: "2px 0", paddingLeft: 12, position: "relative" }}>
-              <span style={{ position: "absolute", left: 0, color: "#000080" }}>•</span>
+              <span style={{ position: "absolute", left: 0, color: "#000080" }}>-</span>
               {b}
             </div>
           ))}
@@ -712,11 +723,11 @@ function ProjectsApp() {
               {p.status === "IN_PROGRESS" ? "In Progress" : "Complete"}
             </span>
           </div>
-          <div style={{ fontSize: 11, color: "#777", marginBottom: 4 }}>{p.subtitle} — {p.date}</div>
+          <div style={{ fontSize: 11, color: "#777", marginBottom: 4 }}>{p.subtitle} - {p.date}</div>
           <div style={{ fontSize: 12, color: "#555", marginBottom: 8 }}>{p.desc}</div>
           {p.impact.map((item, j) => (
             <div key={j} style={{ fontSize: 12, color: "#444", padding: "2px 0", paddingLeft: 12, position: "relative" }}>
-              <span style={{ position: "absolute", left: 0, color: "#800080" }}>▹</span>
+              <span style={{ position: "absolute", left: 0, color: "#800080" }}>{">"}</span>
               {item}
             </div>
           ))}
@@ -799,7 +810,7 @@ function GitHubApp() {
               {r.description && <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>{r.description}</div>}
               <div style={{ display: "flex", gap: 8, marginTop: 3, fontSize: 10, color: "#888" }}>
                 {r.language && <span>{r.language}</span>}
-                {r.stars > 0 && <span>★ {r.stars}</span>}
+                {r.stars > 0 && <span>* {r.stars}</span>}
               </div>
             </div>
           ))}
@@ -816,10 +827,10 @@ function ContactApp() {
       <div style={{ marginBottom: 16, fontSize: 13, color: "#333" }}>Interested in working together? Reach out through any of the channels below.</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
         {[
-          { label: "Email", value: PERSONAL.email, href: `mailto:${PERSONAL.email}`, icon: "✉" },
-          { label: "GitHub", value: PERSONAL.github.replace("https://", ""), href: PERSONAL.github, icon: "⌘" },
-          { label: "LinkedIn", value: PERSONAL.linkedin.replace("https://", ""), href: PERSONAL.linkedin, icon: "▦" },
-          { label: "Location", value: PERSONAL.location, href: null, icon: "◉" },
+          { label: "Email", value: PERSONAL.email, href: `mailto:${PERSONAL.email}`, icon: "@" },
+          { label: "GitHub", value: PERSONAL.github.replace("https://", ""), href: PERSONAL.github, icon: "GH" },
+          { label: "LinkedIn", value: PERSONAL.linkedin.replace("https://", ""), href: PERSONAL.linkedin, icon: "in" },
+          { label: "Location", value: PERSONAL.location, href: null, icon: "US" },
         ].map((c) => (
           <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#f8f9fb", border: "2px inset #c0c0c0" }}>
             <span style={{ fontSize: 16, width: 24, textAlign: "center" }}>{c.icon}</span>
@@ -852,22 +863,22 @@ function TerminalApp() {
 
   const commands = {
     help: () => "Available commands: help, whoami, skills, contact, projects, experience, clear, neofetch, echo [text], date, uptime, cat resume",
-    whoami: () => `${PERSONAL.name} — ${PERSONAL.title}\n${PERSONAL.location}`,
+    whoami: () => `${PERSONAL.name} - ${PERSONAL.title}\n${PERSONAL.location}`,
     skills: () => Object.entries(SKILLS).map(([cat, items]) => `${cat}: ${items.join(", ")}`).join("\n"),
     contact: () => `Email: ${PERSONAL.email}\nGitHub: ${PERSONAL.github}\nLinkedIn: ${PERSONAL.linkedin}`,
-    projects: () => PROJECTS.map((p) => `${p.status === "IN_PROGRESS" ? "[WIP]" : "[OK]"} ${p.title} — ${p.subtitle}`).join("\n"),
+    projects: () => PROJECTS.map((p) => `${p.status === "IN_PROGRESS" ? "[WIP]" : "[OK]"} ${p.title} - ${p.subtitle}`).join("\n"),
     clear: () => "__CLEAR__",
     date: () => new Date().toString(),
     uptime: () => `System uptime: ${Math.floor(Math.random() * 365)} days, ${Math.floor(Math.random() * 24)}:${String(Math.floor(Math.random() * 60)).padStart(2, "0")}`,
-    neofetch: () => `   ╭─────────╮
-   │ JacobOS │    ${PERSONAL.name}
-   │  v1.0   │    ──────────────
-   ╰─────────╯    OS: JacobOS 1.0
-                   Shell: jsh 0.1
-                   Resolution: 640x480
-                   CPU: Intel 80486DX
-                   Memory: 4096 KB
-                   Uptime: way too long`,
+    neofetch: () => `   .--------.
+   | JacobOS |    ${PERSONAL.name}
+   |  v1.0   |    --------------
+   '--------'    OS: JacobOS 1.0
+                 Shell: jsh 0.1
+                 Resolution: 640x480
+                 CPU: Intel 80486DX
+                 Memory: 4096 KB
+                 Uptime: way too long`,
     "cat resume": () => `${PERSONAL.name}\n${PERSONAL.title}\n${PERSONAL.school}\nGPA: ${PERSONAL.gpa} | Graduating: ${PERSONAL.gradDate}\n\nRun "skills", "projects", or "experience" for more details.`,
   };
 
@@ -1040,6 +1051,54 @@ function SettingsApp({ iconSizeMode, setIconSizeMode }) {
     </div>
   );
 }
+function LocationApp() {
+  const now = new Date();
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
+  const dateText = now.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+  const timeText = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+  return (
+    <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, height: "100%" }}>
+      <div style={{ fontSize: 16, fontWeight: 800, color: "#111" }}>Location</div>
+      <div style={{ fontSize: 12, color: "#333", lineHeight: 1.5 }}>
+        <div><strong>Current location:</strong> Lancaster, PA, USA</div>
+        <div><strong>Date:</strong> {dateText}</div>
+        <div><strong>Time:</strong> {timeText}</div>
+        <div><strong>Timezone:</strong> {timezone}</div>
+      </div>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 180,
+          border: "2px inset #c0c0c0",
+          background: "#b8d4f0",
+          padding: 8,
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
+        }}
+      >
+        <div style={{ fontSize: 11, color: "#1a2f50", fontWeight: 700 }}>United States Map (Retro)</div>
+        <div style={{ flex: 1, border: "1px solid #6a6a6a", background: "#7ea3cc", position: "relative" }}>
+          <svg viewBox="0 0 320 170" width="100%" height="100%" style={{ display: "block" }}>
+            <rect x="0" y="0" width="320" height="170" fill="#7ea3cc" />
+            <path
+              d="M22 77 L40 60 L68 55 L92 44 L122 50 L149 45 L171 56 L191 54 L219 58 L238 72 L264 74 L286 89 L276 106 L250 109 L233 124 L206 127 L182 119 L152 121 L124 116 L96 117 L72 111 L47 99 L32 92 Z"
+              fill="#d6d3ae"
+              stroke="#3d3d3d"
+              strokeWidth="2"
+            />
+            <circle cx="228" cy="86" r="5" fill="#c42a2a" stroke="#5a0000" strokeWidth="1.5" />
+            <text x="236" y="83" fontSize="9" fill="#111" fontFamily="monospace">Lancaster, PA</text>
+          </svg>
+        </div>
+      </div>
+      <div style={{ fontSize: 12, color: "#111", background: "#ece8bb", border: "1px solid #b8ac57", padding: "6px 8px" }}>
+        Open to work anywhere in the U.S. and remote opportunities.
+      </div>
+    </div>
+  );
+}
 function ExplorerApp({ items, selectedId, onOpenItem, onAction, onMoveItem }) {
   return (
     <div style={{ padding: "16px 20px" }}>
@@ -1073,10 +1132,10 @@ function ExplorerApp({ items, selectedId, onOpenItem, onAction, onMoveItem }) {
                   <button onClick={() => onAction?.("cut", item.id)} style={{ fontSize: 10, padding: "1px 5px" }}>Cut</button>
                   <button onClick={() => onAction?.("copy", item.id)} style={{ fontSize: 10, padding: "1px 5px" }}>Copy</button>
                   <button onClick={() => onAction?.("delete", item.id)} style={{ fontSize: 10, padding: "1px 5px" }}>Delete</button>
-                  <button onClick={() => onMoveItem?.(item.id, -1, 0)} style={{ fontSize: 10, padding: "1px 5px" }}>←</button>
-                  <button onClick={() => onMoveItem?.(item.id, 1, 0)} style={{ fontSize: 10, padding: "1px 5px" }}>→</button>
-                  <button onClick={() => onMoveItem?.(item.id, 0, -1)} style={{ fontSize: 10, padding: "1px 5px" }}>↑</button>
-                  <button onClick={() => onMoveItem?.(item.id, 0, 1)} style={{ fontSize: 10, padding: "1px 5px" }}>↓</button>
+                  <button onClick={() => onMoveItem?.(item.id, -1, 0)} style={{ fontSize: 10, padding: "1px 5px" }}>{"<"}</button>
+                  <button onClick={() => onMoveItem?.(item.id, 1, 0)} style={{ fontSize: 10, padding: "1px 5px" }}>{">"}</button>
+                  <button onClick={() => onMoveItem?.(item.id, 0, -1)} style={{ fontSize: 10, padding: "1px 5px" }}>^</button>
+                  <button onClick={() => onMoveItem?.(item.id, 0, 1)} style={{ fontSize: 10, padding: "1px 5px" }}>v</button>
                 </div>
               </div>
             ))}
@@ -1109,7 +1168,7 @@ function TextDocumentApp({ item, onChangeContent }) {
     </div>
   );
 }
-// Desktop Icon ────────────────────────────────────────
+// Desktop Icon 
 function DesktopIcon({
   icon,
   position,
@@ -1135,6 +1194,7 @@ function DesktopIcon({
   const movedRef = useRef(false);
   const lastPosRef = useRef(position);
   const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
+  const labelMaxWidth = Math.max(28, Math.min(view.maxLabel, view.tileW - 6));
 
   useEffect(() => {
     lastPosRef.current = position;
@@ -1246,7 +1306,7 @@ function DesktopIcon({
             fontWeight: 700,
           }}
         >
-          {selected ? "x" : ""}
+          {selected ? "v" : ""}
         </div>
       )}
       <div
@@ -1280,7 +1340,8 @@ function DesktopIcon({
           style={{
             display: "inline-block",
             width: "auto",
-            maxWidth: view.maxLabel,
+            maxWidth: labelMaxWidth,
+            boxSizing: "border-box",
             background: "rgba(0,0,0,0.45)",
             color: "#fff",
             border: "none",
@@ -1301,7 +1362,8 @@ function DesktopIcon({
             padding: "1px 5px",
             display: "inline-block",
             width: "auto",
-            maxWidth: view.maxLabel,
+            maxWidth: labelMaxWidth,
+            boxSizing: "border-box",
             textAlign: "center",
             whiteSpace: "nowrap",
             overflow: "hidden",
@@ -1349,6 +1411,7 @@ function TopMenuBar({
       { label: "Open Projects", action: () => openWindow("projects") },
       { label: "Open GitHub", action: () => openWindow("github") },
       { label: "Open Contact", action: () => openWindow("contact") },
+      { label: "Open Location", action: () => openWindow("location") },
       { label: "Open Terminal", action: () => openWindow("terminal") },
       { label: "Open File Explorer", action: () => openWindow("explorer") },
       { label: "Open Settings", action: () => openWindow("settings") },
@@ -1483,21 +1546,33 @@ export default function HeroDesktopComputerComponent() {
   const [clock, setClock] = useState("");
   const [selectedIcon, setSelectedIcon] = useState(null);
   const topZRef = useRef(100);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarViewDate, setCalendarViewDate] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+  const [desktopSelectionBox, setDesktopSelectionBox] = useState(null);
+  const selectionBoxRef = useRef(null);
+  const [marqueePreviewIds, setMarqueePreviewIds] = useState([]);
+  const [startOpen, setStartOpen] = useState(false);
+  const handleBootComplete = useCallback(() => {
+    setBooted(true);
+  }, []);
 
   // Clock
   useEffect(() => {
     const tick = () => {
       const now = new Date();
       const date = now.toLocaleDateString([], { month: "2-digit", day: "2-digit", year: "2-digit" });
-      const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
       setClock(`${date} ${time}`);
     };
     tick();
-    const id = setInterval(tick, 10000);
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
 
-  // ─── Icons state ───
+  //  Icons state 
   const desktopRef = useRef(null);
   const dragStartRef = useRef({});
   const [iconSizeMode, setIconSizeMode] = useState("medium");
@@ -1524,6 +1599,7 @@ export default function HeroDesktopComputerComponent() {
     trash: { x: 112, y: 680 },
     explorer: { x: 112, y: 8 },
     settings: { x: 112, y: 104 },
+    location: { x: 112, y: 200 },
   });
 
   const systemDesktopIcons = [
@@ -1534,6 +1610,7 @@ export default function HeroDesktopComputerComponent() {
     { id: "projects", title: "Projects", glyph: Icons.projects, windowId: "projects", itemType: "app", system: true },
     { id: "github", title: "GitHub", glyph: Icons.github, windowId: "github", itemType: "app", system: true },
     { id: "contact", title: "Contact", glyph: Icons.contact, windowId: "contact", itemType: "app", system: true },
+    { id: "location", title: "Location", glyph: Icons.location, windowId: "location", itemType: "app", system: true },
     { id: "terminal", title: "Terminal", glyph: Icons.terminal, windowId: "terminal", itemType: "app", system: true },
     { id: "explorer", title: "File Explorer", glyph: Icons.folder, windowId: "explorer", itemType: "app", system: true },
     { id: "settings", title: "Settings", glyph: Icons.settings, windowId: "settings", itemType: "app", system: true },
@@ -1546,15 +1623,16 @@ export default function HeroDesktopComputerComponent() {
   const desktopItems = [...systemDesktopIcons, ...customItems];
   const activeTextDoc = customItems.find((item) => item.id === activeTextDocId) || null;
 
-  // ─── Windows state (Welcome + About open by default) ───
+  //  Windows state (Welcome open by default) 
   const [windows, setWindows] = useState({
-    welcome:    { id: "welcome",    title: "Welcome",                  x: 120, y: 20,  w: 460, h: 400, isOpen: true,  isMinimized: false, isMaximized: false, z: 11 },
-    about:      { id: "about",      title: "About",                    x: 200, y: 60,  w: 520, h: 420, isOpen: true,  isMinimized: false, isMaximized: false, z: 10 },
+    welcome:    { id: "welcome",    title: "Welcome",                  x: 250, y: 95,  w: 800, h: 540, isOpen: true,  isMinimized: false, isMaximized: false, z: 11 },
+    about:      { id: "about",      title: "About",                    x: 200, y: 60,  w: 520, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 10 },
     skills:     { id: "skills",     title: "Skills",                   x: 200, y: 60,  w: 480, h: 400, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
     experience: { id: "experience", title: "Experience",               x: 180, y: 50,  w: 560, h: 480, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
     projects:   { id: "projects",   title: "Projects",                 x: 140, y: 30,  w: 540, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
     github:     { id: "github",     title: "GitHub",                   x: 220, y: 70,  w: 460, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 6 },
     contact:    { id: "contact",    title: "Contact",                  x: 260, y: 80,  w: 400, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
+    location:   { id: "location",   title: "Location",                 x: 280, y: 110, w: 560, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
     terminal:   { id: "terminal",   title: "Terminal",                 x: 120, y: 50,  w: 500, h: 350, isOpen: false, isMinimized: false, isMaximized: false, z: 4 },
     trash:      { id: "trash",      title: "Recycle Bin",              x: 300, y: 100, w: 320, h: 260, isOpen: false, isMinimized: false, isMaximized: false, z: 3 },
     explorer:   { id: "explorer",   title: "File Explorer",            x: 260, y: 90,  w: 460, h: 360, isOpen: false, isMinimized: false, isMaximized: false, z: 2 },
@@ -1567,9 +1645,33 @@ export default function HeroDesktopComputerComponent() {
   const openWindow = useCallback((id) => {
     setWindows((prev) => {
       if (!prev[id]) return prev;
+      const shouldMaximize = FULLSCREEN_WINDOW_IDS.has(id);
+      const baseWindow = prev[id];
+      const openedWindow = {
+        ...baseWindow,
+        isOpen: true,
+        isMinimized: false,
+        isMaximized: shouldMaximize,
+        z: nextZ(),
+      };
+
+      if (id === "welcome") {
+        return {
+          ...prev,
+          [id]: {
+            ...openedWindow,
+            isMaximized: false,
+            x: 250,
+            y: 95,
+            w: 800,
+            h: 540,
+          },
+        };
+      }
+
       return {
         ...prev,
-        [id]: { ...prev[id], isOpen: true, isMinimized: false, z: nextZ() },
+        [id]: openedWindow,
       };
     });
   }, []);
@@ -1844,8 +1946,89 @@ export default function HeroDesktopComputerComponent() {
     alignIconsToGrid();
   }, [iconSizeMode]);
 
+  const getIconsInSelectionBox = useCallback((box) => {
+    if (!box || box.w <= 0 || box.h <= 0) return [];
+    const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
+    return desktopItems
+      .filter((item) => {
+        const pos = iconPositions[item.id];
+        if (!pos) return false;
+        return (
+          pos.x < box.x + box.w
+          && pos.x + view.tileW > box.x
+          && pos.y < box.y + box.h
+          && pos.y + view.tileH > box.y
+        );
+      })
+      .sort((a, b) => {
+        const pa = iconPositions[a.id] || { x: 0, y: 0 };
+        const pb = iconPositions[b.id] || { x: 0, y: 0 };
+        if (pa.x === pb.x) return pa.y - pb.y;
+        return pa.x - pb.x;
+      })
+      .map((item) => item.id);
+  }, [desktopItems, iconPositions, iconSizeMode]);
+
+  const handleDesktopPointerDown = useCallback((e) => {
+    if (e.button !== 0) return;
+    if (e.target !== e.currentTarget) return;
+    const rect = desktopRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const startX = clamp(e.clientX - rect.left, 0, rect.width);
+    const startY = clamp(e.clientY - rect.top, 0, rect.height);
+    const initialBox = { x: startX, y: startY, w: 0, h: 0 };
+
+    setSelectedIcon(null);
+    setStartOpen(false);
+    setCalendarOpen(false);
+    setIconMenu(null);
+    setDesktopMenu(null);
+    setDesktopViewMenuOpen(false);
+    setMarqueePreviewIds([]);
+    setDesktopSelectionBox(initialBox);
+    selectionBoxRef.current = initialBox;
+
+    const handleMove = (ev) => {
+      const currentX = clamp(ev.clientX - rect.left, 0, rect.width);
+      const currentY = clamp(ev.clientY - rect.top, 0, rect.height);
+      const box = {
+        x: Math.min(startX, currentX),
+        y: Math.min(startY, currentY),
+        w: Math.abs(currentX - startX),
+        h: Math.abs(currentY - startY),
+      };
+      selectionBoxRef.current = box;
+      setDesktopSelectionBox(box);
+      if (box.w > 3 || box.h > 3) {
+        setMarqueePreviewIds(getIconsInSelectionBox(box));
+      } else {
+        setMarqueePreviewIds([]);
+      }
+    };
+
+    const handleUp = () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+      const box = selectionBoxRef.current;
+      if (box && (box.w > 4 || box.h > 4)) {
+        const hits = getIconsInSelectionBox(box);
+        if (hits.length > 0) {
+          setSelectedIcon(hits[0]);
+        }
+      }
+      selectionBoxRef.current = null;
+      setDesktopSelectionBox(null);
+      setMarqueePreviewIds([]);
+    };
+
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp);
+  }, [getIconsInSelectionBox]);
+
   const selectDesktopIcon = useCallback((id) => {
     setSelectedIcon(id);
+    setCalendarOpen(false);
     setIconMenu(null);
     setDesktopMenu(null);
     setDesktopViewMenuOpen(false);
@@ -1861,6 +2044,7 @@ export default function HeroDesktopComputerComponent() {
     setSelectedIcon(id);
     setDesktopMenu(null);
     setDesktopViewMenuOpen(false);
+    setCalendarOpen(false);
 
     if (rect && iconPos) {
       let menuX = iconPos.x + view.tileW + 6;
@@ -1887,6 +2071,7 @@ export default function HeroDesktopComputerComponent() {
     setDesktopMenu({ x: point.x, y: point.y });
     setDesktopViewMenuOpen(false);
     setIconMenu(null);
+    setCalendarOpen(false);
   }, [toDesktopPoint]);
 
   const handleIconAction = useCallback((action, id) => {
@@ -1998,6 +2183,7 @@ export default function HeroDesktopComputerComponent() {
         setIconMenu(null);
         setDesktopMenu(null);
         setDesktopViewMenuOpen(false);
+        setCalendarOpen(false);
         cancelRenameDesktopItem();
         return;
       }
@@ -2005,6 +2191,15 @@ export default function HeroDesktopComputerComponent() {
       if (ctrl && e.shiftKey && (e.key === "N" || e.key === "n")) {
         e.preventDefault();
         createFolder();
+        return;
+      }
+
+      if (ctrl && (e.key === "v" || e.key === "V")) {
+        e.preventDefault();
+        if (!clipboardState) return;
+        const pos = selectedIcon ? (iconPositions[selectedIcon] || getNextDesktopSlot()) : getNextDesktopSlot();
+        const rect = desktopRef.current?.getBoundingClientRect();
+        pasteDesktopItem((rect?.left ?? 0) + pos.x + 20, (rect?.top ?? 0) + pos.y + 20);
         return;
       }
 
@@ -2019,14 +2214,6 @@ export default function HeroDesktopComputerComponent() {
       if (ctrl && (e.key === "x" || e.key === "X")) {
         e.preventDefault();
         setClipboardState({ mode: "cut", id: selectedIcon });
-        return;
-      }
-
-      if (ctrl && (e.key === "v" || e.key === "V")) {
-        e.preventDefault();
-        const pos = iconPositions[selectedIcon] || getNextDesktopSlot();
-        const rect = desktopRef.current?.getBoundingClientRect();
-        pasteDesktopItem((rect?.left ?? 0) + pos.x + 20, (rect?.top ?? 0) + pos.y + 20);
         return;
       }
 
@@ -2050,7 +2237,7 @@ export default function HeroDesktopComputerComponent() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [cancelRenameDesktopItem, createFolder, deleteDesktopItem, getNextDesktopSlot, iconPositions, nudgeSelectedIcon, pasteDesktopItem, renameDesktopItem, selectedIcon]);
+  }, [cancelRenameDesktopItem, clipboardState, createFolder, deleteDesktopItem, getNextDesktopSlot, iconPositions, nudgeSelectedIcon, pasteDesktopItem, renameDesktopItem, selectedIcon]);
 
   const closeWindow = useCallback((id) => {
     setWindows((prev) => ({
@@ -2147,8 +2334,7 @@ export default function HeroDesktopComputerComponent() {
   const openWindows = Object.values(windows).filter((w) => w.isOpen);
   const activeWindowId = openWindows.filter((w) => !w.isMinimized).sort((a, b) => b.z - a.z)[0]?.id;
 
-  // ─── Start menu ───
-  const [startOpen, setStartOpen] = useState(false);
+  //  Start menu 
 
   const windowContent = {
     welcome: <WelcomeApp />,
@@ -2158,6 +2344,7 @@ export default function HeroDesktopComputerComponent() {
     projects: <ProjectsApp />,
     github: <GitHubApp />,
     contact: <ContactApp />,
+    location: <LocationApp />,
     terminal: <TerminalApp />,
     trash: <TrashApp onProtectedDelete={showProtectedDeleteAlert} />,
     explorer: (
@@ -2172,6 +2359,22 @@ export default function HeroDesktopComputerComponent() {
     settings: <SettingsApp iconSizeMode={iconSizeMode} setIconSizeMode={setIconSizeMode} />,
     textdoc: <TextDocumentApp item={activeTextDoc} onChangeContent={updateTextContent} />,
   };
+
+  const monthStart = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth(), 1);
+  const monthEnd = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth() + 1, 0);
+  const monthLabel = monthStart.toLocaleDateString([], { month: "long", year: "numeric" });
+  const leadingDays = monthStart.getDay();
+  const dayCells = [];
+  for (let i = 0; i < leadingDays; i += 1) dayCells.push(null);
+  for (let d = 1; d <= monthEnd.getDate(); d += 1) dayCells.push(d);
+  while (dayCells.length % 7 !== 0) dayCells.push(null);
+  const today = new Date();
+  const isToday = (day) => (
+    day
+    && today.getFullYear() === monthStart.getFullYear()
+    && today.getMonth() === monthStart.getMonth()
+    && today.getDate() === day
+  );
 
   return (
     <>
@@ -2191,13 +2394,15 @@ export default function HeroDesktopComputerComponent() {
           border-right: 1px solid #2a2a2a; 
           border-bottom: 1px solid #2a2a2a; 
           min-height: 24px;
+          cursor: pointer;
         }
         ::-webkit-scrollbar-thumb:hover {
-          background: #1a56c9;
-          border-top: 1px solid #7ea6ff;
-          border-left: 1px solid #7ea6ff;
-          border-right: 1px solid #0b3b8f;
-          border-bottom: 1px solid #0b3b8f;
+          background: #727272;
+          border-top: 1px solid #a4a4a4;
+          border-left: 1px solid #a4a4a4;
+          border-right: 1px solid #4a4a4a;
+          border-bottom: 1px solid #4a4a4a;
+          cursor: pointer;
         }
         ::selection { background: #000080; color: #fff; }
       `}</style>
@@ -2267,7 +2472,7 @@ export default function HeroDesktopComputerComponent() {
                 zIndex: 51,
               }} />
 
-              {/* ─── OS Menu Bar with functional dropdowns ─── */}
+              {/*  OS Menu Bar with functional dropdowns  */}
               {booted ? (
                 <>
                   <TopMenuBar
@@ -2283,19 +2488,11 @@ export default function HeroDesktopComputerComponent() {
                     hasClipboard={!!clipboardState}
                   />
 
-              {/* ─── Desktop Area ─── */}
+              {/*  Desktop Area  */}
               <div
                 ref={desktopRef}
                 style={{ flex: 1, position: "relative", overflow: "hidden" }}
-                onPointerDown={(e) => {
-                  if (e.button !== 0) return;
-                  if (e.target !== e.currentTarget) return;
-                  setSelectedIcon(null);
-                  setStartOpen(false);
-                  setIconMenu(null);
-                  setDesktopMenu(null);
-                  setDesktopViewMenuOpen(false);
-                }}
+                onPointerDown={handleDesktopPointerDown}
                 onContextMenu={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -2309,7 +2506,7 @@ export default function HeroDesktopComputerComponent() {
                     icon={icon}
                     position={iconPositions[icon.id]}
                     selected={selectedIcon === icon.id}
-                    hovered={hoveredIcon === icon.id}
+                    hovered={hoveredIcon === icon.id || marqueePreviewIds.includes(icon.id)}
                     iconSizeMode={iconSizeMode}
                     onDoubleClick={() => openDesktopItem(icon)}
                     onDragStart={handleIconDragStart}
@@ -2325,6 +2522,23 @@ export default function HeroDesktopComputerComponent() {
                     onRenameCancel={cancelRenameDesktopItem}
                   />
                 ))}
+
+                {desktopSelectionBox && (desktopSelectionBox.w > 0 || desktopSelectionBox.h > 0) && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: desktopSelectionBox.x,
+                      top: desktopSelectionBox.y,
+                      width: desktopSelectionBox.w,
+                      height: desktopSelectionBox.h,
+                      background: "rgba(154,198,255,0.35)",
+                      border: "1px solid #5b8fd8",
+                      boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.35)",
+                      pointerEvents: "none",
+                      zIndex: 150,
+                    }}
+                  />
+                )}
 
                 {desktopMenu && (
                   <div
@@ -2551,7 +2765,7 @@ export default function HeroDesktopComputerComponent() {
                   ))}
               </div>
 
-              {/* ─── Taskbar ─── */}
+              {/*  Taskbar  */}
               <div style={{
                 background: "#c0c0c0",
                 borderTop: "2px solid #fff",
@@ -2565,7 +2779,7 @@ export default function HeroDesktopComputerComponent() {
               }}>
                 {/* Explore Button (was Start) */}
                 <button
-                  onClick={(e) => { e.stopPropagation(); setStartOpen((p) => !p); }}
+                  onClick={(e) => { e.stopPropagation(); setCalendarOpen(false); setStartOpen((p) => !p); }}
                   style={{
                     background: startOpen ? "#a0a0a0" : "#c0c0c0",
                     border: "none",
@@ -2584,7 +2798,7 @@ export default function HeroDesktopComputerComponent() {
                     color: "#0b2f6b",
                   }}
                 >
-                  <span style={{ fontSize: 14 }}>🖥</span> Explore
+                  <span style={{ fontSize: 12, fontWeight: 800 }}>OS</span> Explore
                 </button>
 
                 {/* Divider */}
@@ -2647,38 +2861,148 @@ export default function HeroDesktopComputerComponent() {
                           lineHeight: 1,
                           flexShrink: 0,
                         }}
-                        title="Close"
                       >
-                        ×
+                        x
                       </button>
                     </div>
                   ))}
                 </div>
 
-                {/* Clock */}
-                <div style={{
-                  background: "#c0c0c0",
-                  borderTop: "1px solid #404040",
-                  borderLeft: "1px solid #404040",
-                  borderRight: "1px solid #fff",
-                  borderBottom: "1px solid #fff",
-                  padding: "3px 8px",
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: "#111",
-                  whiteSpace: "nowrap",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                }}>
-                  <span style={{ display: "inline-flex", alignItems: "flex-end", gap: 1, height: 10 }}>
+                {/* Network + Clock */}
+                <div style={{ display: "flex", alignItems: "stretch", gap: 4 }}>
+                  <div
+                    style={{
+                      background: "#c0c0c0",
+                      borderTop: "1px solid #404040",
+                      borderLeft: "1px solid #404040",
+                      borderRight: "1px solid #fff",
+                      borderBottom: "1px solid #fff",
+                      padding: "3px 6px",
+                      display: "inline-flex",
+                      alignItems: "flex-end",
+                      gap: 1,
+                      minWidth: 20,
+                      justifyContent: "center",
+                    }}
+                  >
                     <span style={{ width: 3, height: 3, background: "#0b3b8f" }} />
                     <span style={{ width: 3, height: 5, background: "#0b3b8f" }} />
                     <span style={{ width: 3, height: 7, background: "#0b3b8f" }} />
                     <span style={{ width: 3, height: 9, background: "#0b3b8f" }} />
-                  </span>
-                  <span>{clock}</span>
+                  </div>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setStartOpen(false);
+                      setCalendarOpen((prev) => !prev);
+                    }}
+                    style={{
+                      background: "#c0c0c0",
+                      border: "none",
+                      borderTop: "1px solid #404040",
+                      borderLeft: "1px solid #404040",
+                      borderRight: "1px solid #fff",
+                      borderBottom: "1px solid #fff",
+                      padding: "3px 8px",
+                      fontSize: 11,
+                      fontWeight: 500,
+                      color: "#111",
+                      whiteSpace: "nowrap",
+                      fontFamily: "inherit",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {clock}
+                  </button>
                 </div>
+
+                {calendarOpen && (
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      position: "absolute",
+                      right: 6,
+                      bottom: "100%",
+                      marginBottom: 3,
+                      width: 255,
+                      background: "#c0c0c0",
+                      borderTop: "2px solid #fff",
+                      borderLeft: "2px solid #fff",
+                      borderRight: "2px solid #404040",
+                      borderBottom: "2px solid #404040",
+                      boxShadow: "3px 3px 10px rgba(0,0,0,0.35)",
+                      zIndex: 9100,
+                      padding: 8,
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                      <button
+                        onClick={() => setCalendarViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
+                        style={{
+                          width: 20,
+                          height: 18,
+                          border: "none",
+                          borderTop: "1px solid #fff",
+                          borderLeft: "1px solid #fff",
+                          borderRight: "1px solid #404040",
+                          borderBottom: "1px solid #404040",
+                          background: "#c0c0c0",
+                          fontSize: 12,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                          lineHeight: 1,
+                        }}
+                      >
+                        {"<"}
+                      </button>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111" }}>{monthLabel}</div>
+                      <button
+                        onClick={() => setCalendarViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
+                        style={{
+                          width: 20,
+                          height: 18,
+                          border: "none",
+                          borderTop: "1px solid #fff",
+                          borderLeft: "1px solid #fff",
+                          borderRight: "1px solid #404040",
+                          borderBottom: "1px solid #404040",
+                          background: "#c0c0c0",
+                          fontSize: 12,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                          lineHeight: 1,
+                        }}
+                      >
+                        {">"}
+                      </button>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 2 }}>
+                      {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((dow) => (
+                        <div key={dow} style={{ textAlign: "center", fontSize: 11, color: "#2f2f2f", fontWeight: 700, padding: "1px 0" }}>
+                          {dow}
+                        </div>
+                      ))}
+                      {dayCells.map((day, idx) => (
+                        <div
+                          key={`${idx}-${day ?? "empty"}`}
+                          style={{
+                            textAlign: "center",
+                            fontSize: 11,
+                            color: day ? "#111" : "#777",
+                            padding: "3px 0",
+                            border: day && isToday(day) ? "1px solid #000080" : "1px solid transparent",
+                            background: day && isToday(day) ? "#dbe7ff" : "transparent",
+                            minHeight: 20,
+                          }}
+                        >
+                          {day ?? ""}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Start Menu Popup */}
                 {startOpen && (
@@ -2741,7 +3065,7 @@ export default function HeroDesktopComputerComponent() {
                             onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
                             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#111"; }}
                           >
-                            <span style={{ width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <span style={{ width: 26, height: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>
                               <span style={{ transform: "scale(0.6)", display: "block" }}>{icon.glyph}</span>
                             </span>
                             {icon.title}
@@ -2767,7 +3091,7 @@ export default function HeroDesktopComputerComponent() {
                           onMouseEnter={(e) => { e.currentTarget.style.background = "#000080"; e.currentTarget.style.color = "#fff"; }}
                           onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#111"; }}
                         >
-                          <span style={{ width: 20, textAlign: "center" }}>📄</span>
+                          <span style={{ width: 26, textAlign: "center" }}>DOC</span>
                           Resume.pdf
                         </button>
                       </div>
@@ -2777,7 +3101,7 @@ export default function HeroDesktopComputerComponent() {
               </div>
                 </>
               ) : (
-                <BootSequence embedded onComplete={() => setBooted(true)} />
+                <BootSequence embedded onComplete={handleBootComplete} />
               )}
             </div>
           </div>
@@ -2797,6 +3121,12 @@ export default function HeroDesktopComputerComponent() {
     </>
   );
 }
+
+
+
+
+
+
 
 
 
