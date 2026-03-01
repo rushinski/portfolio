@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
@@ -39,9 +39,10 @@ const STATS = [
 ];
 
 const SKILLS = {
-  Languages: ["JavaScript", "TypeScript", "Python", "Java", "PHP", "C++", "SQL", "HTML", "CSS"],
-  Technologies: ["Node.js", "Next.js", "React", "Supabase", "PostgreSQL", "MongoDB", "Stripe", "Shippo", "Upstash Redis", "AWS SES", "Docker", "Git", "GitHub Actions", "Vercel", "Discord.js", "ADBKit", "Tesseract.js", "Sharp"],
-  Concepts: ["REST API Design", "Auth & RBAC", "Row-Level Security", "Rate Limiting", "CSRF Protection", "Webhook Processing", "Idempotency", "Transactional Integrity", "Queue-Based Processing", "Concurrency Control", "Event-Driven Architecture", "CI/CD"],
+  Languages: ["TypeScript", "JavaScript", "Python", "Go", "SQL", "Java", "C++", "PHP", "HTML", "CSS"],
+  Technologies: ["Node.js", "Next.js", "Flask", "React", "PostgreSQL", "MySQL", "MongoDB", "Redis", "Tailwind CSS"],
+  Integrations: ["Stripe", "Supabase", "Discord.js", "ADBKit", "AWS SES"],
+  "Developer Tools": ["Docker", "Git", "GitHub", "GitHub Actions", "Vercel"],
 };
 
 const EXPERIENCE = [
@@ -629,27 +630,138 @@ function AboutApp() {
   );
 }
 
+const SKILL_ICON_FILES = {
+  TypeScript: "typescript.webp",
+  JavaScript: "javascript.webp",
+  Python: "python.png",
+  Go: "go.png",
+  SQL: "sql.png",
+  Java: "java.png",
+  "C++": "c__.png",
+  PHP: "php.png",
+  HTML: "html.png",
+  CSS: "css.png",
+  // Technologies
+  "Node.js": "nodejs.png",
+  "Next.js": "nextjs.png",
+  Flask: "flask.png",
+  React: "react.png",
+  PostgreSQL: "postgresql.png",
+  MySQL: "mysql.png",
+  MongoDB: "mongodb.webp",
+  Redis: "redis.webp",
+  "Tailwind CSS": "tailwindcss.webp",
+  // Integrations
+  Stripe: "stripe.webp",
+  Supabase: "supabase.webp",
+  "Discord.js": "discordjs.webp",
+  ADBKit: "adbkit.webp",
+  "AWS SES": "awsses.webp",
+  // Dev Tools
+  Docker: "docker.webp",
+  Git: "git.webp",
+  GitHub: "github.webp",
+  "GitHub Actions": "ghactions.webp",
+  Vercel: "vercel.webp",
+};
+
+function SkillCard({ name }) {
+  const file = SKILL_ICON_FILES[name];
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 5,
+        padding: "10px 4px 8px",
+        background: "#f0f4f8",
+        border: "2px outset #c0c0c0",
+      }}
+    >
+      {file ? (
+        <img
+          src={`/skills/${file}`}
+          alt={name}
+          width={32}
+          height={32}
+          style={{
+            imageRendering: "pixelated",
+            width: 32,
+            height: 32,
+            objectFit: "contain",
+          }}
+        />
+      ) : (
+        // Fallback: just show initials until you create the icon
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            background: "#c0c0c0",
+            border: "1px solid #808080",
+            display: "grid",
+            placeItems: "center",
+            fontSize: 9,
+            fontWeight: 700,
+            color: "#333",
+          }}
+        >
+          {name.slice(0, 3)}
+        </div>
+      )}
+      <span
+        style={{
+          fontSize: 10,
+          color: "#333",
+          textAlign: "center",
+          fontWeight: 600,
+          lineHeight: 1.2,
+          maxWidth: 82,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {name}
+      </span>
+    </div>
+  );
+}
+
+// --- Step 3: Replace the old SkillsApp function with this ---
+
 function SkillsApp() {
   return (
-    <div style={{ padding: "16px 20px" }}>
-      <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12, color: "#111" }}>Skills & Technologies</div>
+    <div style={{ padding: "20px 24px" }}>
+      <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 20, color: "#111" }}>
+        Skills & Technologies
+      </div>
       {Object.entries(SKILLS).map(([cat, items]) => (
-        <div key={cat} style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#000080", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{cat}</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+        <div key={cat} style={{ marginBottom: 20 }}>
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: "#000080",
+              marginBottom: 10,
+              textTransform: "uppercase",
+              letterSpacing: 1,
+              borderBottom: "2px solid #000080",
+              paddingBottom: 4,
+            }}
+          >
+            {cat}
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(88px, 1fr))",
+              gap: 6,
+            }}
+          >
             {items.map((s) => (
-              <span
-                key={s}
-                style={{
-                  background: "#e8eef6",
-                  border: "1px solid #c0c0c0",
-                  padding: "3px 8px",
-                  fontSize: 11,
-                  color: "#333",
-                }}
-              >
-                {s}
-              </span>
+              <SkillCard key={s} name={s} />
             ))}
           </div>
         </div>
