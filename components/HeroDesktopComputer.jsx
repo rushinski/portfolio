@@ -648,21 +648,21 @@ const SKILL_ICON_FILES = {
   React: "react.png",
   PostgreSQL: "postgresql.png",
   MySQL: "mysql.png",
-  MongoDB: "mongodb.webp",
-  Redis: "redis.webp",
-  "Tailwind CSS": "tailwindcss.webp",
+  MongoDB: "mongodb.png",
+  Redis: "redis.png",
+  "Tailwind CSS": "tailwindcss.png",
   // Integrations
   Stripe: "stripe.webp",
-  Supabase: "supabase.webp",
-  "Discord.js": "discordjs.webp",
-  ADBKit: "adbkit.webp",
-  "AWS SES": "awsses.webp",
+  Supabase: "supabase.png",
+  "Discord.js": "discord.webp",
+  ADBKit: "andriod.png",
+  "AWS SES": "awsses.png",
   // Dev Tools
-  Docker: "docker.webp",
-  Git: "git.webp",
-  GitHub: "github.webp",
-  "GitHub Actions": "ghactions.webp",
-  Vercel: "vercel.webp",
+  Docker: "docker.png",
+  Git: "git.png",
+  GitHub: "github.png",
+  "GitHub Actions": "githubactions.png",
+  Vercel: "vercel.png",
 };
 
 function SkillCard({ name }) {
