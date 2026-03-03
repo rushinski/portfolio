@@ -22,13 +22,6 @@ const PERSONAL = {
   gpa: "3.52 / 4.00",
 };
 
-const STATS = [
-  { value: "3.52", label: "GPA" },
-  { value: "60+", label: "API Routes" },
-  { value: "100%", label: "Order Success" },
-  { value: "58%", label: "Cost Reduction" },
-];
-
 const SKILLS = {
   Languages: ["TypeScript", "JavaScript", "Python", "Go", "SQL", "Java", "C++", "PHP", "HTML", "CSS"],
   Technologies: ["Node.js", "Next.js", "Flask", "React", "PostgreSQL", "MySQL", "MongoDB", "Redis", "Tailwind CSS"],
@@ -68,18 +61,17 @@ const EXPERIENCE = [
 
 const PROJECTS = [
   {
-    title: "Sneaker Eco SaaS",
-    subtitle: "Multi-tenant sneaker marketplace - in progress",
+    title: "Multi-Tenant Sneaker Resale Marketplace",
     date: "Feb 2026 - Present",
     status: "IN_PROGRESS",
-    desc: "Multi-tenant SaaS expansion of the Realdealkickzsc platform, enabling other sneaker retailers to spin up their own storefronts on shared infrastructure.",
+    desc: "Expansion of the Realdealkickzsc platform, enabling other sneaker retailers to spin up their own storefronts on shared infrastructure.",
     impact: [
       "Multi-tenant architecture with full per-store data isolation",
       "Shared infra dramatically reduces per-tenant cost vs Shopify",
       "Reusing proven payment, webhook, and rate-limiting patterns",
       "22-week implementation roadmap in active progress",
     ],
-    stack: ["Go", "Next.js", "PostgreSQL", "Digital Ocean", "Upstash Redis", "Vercel"],
+    stack: ["Go", "Next.js", "PostgreSQL", "Digital Ocean", "Upstash Redis"],
     narrative: "I started this project after completing the Realdealkickzsc contract. The interest I received from other sneaker resellers made it clear there was a real market opportunity. Rather than building separate codebases for each client, I decided to architect a proper multi-tenant SaaS platform. This also gave me the chance to fix the bottlenecks and architectural issues I discovered in the v1 system, and to learn Go for the backend rebuild. I currently have 1 seller on the platform and 5 more waiting to join once the full multi-tenant rebuild is complete.",
     architecture: [
       "Single Go backend with Chi router, domain-driven folder structure (internal/domain/, internal/router/, internal/platform/)",
@@ -97,8 +89,7 @@ const PROJECTS = [
   },
   {
     title: "Discord Title Automation Bot",
-    subtitle: "ADB automation pipeline with computer vision",
-    date: "Jan-Mar 2025",
+    date: "Jan 2025 - Mar 2025",
     status: "COMPLETE",
     desc: "Orchestrated a Discord-to-device automation pipeline that mapped Discord user IDs to MongoDB player records.",
     impact: [
@@ -127,8 +118,7 @@ const PROJECTS = [
   },
   {
     title: "Discord Moderation Bot",
-    subtitle: "Modular event-driven bot for community management",
-    date: "Oct 2024-Jan 2025",
+    date: "Oct 2024 - Jan 2025",
     status: "COMPLETE",
     desc: "Engineered a modular, event-driven Discord bot serving 8 servers and 900+ members.",
     impact: [
@@ -980,8 +970,10 @@ function ProjectDetailModal({ project, onClose }) {
   return (
     <div
       style={{
-        position: "absolute",
+        position: "fixed",
         inset: 0,
+        width: "100vw",
+        height: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -1057,14 +1049,21 @@ function ProjectDetailModal({ project, onClose }) {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
                 <div>
                   <div style={{ fontWeight: 800, fontSize: 18, color: "#111" }}>{project.title}</div>
-                  <div style={{ fontSize: 12, color: "#777" }}>{project.subtitle} - {project.date}</div>
                 </div>
-                <span style={{
-                  fontSize: 10, padding: "3px 10px", fontWeight: 700,
-                  background: project.status === "IN_PROGRESS" ? "#ffffcc" : "#ccffcc",
-                  color: project.status === "IN_PROGRESS" ? "#806000" : "#006000",
-                  border: `1px solid ${project.status === "IN_PROGRESS" ? "#c0a000" : "#00a000"}`,
-                }}>{project.status === "IN_PROGRESS" ? "In Progress" : "Complete"}</span>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                  <span style={{
+                    fontSize: 10, padding: "3px 10px", fontWeight: 700,
+                    background: "#e8eef6",
+                    color: "#1f3763",
+                    border: "1px solid #9bb2d9",
+                  }}>{project.date}</span>
+                  <span style={{
+                    fontSize: 10, padding: "3px 10px", fontWeight: 700,
+                    background: project.status === "IN_PROGRESS" ? "#ffffcc" : "#ccffcc",
+                    color: project.status === "IN_PROGRESS" ? "#806000" : "#006000",
+                    border: `1px solid ${project.status === "IN_PROGRESS" ? "#c0a000" : "#00a000"}`,
+                  }}>{project.status === "IN_PROGRESS" ? "In Progress" : "Complete"}</span>
+                </div>
               </div>
 
               {/* My Thinking */}
@@ -1135,7 +1134,7 @@ function ProjectDetailModal({ project, onClose }) {
                   <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f0fff0", border: "2px inset #c0c0c0" }}>
                     <div style={{ width: 36, height: 36, background: "#006000", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 12, fontWeight: 800, flexShrink: 0 }}>WWW</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>Live Site</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>Tenant Live Site</div>
                       <div style={{ fontSize: 11, color: "#666", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.links.live.replace("https://", "")}</div>
                     </div>
                     <RetroButton href={project.links.live} primary>Visit Site</RetroButton>
@@ -1213,17 +1212,23 @@ function ProjectsApp() {
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <span style={{
                 fontSize: 10, padding: "2px 8px",
+                background: "#e8eef6",
+                color: "#1f3763",
+                border: "1px solid #9bb2d9",
+                fontWeight: 600,
+              }}>{p.date}</span>
+              <span style={{
+                fontSize: 10, padding: "2px 8px",
                 background: p.status === "IN_PROGRESS" ? "#ffffcc" : "#ccffcc",
                 color: p.status === "IN_PROGRESS" ? "#806000" : "#006000",
                 border: `1px solid ${p.status === "IN_PROGRESS" ? "#c0a000" : "#00a000"}`,
                 fontWeight: 600,
               }}>{p.status === "IN_PROGRESS" ? "In Progress" : "Complete"}</span>
               <span style={{ fontSize: 10, padding: "2px 8px", background: "#000080", color: "#fff", fontWeight: 600, border: "1px solid #000060" }}>
-                View Details {"\u2192"}
+                View Details
               </span>
             </div>
           </div>
-          <div style={{ fontSize: 11, color: "#777", marginBottom: 4 }}>{p.subtitle} - {p.date}</div>
           <div style={{ fontSize: 12, color: "#555", marginBottom: 8 }}>{p.desc}</div>
           {p.impact.slice(0, 2).map((item, j) => (
             <div key={j} style={{ fontSize: 12, color: "#444", padding: "2px 0", paddingLeft: 12, position: "relative" }}>
@@ -1373,7 +1378,7 @@ function TerminalApp() {
     whoami: () => `${PERSONAL.name} - ${PERSONAL.title}\n${PERSONAL.location}`,
     skills: () => Object.entries(SKILLS).map(([cat, items]) => `${cat}: ${items.join(", ")}`).join("\n"),
     contact: () => `Email: ${PERSONAL.email}\nGitHub: ${PERSONAL.github}\nLinkedIn: ${PERSONAL.linkedin}`,
-    projects: () => PROJECTS.map((p) => `${p.status === "IN_PROGRESS" ? "[WIP]" : "[OK]"} ${p.title} - ${p.subtitle}`).join("\n"),
+    projects: () => PROJECTS.map((p) => `${p.status === "IN_PROGRESS" ? "[WIP]" : "[OK]"} ${p.title} - ${p.date}`).join("\n"),
     clear: () => "__CLEAR__",
     date: () => new Date().toString(),
     uptime: () => `System uptime: ${Math.floor(Math.random() * 365)} days, ${Math.floor(Math.random() * 24)}:${String(Math.floor(Math.random() * 60)).padStart(2, "0")}`,
@@ -1391,7 +1396,6 @@ function TerminalApp() {
 
   const formatProjectsDetails = () => PROJECTS.map((p, idx) => [
     `${idx + 1}. ${p.title} (${p.date}) ${p.status === "IN_PROGRESS" ? "[WIP]" : "[COMPLETE]"}`,
-    `   ${p.subtitle}`,
     `   ${p.desc}`,
     ...p.impact.map((line) => `   - ${line}`),
   ].join("\n")).join("\n\n");
