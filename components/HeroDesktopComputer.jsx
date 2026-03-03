@@ -612,7 +612,16 @@ function Window({ win, isActive, onFocus, onClose, onMinimize, onMaximize, onMov
 
 //  App Contents 
 
-function WelcomeApp() {
+function WelcomeApp({ openWindow }) {
+  const startHereItems = [
+    { id: "about", title: "About", description: "for a quick overview" },
+    { id: "skills", title: "Skills", description: "for technologies and tools" },
+    { id: "experience", title: "Experience", description: "for work history" },
+    { id: "projects", title: "Projects", description: "for shipped and in-progress work" },
+    { id: "contact", title: "Contact", description: "to reach out" },
+    { id: "github", title: "GitHub", description: "to view activity charts" },
+  ];
+
   return (
     <div style={{ padding: "16px 20px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
@@ -620,15 +629,31 @@ function WelcomeApp() {
       </div>
       <div style={{ fontSize: 13, color: "#333", marginBottom: 14, lineHeight: 1.7 }}>
         This is the portfolio of <strong>Jacob Rushinski</strong> - a backend/full-stack developer.
-        Navigate this retro desktop to explore my work, skills, and projects, and use it just like you would a desktop.
+        Navigate this retro desktop to explore my work, skills, projects, and more! You navigate this desktop just like any other desktop.
       </div>
       <div style={{ fontSize: 12, color: "#444", marginBottom: 10, fontWeight: 700 }}>Start here:</div>
       <div style={{ fontSize: 12, color: "#444", lineHeight: 1.8, paddingLeft: 8 }}>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>About</strong> for a quick overview</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Skills</strong> for technologies and tools</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Experience</strong> for work history</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Projects</strong> for shipped and in-progress work</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Contact</strong> to reach out</div>
+        {startHereItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => openWindow?.(item.id)}
+            style={{
+              width: "100%",
+              textAlign: "left",
+              background: "transparent",
+              border: "none",
+              padding: "0",
+              fontSize: 12,
+              color: "#444",
+              lineHeight: 1.8,
+              fontFamily: "inherit",
+              cursor: "pointer",
+            }}
+          >
+            <span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>
+            <strong style={{ color: "#000080", textDecoration: "underline", textDecorationColor: "#000080" }}>{item.title}</strong> {item.description}
+          </button>
+        ))}
         <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>Explore the other apps too see more cool features of JacobOS.</div>
       </div>
       <div style={{ marginTop: 16, padding: "10px 12px", background: "#ffffcc", border: "1px solid #e0d080", fontSize: 12, color: "#555" }}>
@@ -2125,7 +2150,7 @@ export default function HeroDesktopComputerComponent() {
 
   //  Windows state (Welcome open by default) 
   const [windows, setWindows] = useState({
-    welcome:    { id: "welcome",    title: "Welcome",                  x: 250, y: 95,  w: 800, h: 540, isOpen: true,  isMinimized: false, isMaximized: false, z: 11 },
+    welcome:    { id: "welcome",    title: "Welcome",                  x: 250, y: 95,  w: 800, h: 500, isOpen: true,  isMinimized: false, isMaximized: false, z: 11 },
     about:      { id: "about",      title: "About",                    x: 30, y: 20,  w: 1200, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 10 },
     skills:     { id: "skills",     title: "Skills",                   x: 200, y: 60,  w: 480, h: 400, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
     experience: { id: "experience", title: "Experience",               x: 180, y: 50,  w: 560, h: 480, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
@@ -3004,7 +3029,7 @@ export default function HeroDesktopComputerComponent() {
   //  Start menu 
 
   const windowContent = {
-    welcome: <WelcomeApp />,
+    welcome: <WelcomeApp openWindow={openWindow} />,
     about: <AboutApp openWindow={openWindow} />,
     skills: <SkillsApp />,
     experience: <ExperienceApp />,
