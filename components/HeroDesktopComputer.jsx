@@ -502,6 +502,10 @@ function Window({ win, isActive, onFocus, onClose, onMinimize, onMaximize, onMov
         transition: isDragging ? "none" : "opacity 0.15s",
       }}
       onPointerDown={(e) => { e.stopPropagation(); onFocus(); }}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
     >
       <div
         style={{
@@ -2819,6 +2823,7 @@ export default function HeroDesktopComputerComponent() {
                 onPointerDown={handleDesktopPointerDown}
                 onPointerMove={(e) => rememberDesktopCursor(e.clientX, e.clientY)}
                 onContextMenu={(e) => {
+                  if (e.target !== e.currentTarget) return;
                   e.preventDefault();
                   e.stopPropagation();
                   openDesktopMenuAt(e.clientX, e.clientY);
@@ -3123,7 +3128,6 @@ export default function HeroDesktopComputerComponent() {
                           onContextMenu={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            openTaskbarMenuAt(id, e.clientX, e.clientY);
                           }}
                           style={{
                             border: "none",
@@ -3201,7 +3205,6 @@ export default function HeroDesktopComputerComponent() {
                       onContextMenu={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        openTaskbarMenuAt(id, e.clientX, e.clientY);
                       }}
                       style={{
                         display: "flex",
