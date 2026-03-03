@@ -13,7 +13,7 @@ const PERSONAL = {
   title: "Backend / Full-Stack Developer",
   tagline: "I build production-grade systems: APIs, data modeling, auth, payments, automation.",
   email: "jacobrushinski@gmail.com",
-  location: "Lancaster, PA",
+  location: "United States",
   github: "https://github.com/rushinski",
   linkedin: "https://linkedin.com/in/jacobrushinski",
   resumeUrl: "/Jacob_Rushinski_Resume.pdf",
@@ -21,15 +21,6 @@ const PERSONAL = {
   gradDate: "May 2026",
   gpa: "3.52 / 4.00",
 };
-
-const ABOUT_LINES = [
-  `Software Engineering Student @ ${PERSONAL.school}`,
-  `Graduating ${PERSONAL.gradDate} - GPA ${PERSONAL.gpa}`,
-  "I build things that ship and hold up under pressure.",
-  "Currently expanding a production e-commerce platform into multi-tenant SaaS.",
-  "Interested in backend architecture, distributed systems, and automation.",
-  "Looking for backend or full-stack roles where I can do meaningful work.",
-];
 
 const STATS = [
   { value: "3.52", label: "GPA" },
@@ -300,7 +291,7 @@ const ICON_VIEW_MODES = {
   large: { tileW: 94, tileH: 112, glyphScale: 1.2, labelSize: 12, cellX: 108, cellY: 126, maxLabel: 100 },
 };
 const MENU_TEXT_COLOR = "#162133";
-const FULLSCREEN_WINDOW_IDS = new Set(["about", "skills", "experience", "projects", "github", "contact"]);
+const FULLSCREEN_WINDOW_IDS = new Set(["skills", "experience", "projects", "github", "contact"]);
 const DEFAULT_PINNED_TASKBAR_IDS = ["about", "skills", "experience", "projects", "contact"];
 const canPinItemToTaskbar = (item) => item?.itemType === "app" && !!item.windowId;
 const snapIconToGrid = (x, y, mode = "medium", marginX = 12, marginY = 8) => {
@@ -647,32 +638,106 @@ function WelcomeApp() {
   );
 }
 
-function AboutApp() {
+function AboutApp({ openWindow }) {
+  const TOP_SKILLS = ["JavaScript", "Python", "PostgreSQL", "Next.js"];
+
+  const SOCIALS = [
+    { label: "Email", value: "jacobrushinski@gmail.com", href: "mailto:jacobrushinski@gmail.com", icon: "email.png" },
+    { label: "Phone", value: "(717) 216-9005", href: "tel:+17172169005", icon: "phone.png" },
+    { label: "LinkedIn", value: "linkedin.com/in/jacobrushinski", href: "https://linkedin.com/in/jacobrushinski", icon: "linkedin.png" },
+    { label: "GitHub", value: "github.com/rushinski", href: "https://github.com/rushinski", icon: "github.png" },
+  ];
+
   return (
-    <div style={{ padding: "16px 20px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, #000080, #0000c0)", display: "grid", placeItems: "center", color: "#fff", fontSize: 24, fontWeight: 800, flexShrink: 0, border: "2px solid #808080" }}>JR</div>
+    <div style={{ padding: "16px 24px" }}>
+      {/* Open to work banner */}
+      <div style={{
+        background: "#eaffea", border: "1px solid #66bb6a",
+        padding: "7px 14px", fontSize: 12, color: "#2e7d32", fontWeight: 600,
+        marginBottom: 16,
+      }}>
+        I am looking for Backend, Full-Stack, or related technical roles near Philadelphia, PA (up to 50 miles) and open to nationwide remote opportunities.
+      </div>
+
+      {/* Profile row */}
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 8 }}>
+        <div style={{
+          width: 64, height: 64, background: "linear-gradient(135deg, #000080, #0000c0)",
+          display: "grid", placeItems: "center", color: "#fff", fontSize: 24, fontWeight: 800,
+          flexShrink: 0, border: "2px solid #808080",
+        }}>JR</div>
         <div>
           <div style={{ fontSize: 20, fontWeight: 800, color: "#111" }}>{PERSONAL.name}</div>
           <div style={{ fontSize: 13, color: "#555", fontWeight: 600 }}>{PERSONAL.title}</div>
           <div style={{ fontSize: 12, color: "#777" }}>{PERSONAL.location}</div>
         </div>
       </div>
-      <div style={{ marginBottom: 16 }}>
-        {ABOUT_LINES.map((line, i) => (
-          <div key={i} style={{ padding: "3px 0", fontSize: 13, color: "#333" }}>
-            <span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>
-            {line}
-          </div>
+
+      {/* Socials inline */}
+      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 6 }}>
+        {SOCIALS.map((s) => (
+          <a key={s.label} href={s.href}
+            target={s.href.startsWith("mailto") || s.href.startsWith("tel") ? undefined : "_blank"}
+            rel="noopener noreferrer"
+            style={{
+              display: "flex", alignItems: "center", gap: 5, padding: "3px 2px",
+              textDecoration: "none", color: "#000080", fontSize: 11, fontWeight: 600,
+            }}
+          >
+            <img src={`/socials/${s.icon}`} alt={s.label} width={13} height={13} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+            {s.value}
+          </a>
         ))}
       </div>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        {STATS.map((s) => (
-          <div key={s.label} style={{ background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 16px", textAlign: "center", minWidth: 100 }}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#000080" }}>{s.value}</div>
-            <div style={{ fontSize: 10, color: "#666", textTransform: "uppercase", letterSpacing: 0.5 }}>{s.label}</div>
-          </div>
-        ))}
+
+      {/* Top Skills inline */}
+      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 16 }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 0.5 }}>Top Skills:</span>
+        {TOP_SKILLS.map((s) => {
+          const file = SKILL_ICON_FILES[s];
+          return (
+            <div key={s} style={{ display: "flex", alignItems: "center", gap: 4, background: "#f0f4f8", border: "1px solid #c0c0c0", padding: "2px 6px" }}>
+              {file ? (
+                <img src={`/skills/${file}`} alt={s} width={13} height={13} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+              ) : (
+                <div style={{ width: 13, height: 13, background: "#c0c0c0", display: "grid", placeItems: "center", fontSize: 6, fontWeight: 700 }}>{s.slice(0, 2)}</div>
+              )}
+              <span style={{ fontSize: 10, fontWeight: 600, color: "#333" }}>{s}</span>
+            </div>
+          );
+        })}
+        <button onClick={() => openWindow?.("skills")} style={{
+          background: "transparent", border: "none", padding: 0, fontSize: 10,
+          color: "#000080", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline",
+        }}>All skills {"\u2192"}</button>
+      </div>
+
+      {/* About Me */}
+      <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>About Me</div>
+      <div style={{ fontSize: 12, color: "#333", lineHeight: 1.75, marginBottom: 16 }}>
+        Hi, I'm Jacob Rushinski! I'm currently attending Thaddeus Stevens College of Technology and will be graduating with an Associate's in Computer Software Engineering Technology in May 2026. Right now I'm rebuilding a{" "}
+        <button onClick={() => openWindow?.("projects")} style={{
+          background: "none", border: "none", padding: 0, color: "#000080",
+          fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 12,
+          textDecoration: "underline",
+        }}>multi-tenant sneaker marketplace platform</button>
+        {" "}from the ground up. I'm looking for a backend, full-stack, or any other role that you think may be a good fit for me. I'm a really excited and motivated engineer and take pride over my code, I feel my code is my identity, so I own that. Feel free to reach out, I'd love to hear from you!
+      </div>
+
+      {/* Action buttons */}
+      <div style={{ display: "flex", gap: 8 }}>
+        <button onClick={() => window.open(PERSONAL.resumeUrl, "_blank")} style={{
+          background: "#000080", color: "#fff", border: "none",
+          borderTop: "2px solid #3366cc", borderLeft: "2px solid #3366cc",
+          borderRight: "2px solid #000040", borderBottom: "2px solid #000040",
+          padding: "6px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+        }}>View Resume</button>
+        <button onClick={() => openWindow?.("contact")} style={{
+          background: "#c0c0c0", color: "#111", border: "none",
+          borderTop: "2px solid #fff", borderLeft: "2px solid #fff",
+          borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
+          padding: "6px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+        }}>Contact Me</button>
       </div>
     </div>
   );
@@ -2061,7 +2126,7 @@ export default function HeroDesktopComputerComponent() {
   //  Windows state (Welcome open by default) 
   const [windows, setWindows] = useState({
     welcome:    { id: "welcome",    title: "Welcome",                  x: 250, y: 95,  w: 800, h: 540, isOpen: true,  isMinimized: false, isMaximized: false, z: 11 },
-    about:      { id: "about",      title: "About",                    x: 200, y: 60,  w: 520, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 10 },
+    about:      { id: "about",      title: "About",                    x: 30, y: 20,  w: 1200, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 10 },
     skills:     { id: "skills",     title: "Skills",                   x: 200, y: 60,  w: 480, h: 400, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
     experience: { id: "experience", title: "Experience",               x: 180, y: 50,  w: 560, h: 480, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
     projects:   { id: "projects",   title: "Projects",                 x: 140, y: 30,  w: 540, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
@@ -2940,7 +3005,7 @@ export default function HeroDesktopComputerComponent() {
 
   const windowContent = {
     welcome: <WelcomeApp />,
-    about: <AboutApp />,
+    about: <AboutApp openWindow={openWindow} />,
     skills: <SkillsApp />,
     experience: <ExperienceApp />,
     projects: <ProjectsApp />,
