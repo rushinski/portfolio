@@ -117,26 +117,25 @@ const PROJECTS = [
     },
   },
   {
-    title: "Discord Moderation Bot",
+    title: "Discord Automation & Moderation Bot",
     date: "Oct 2024 - Jan 2025",
     status: "COMPLETE",
-    desc: "Engineered a modular, event-driven Discord bot serving 8 servers and 900+ members.",
+    desc: "Engineered a modular, event-driven Discord bot serving 900+ users.",
     impact: [
-      "60% reduction in moderator workload",
+      "Consolidated 5+ single-purpose bots into a one unified bot",
       "1,000+ transcripts archived with GitHub Gist + MongoDB fallback",
-      "500+ new members screened in 2 months",
       "3 paid bot development offers generated from this project",
     ],
-    stack: ["JavaScript", "Discord.js", "MongoDB", "GitHub Gist API"],
+    stack: ["Node.js", "Discord.js", "MongoDB", "GitHub Gist API"],
     narrative: "I built this bot for a project in Rise of Kingdoms where I was organizing a large group of 900+ players. Creating my own bot allowed me to have full control over Discord's features while personalizing everything to our project's exact needs. I was also able to combine the functionality of multiple bots into one, reducing the server from 10+ bots down to 2-3. The bot grew to be deployed across 8 servers and generated 3 paid development offers.",
     architecture: [
       "Event-driven Node.js architecture with discord.js v14 and modular subsystem design",
       "6 independent subsystems: Ticketing & Verification, Moderation, Leveling, Roles & Counts, Giveaways, Logging",
       "MongoDB persistence layer for users, infractions, tickets, transcripts, giveaways, and role systems",
       "GitHub Gist integration for external ticket transcript archiving (1000+ stored)",
-      "Moderation escalation policy: warnings → strikes → auto-ban with fuzzy banned-word matching (fast-levenshtein)",
+      "Moderation escalation policy: warnings -> strikes -> auto-ban with fuzzy banned-word matching (fast-levenshtein)",
       "Dynamic loaders for auto-registration of commands, events, and UI components",
-      "Deployed on VPS + Discloud with backup/rollback support and GitHub Pages landing page",
+      "Deployed on Discloud with backup/rollback support and GitHub Pages landing page",
     ],
     links: {
       github: "https://github.com/rushinski/Discord-Bot-Unity",
@@ -145,7 +144,7 @@ const PROJECTS = [
   },
 ];
 
-//  Retro Pixel Icon SVGs 
+// Retro Pixel Icon SVGs 
 // These are designed to look like classic Win3.1/95 16-color style icons
 const Icons = {
   folder: (
@@ -937,7 +936,7 @@ function ProjectDetailModal({ project, onClose }) {
 
   const tabs = [
     { id: "overview", label: "Overview" },
-    { id: "architecture", label: "Architecture" },
+    { id: "architecture", label: "How It's Built" },
     { id: "links", label: "Links & Demos" },
   ];
 
@@ -984,9 +983,8 @@ function ProjectDetailModal({ project, onClose }) {
     >
       <div
         style={{
-          width: "92%",
-          maxWidth: 720,
-          maxHeight: "88%",
+          width: 760,
+          height: 580,
           background: "#c0c0c0",
           borderTop: "2px solid #fff",
           borderLeft: "2px solid #fff",
@@ -995,6 +993,7 @@ function ProjectDetailModal({ project, onClose }) {
           boxShadow: "4px 8px 24px rgba(0,0,0,0.6)",
           display: "flex",
           flexDirection: "column",
+          flexShrink: 0,
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -1005,6 +1004,7 @@ function ProjectDetailModal({ project, onClose }) {
           padding: "5px 8px",
           display: "flex", alignItems: "center", justifyContent: "space-between",
           userSelect: "none",
+          flexShrink: 0,
         }}>
           <span>{project.title} - Project Details</span>
           <button onClick={onClose} style={{
@@ -1017,7 +1017,7 @@ function ProjectDetailModal({ project, onClose }) {
         </div>
 
         {/* Tab strip */}
-        <div style={{ display: "flex", gap: 0, padding: "6px 8px 0", background: "#c0c0c0" }}>
+        <div style={{ display: "flex", gap: 0, padding: "6px 8px 0", background: "#c0c0c0", flexShrink: 0 }}>
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -1046,16 +1046,12 @@ function ProjectDetailModal({ project, onClose }) {
           {/* OVERVIEW TAB */}
           {activeTab === "overview" && (
             <div style={{ padding: "16px 20px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-                <div>
-                  <div style={{ fontWeight: 800, fontSize: 18, color: "#111" }}>{project.title}</div>
-                </div>
-                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
+                <div style={{ fontWeight: 800, fontSize: 18, color: "#111" }}>{project.title}</div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <span style={{
                     fontSize: 10, padding: "3px 10px", fontWeight: 700,
-                    background: "#e8eef6",
-                    color: "#1f3763",
-                    border: "1px solid #9bb2d9",
+                    background: "#e8eef6", color: "#1f3763", border: "1px solid #9bb2d9",
                   }}>{project.date}</span>
                   <span style={{
                     fontSize: 10, padding: "3px 10px", fontWeight: 700,
@@ -1066,9 +1062,9 @@ function ProjectDetailModal({ project, onClose }) {
                 </div>
               </div>
 
-              {/* My Thinking */}
-              <div style={{ background: "#f8f6f0", border: "2px inset #c0c0c0", padding: "12px 14px", marginBottom: 16 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>My Thinking</div>
+              {/* Why I Built This */}
+              <div style={{ background: "#f0f4ff", border: "1px solid #c0cce8", padding: "12px 14px", marginBottom: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Why I Built This</div>
                 <div style={{ fontSize: 12, color: "#333", lineHeight: 1.7 }}>{project.narrative}</div>
               </div>
 
@@ -1091,22 +1087,20 @@ function ProjectDetailModal({ project, onClose }) {
             </div>
           )}
 
-          {/* ARCHITECTURE TAB */}
+          {/* HOW IT'S BUILT TAB */}
           {activeTab === "architecture" && (
             <div style={{ padding: "16px 20px" }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 12, borderBottom: "2px solid #000080", paddingBottom: 4 }}>
-                System Architecture
+                How It's Built
               </div>
               {project.architecture?.map((item, j) => (
                 <div key={j} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "8px 0", borderBottom: j < project.architecture.length - 1 ? "1px solid #e8e8e8" : "none" }}>
-                  <div style={{ width: 22, height: 22, background: "#000080", color: "#fff", fontSize: 10, fontWeight: 700, display: "grid", placeItems: "center", flexShrink: 0, marginTop: 1 }}>
-                    {String(j + 1).padStart(2, "0")}
-                  </div>
+                  <span style={{ color: "#000080", fontWeight: 700, flexShrink: 0, fontSize: 12, marginTop: 1 }}>{">"}</span>
                   <div style={{ fontSize: 12, color: "#333", lineHeight: 1.6, flex: 1 }}>{item}</div>
                 </div>
               ))}
               {(!project.architecture || project.architecture.length === 0) && (
-                <div style={{ fontSize: 12, color: "#888", fontStyle: "italic" }}>Architecture details coming soon.</div>
+                <div style={{ fontSize: 12, color: "#888", fontStyle: "italic" }}>Details coming soon.</div>
               )}
             </div>
           )}
@@ -1118,7 +1112,6 @@ function ProjectDetailModal({ project, onClose }) {
                 Links & Demos
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-
                 {project.links?.github && (
                   <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f4f4f8", border: "2px inset #c0c0c0" }}>
                     <div style={{ width: 36, height: 36, background: "#24292e", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 14, fontWeight: 800, flexShrink: 0 }}>GH</div>
@@ -1129,18 +1122,16 @@ function ProjectDetailModal({ project, onClose }) {
                     <RetroButton href={project.links.github} primary>Open Repo</RetroButton>
                   </div>
                 )}
-
                 {project.links?.live && (
                   <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f0fff0", border: "2px inset #c0c0c0" }}>
                     <div style={{ width: 36, height: 36, background: "#006000", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 12, fontWeight: 800, flexShrink: 0 }}>WWW</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>Tenant Live Site</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>Live Site</div>
                       <div style={{ fontSize: 11, color: "#666", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.links.live.replace("https://", "")}</div>
                     </div>
                     <RetroButton href={project.links.live} primary>Visit Site</RetroButton>
                   </div>
                 )}
-
                 {project.links?.landing && (
                   <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f5f0ff", border: "2px inset #c0c0c0" }}>
                     <div style={{ width: 36, height: 36, background: "#6b21a8", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>LP</div>
@@ -1151,7 +1142,6 @@ function ProjectDetailModal({ project, onClose }) {
                     <RetroButton href={project.links.landing} primary>View Page</RetroButton>
                   </div>
                 )}
-
                 {project.links?.youtube?.map((video, idx) => (
                   <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#fff5f5", border: "2px inset #c0c0c0" }}>
                     <div style={{ width: 36, height: 36, background: "#cc0000", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 16, fontWeight: 800, flexShrink: 0 }}>{"\u25B6"}</div>
@@ -1162,23 +1152,12 @@ function ProjectDetailModal({ project, onClose }) {
                     <RetroButton href={video.url} primary style={{ background: "#cc0000", borderTop: "2px solid #ff3333", borderLeft: "2px solid #ff3333", borderRight: "2px solid #800000", borderBottom: "2px solid #800000" }}>Watch</RetroButton>
                   </div>
                 ))}
-
                 {!project.links && (
-                  <div style={{ fontSize: 12, color: "#888", fontStyle: "italic" }}>Links will be available once this project reaches its next milestone.</div>
+                  <div style={{ fontSize: 12, color: "#888", fontStyle: "italic" }}>Links available at the next milestone.</div>
                 )}
               </div>
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div style={{ padding: "6px 12px", background: "#c0c0c0", display: "flex", justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{
-            background: "#c0c0c0", border: "none",
-            borderTop: "2px solid #fff", borderLeft: "2px solid #fff",
-            borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
-            padding: "5px 24px", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
-          }}>Close</button>
         </div>
       </div>
     </div>
@@ -1209,23 +1188,14 @@ function ProjectsApp() {
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 4 }}>
             <div style={{ fontWeight: 700, fontSize: 14, color: "#111" }}>{p.title}</div>
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
               <span style={{
                 fontSize: 10, padding: "2px 8px",
-                background: "#e8eef6",
-                color: "#1f3763",
-                border: "1px solid #9bb2d9",
+                background: "#e8eef6", color: "#1f3763", border: "1px solid #9bb2d9",
                 fontWeight: 600,
               }}>{p.date}</span>
-              <span style={{
-                fontSize: 10, padding: "2px 8px",
-                background: p.status === "IN_PROGRESS" ? "#ffffcc" : "#ccffcc",
-                color: p.status === "IN_PROGRESS" ? "#806000" : "#006000",
-                border: `1px solid ${p.status === "IN_PROGRESS" ? "#c0a000" : "#00a000"}`,
-                fontWeight: 600,
-              }}>{p.status === "IN_PROGRESS" ? "In Progress" : "Complete"}</span>
-              <span style={{ fontSize: 10, padding: "2px 8px", background: "#000080", color: "#fff", fontWeight: 600, border: "1px solid #000060" }}>
-                View Details
+              <span style={{ fontSize: 10, padding: "2px 8px", background: "#000080", color: "#fff", fontWeight: 600, border: "1px solid #000060", cursor: "pointer" }}>
+                Details
               </span>
             </div>
           </div>
