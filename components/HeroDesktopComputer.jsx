@@ -77,18 +77,32 @@ const EXPERIENCE = [
 
 const PROJECTS = [
   {
-    title: "RDK SaaS Platform",
+    title: "Sneaker Eco SaaS",
     subtitle: "Multi-tenant sneaker marketplace - in progress",
-    date: "2025 - Present",
+    date: "Feb 2026 - Present",
     status: "IN_PROGRESS",
     desc: "Multi-tenant SaaS expansion of the Realdealkickzsc platform, enabling other sneaker retailers to spin up their own storefronts on shared infrastructure.",
     impact: [
-      "Multi-tenant Supabase architecture with full per-store data isolation",
+      "Multi-tenant architecture with full per-store data isolation",
       "Shared infra dramatically reduces per-tenant cost vs Shopify",
       "Reusing proven payment, webhook, and rate-limiting patterns",
       "22-week implementation roadmap in active progress",
     ],
-    stack: ["Next.js", "Supabase", "PostgreSQL", "Stripe", "Upstash Redis", "Vercel"],
+    stack: ["Go", "Next.js", "PostgreSQL", "Digital Ocean", "Upstash Redis", "Vercel"],
+    narrative: "I started this project after completing the Realdealkickzsc contract. The interest I received from other sneaker resellers made it clear there was a real market opportunity. Rather than building separate codebases for each client, I decided to architect a proper multi-tenant SaaS platform. This also gave me the chance to fix the bottlenecks and architectural issues I discovered in the v1 system, and to learn Go for the backend rebuild. I currently have 1 seller on the platform and 5 more waiting to join once the full multi-tenant rebuild is complete.",
+    architecture: [
+      "Single Go backend with Chi router, domain-driven folder structure (internal/domain/, internal/router/, internal/platform/)",
+      "Multi-runtime codebase: Go API + Python image processing service using rembg",
+      "PostgreSQL with Row Level Security for complete tenant data isolation",
+      "PayRilla Gateway (white-labeled Accept.Blue) replacing Stripe after account closure",
+      "AWS Cognito for auth, Doppler for secrets management, New Relic APM for observability",
+      "Digital Ocean infrastructure replacing Vercel + Supabase with parallel build/hard cutover migration",
+      "TaxJar API-only tier for tax calculation, Signifyd for fraud prevention",
+    ],
+    links: {
+      github: "https://github.com/rushinski/rdk-webstore",
+      live: "https://www.realdealkickzsc.com/",
+    },
   },
   {
     title: "Discord Title Automation Bot",
@@ -102,6 +116,23 @@ const PROJECTS = [
       "100% conflict-free processing with role-based bucket queue",
     ],
     stack: ["JavaScript", "MongoDB", "ADBKit", "Tesseract.js", "Discord.js"],
+    narrative: "I built this bot because of a game I was playing called Rise of Kingdoms. In this game you can assign titles to players for buffs, but manually doing this took a lot of time. In the culture of the game, the solution was a title bot — they already existed, but building my own gave me the chance to learn new technologies like ADB device automation and OCR, while also saving our kingdom money and giving us full control over the system. The project ended up generating two paid offers from other kingdoms wanting similar solutions.",
+    architecture: [
+      "Modular Node.js application integrating Discord, MongoDB, ADB, and OCR libraries",
+      "Discord.js slash command interface (/title, /set-location, /locate-bot) with permissions enforcement",
+      "MongoDB + Mongoose for player location persistence and bot state tracking",
+      "ADBKit for communicating with Android emulator — executes taps, text inputs, screenshots",
+      "Sharp + Pixelmatch + PNG.js for image comparison and reference UI element detection",
+      "Tesseract.js OCR engine to extract in-game coordinates from screenshots",
+      "Resilient queueing system with cooldowns to prevent overlapping title assignments",
+    ],
+    links: {
+      github: "https://github.com/rushinski/Discord-Title-Bot",
+      youtube: [
+        { label: "Set Location Demo", url: "https://www.youtube.com/watch?v=qWGF4W2bfXI" },
+        { label: "Assign Title Demo", url: "https://www.youtube.com/watch?v=NFrKKCJ1rGU" },
+      ],
+    },
   },
   {
     title: "Discord Moderation Bot",
@@ -113,8 +144,23 @@ const PROJECTS = [
       "60% reduction in moderator workload",
       "1,000+ transcripts archived with GitHub Gist + MongoDB fallback",
       "500+ new members screened in 2 months",
+      "3 paid bot development offers generated from this project",
     ],
     stack: ["JavaScript", "Discord.js", "MongoDB", "GitHub Gist API"],
+    narrative: "I built this bot for a project in Rise of Kingdoms where I was organizing a large group of 900+ players. Creating my own bot allowed me to have full control over Discord's features while personalizing everything to our project's exact needs. I was also able to combine the functionality of multiple bots into one, reducing the server from 10+ bots down to 2-3. The bot grew to be deployed across 8 servers and generated 3 paid development offers.",
+    architecture: [
+      "Event-driven Node.js architecture with discord.js v14 and modular subsystem design",
+      "6 independent subsystems: Ticketing & Verification, Moderation, Leveling, Roles & Counts, Giveaways, Logging",
+      "MongoDB persistence layer for users, infractions, tickets, transcripts, giveaways, and role systems",
+      "GitHub Gist integration for external ticket transcript archiving (1000+ stored)",
+      "Moderation escalation policy: warnings → strikes → auto-ban with fuzzy banned-word matching (fast-levenshtein)",
+      "Dynamic loaders for auto-registration of commands, events, and UI components",
+      "Deployed on VPS + Discloud with backup/rollback support and GitHub Pages landing page",
+    ],
+    links: {
+      github: "https://github.com/rushinski/Discord-Bot-Unity",
+      landing: "https://rushinski.github.io/Unity-Landing-Page/",
+    },
   },
 ];
 
@@ -579,22 +625,20 @@ function WelcomeApp() {
   return (
     <div style={{ padding: "16px 20px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-        <span style={{ fontSize: 28 }}>OS</span>
         <div style={{ fontSize: 18, fontWeight: 800, color: "#000080" }}>Welcome to JacobOS</div>
       </div>
       <div style={{ fontSize: 13, color: "#333", marginBottom: 14, lineHeight: 1.7 }}>
         This is the portfolio of <strong>Jacob Rushinski</strong> - a backend/full-stack developer.
-        Navigate this retro desktop to explore my work, skills, and projects.
+        Navigate this retro desktop to explore my work, skills, and projects, and use it just like you would a desktop.
       </div>
-      <div style={{ fontSize: 12, color: "#444", marginBottom: 10, fontWeight: 700 }}>How to navigate:</div>
+      <div style={{ fontSize: 12, color: "#444", marginBottom: 10, fontWeight: 700 }}>Start here:</div>
       <div style={{ fontSize: 12, color: "#444", lineHeight: 1.8, paddingLeft: 8 }}>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Double-click</strong> desktop icons to open apps</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Drag</strong> window title bars to move them</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Drag edges/corners</strong> of windows to resize</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>Click <strong>{"[]"}</strong> to maximize, <strong>_</strong> to minimize, <strong>x</strong> to close</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>Use the <strong>Explore</strong> menu in the taskbar to find all apps</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>Use <strong>Desk, File, View, Options</strong> at the top for extras</div>
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>Click the <strong>x</strong> on taskbar tabs to close windows quickly</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>About</strong> for a quick overview</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Skills</strong> for technologies and tools</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Experience</strong> for work history</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Projects</strong> for shipped and in-progress work</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span><strong>Contact</strong> to reach out</div>
+        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>Explore the other apps too see more cool features of JacobOS.</div>
       </div>
       <div style={{ marginTop: 16, padding: "10px 12px", background: "#ffffcc", border: "1px solid #e0d080", fontSize: 12, color: "#555" }}>
         <strong>Tip:</strong> Try the Terminal app for a command-line experience. Type &quot;help&quot; to see available commands!
@@ -805,33 +849,301 @@ function ExperienceApp() {
   );
 }
 
-function ProjectsApp() {
+function ProjectDetailModal({ project, onClose }) {
+  const scrollRef = useRef(null);
+  const [activeTab, setActiveTab] = useState("overview");
+
+  if (!project) return null;
+
+  const tabs = [
+    { id: "overview", label: "Overview" },
+    { id: "architecture", label: "Architecture" },
+    { id: "links", label: "Links & Demos" },
+  ];
+
+  const RetroButton = ({ children, onClick, href, primary = false, style: extraStyle = {} }) => {
+    const baseStyle = {
+      background: primary ? "#000080" : "#c0c0c0",
+      color: primary ? "#fff" : "#111",
+      border: "none",
+      borderTop: primary ? "2px solid #3366cc" : "2px solid #fff",
+      borderLeft: primary ? "2px solid #3366cc" : "2px solid #fff",
+      borderRight: primary ? "2px solid #000040" : "2px solid #404040",
+      borderBottom: primary ? "2px solid #000040" : "2px solid #404040",
+      padding: "5px 14px",
+      fontSize: 12,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      fontWeight: primary ? 700 : 400,
+      textDecoration: "none",
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
+      ...extraStyle,
+    };
+    if (href) {
+      return <a href={href} target="_blank" rel="noopener noreferrer" style={baseStyle}>{children}</a>;
+    }
+    return <button onClick={onClick} style={baseStyle}>{children}</button>;
+  };
+
   return (
-    <div style={{ padding: "16px 20px" }}>
-      <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12, color: "#111" }}>Projects</div>
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "rgba(0,0,0,0.45)",
+        zIndex: 99990,
+      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        style={{
+          width: "92%",
+          maxWidth: 720,
+          maxHeight: "88%",
+          background: "#c0c0c0",
+          borderTop: "2px solid #fff",
+          borderLeft: "2px solid #fff",
+          borderRight: "2px solid #404040",
+          borderBottom: "2px solid #404040",
+          boxShadow: "4px 8px 24px rgba(0,0,0,0.6)",
+          display: "flex",
+          flexDirection: "column",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Title bar */}
+        <div style={{
+          background: "linear-gradient(180deg, #1a56c9, #0b3b8f)",
+          color: "#fff", fontWeight: 700, fontSize: 12,
+          padding: "5px 8px",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          userSelect: "none",
+        }}>
+          <span>{project.title} - Project Details</span>
+          <button onClick={onClose} style={{
+            width: 28, height: 22, background: "#c0c0c0", border: "none",
+            borderTop: "1px solid #fff", borderLeft: "1px solid #fff",
+            borderRight: "1px solid #404040", borderBottom: "1px solid #404040",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "#111", fontSize: 14, cursor: "pointer", fontFamily: "inherit", padding: 0,
+          }}>{"\u00D7"}</button>
+        </div>
+
+        {/* Tab strip */}
+        <div style={{ display: "flex", gap: 0, padding: "6px 8px 0", background: "#c0c0c0" }}>
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+                background: isActive ? "#fff" : "#c0c0c0",
+                border: "none",
+                borderTop: isActive ? "2px solid #404040" : "1px solid #808080",
+                borderLeft: isActive ? "2px solid #404040" : "1px solid #808080",
+                borderRight: isActive ? "2px solid #fff" : "1px solid #808080",
+                borderBottom: isActive ? "2px solid #fff" : "1px solid #808080",
+                padding: "5px 14px", fontSize: 11, fontFamily: "inherit",
+                fontWeight: isActive ? 700 : 400, cursor: "pointer",
+                color: isActive ? "#000080" : "#333",
+                position: "relative", top: isActive ? 1 : 0,
+              }}>{tab.label}</button>
+            );
+          })}
+        </div>
+
+        {/* Content area */}
+        <div ref={scrollRef} style={{
+          flex: 1, overflow: "auto", background: "#fff",
+          border: "2px inset #c0c0c0", margin: "0 3px 3px", minHeight: 0,
+        }}>
+
+          {/* OVERVIEW TAB */}
+          {activeTab === "overview" && (
+            <div style={{ padding: "16px 20px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: 18, color: "#111" }}>{project.title}</div>
+                  <div style={{ fontSize: 12, color: "#777" }}>{project.subtitle} - {project.date}</div>
+                </div>
+                <span style={{
+                  fontSize: 10, padding: "3px 10px", fontWeight: 700,
+                  background: project.status === "IN_PROGRESS" ? "#ffffcc" : "#ccffcc",
+                  color: project.status === "IN_PROGRESS" ? "#806000" : "#006000",
+                  border: `1px solid ${project.status === "IN_PROGRESS" ? "#c0a000" : "#00a000"}`,
+                }}>{project.status === "IN_PROGRESS" ? "In Progress" : "Complete"}</span>
+              </div>
+
+              {/* My Thinking */}
+              <div style={{ background: "#f8f6f0", border: "2px inset #c0c0c0", padding: "12px 14px", marginBottom: 16 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>My Thinking</div>
+                <div style={{ fontSize: 12, color: "#333", lineHeight: 1.7 }}>{project.narrative}</div>
+              </div>
+
+              <div style={{ fontSize: 13, color: "#444", marginBottom: 14, lineHeight: 1.6 }}>{project.desc}</div>
+
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#800080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Impact</div>
+              {project.impact.map((item, j) => (
+                <div key={j} style={{ fontSize: 12, color: "#444", padding: "3px 0", paddingLeft: 14, position: "relative" }}>
+                  <span style={{ position: "absolute", left: 0, color: "#800080", fontWeight: 700 }}>{">"}</span>
+                  {item}
+                </div>
+              ))}
+
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginTop: 16, marginBottom: 8 }}>Tech Stack</div>
+              <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                {project.stack.map((t) => (
+                  <span key={t} style={{ background: "#f0e0ff", border: "1px solid #c0a0e0", padding: "3px 8px", fontSize: 11, color: "#600080", fontWeight: 600 }}>{t}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ARCHITECTURE TAB */}
+          {activeTab === "architecture" && (
+            <div style={{ padding: "16px 20px" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 12, borderBottom: "2px solid #000080", paddingBottom: 4 }}>
+                System Architecture
+              </div>
+              {project.architecture?.map((item, j) => (
+                <div key={j} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "8px 0", borderBottom: j < project.architecture.length - 1 ? "1px solid #e8e8e8" : "none" }}>
+                  <div style={{ width: 22, height: 22, background: "#000080", color: "#fff", fontSize: 10, fontWeight: 700, display: "grid", placeItems: "center", flexShrink: 0, marginTop: 1 }}>
+                    {String(j + 1).padStart(2, "0")}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#333", lineHeight: 1.6, flex: 1 }}>{item}</div>
+                </div>
+              ))}
+              {(!project.architecture || project.architecture.length === 0) && (
+                <div style={{ fontSize: 12, color: "#888", fontStyle: "italic" }}>Architecture details coming soon.</div>
+              )}
+            </div>
+          )}
+
+          {/* LINKS & DEMOS TAB */}
+          {activeTab === "links" && (
+            <div style={{ padding: "16px 20px" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 14, borderBottom: "2px solid #000080", paddingBottom: 4 }}>
+                Links & Demos
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+
+                {project.links?.github && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f4f4f8", border: "2px inset #c0c0c0" }}>
+                    <div style={{ width: 36, height: 36, background: "#24292e", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 14, fontWeight: 800, flexShrink: 0 }}>GH</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>Source Code</div>
+                      <div style={{ fontSize: 11, color: "#666", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.links.github.replace("https://", "")}</div>
+                    </div>
+                    <RetroButton href={project.links.github} primary>Open Repo</RetroButton>
+                  </div>
+                )}
+
+                {project.links?.live && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f0fff0", border: "2px inset #c0c0c0" }}>
+                    <div style={{ width: 36, height: 36, background: "#006000", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 12, fontWeight: 800, flexShrink: 0 }}>WWW</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>Live Site</div>
+                      <div style={{ fontSize: 11, color: "#666", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.links.live.replace("https://", "")}</div>
+                    </div>
+                    <RetroButton href={project.links.live} primary>Visit Site</RetroButton>
+                  </div>
+                )}
+
+                {project.links?.landing && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f5f0ff", border: "2px inset #c0c0c0" }}>
+                    <div style={{ width: 36, height: 36, background: "#6b21a8", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>LP</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>Landing Page</div>
+                      <div style={{ fontSize: 11, color: "#666", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.links.landing.replace("https://", "")}</div>
+                    </div>
+                    <RetroButton href={project.links.landing} primary>View Page</RetroButton>
+                  </div>
+                )}
+
+                {project.links?.youtube?.map((video, idx) => (
+                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#fff5f5", border: "2px inset #c0c0c0" }}>
+                    <div style={{ width: 36, height: 36, background: "#cc0000", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 16, fontWeight: 800, flexShrink: 0 }}>{"\u25B6"}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>{video.label}</div>
+                      <div style={{ fontSize: 11, color: "#666" }}>YouTube Demo</div>
+                    </div>
+                    <RetroButton href={video.url} primary style={{ background: "#cc0000", borderTop: "2px solid #ff3333", borderLeft: "2px solid #ff3333", borderRight: "2px solid #800000", borderBottom: "2px solid #800000" }}>Watch</RetroButton>
+                  </div>
+                ))}
+
+                {!project.links && (
+                  <div style={{ fontSize: 12, color: "#888", fontStyle: "italic" }}>Links will be available once this project reaches its next milestone.</div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: "6px 12px", background: "#c0c0c0", display: "flex", justifyContent: "flex-end" }}>
+          <button onClick={onClose} style={{
+            background: "#c0c0c0", border: "none",
+            borderTop: "2px solid #fff", borderLeft: "2px solid #fff",
+            borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
+            padding: "5px 24px", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
+          }}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProjectsApp() {
+  const [selectedProject, setSelectedProject] = useState(null);
+
+  return (
+    <div style={{ padding: "16px 20px", position: "relative" }}>
+      <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4, color: "#111" }}>Projects</div>
+      <div style={{ fontSize: 11, color: "#666", marginBottom: 14 }}>Click a project to view full details, architecture, and demos.</div>
+
       {PROJECTS.map((p, i) => (
-        <div key={i} style={{ marginBottom: 18, paddingBottom: 16, borderBottom: i < PROJECTS.length - 1 ? "1px solid #c0c0c0" : "none" }}>
+        <div
+          key={i}
+          onClick={() => setSelectedProject(p)}
+          style={{
+            marginBottom: 16, cursor: "pointer",
+            padding: "10px 12px",
+            border: "2px outset #c0c0c0",
+            background: "#fafafa",
+            transition: "background 0.1s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#eef0ff"; e.currentTarget.style.borderColor = "#9090c0"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "#fafafa"; e.currentTarget.style.borderColor = ""; }}
+        >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 4 }}>
             <div style={{ fontWeight: 700, fontSize: 14, color: "#111" }}>{p.title}</div>
-            <span style={{
-              fontSize: 10,
-              padding: "2px 8px",
-              background: p.status === "IN_PROGRESS" ? "#ffffcc" : "#ccffcc",
-              color: p.status === "IN_PROGRESS" ? "#806000" : "#006000",
-              border: `1px solid ${p.status === "IN_PROGRESS" ? "#c0a000" : "#00a000"}`,
-              fontWeight: 600,
-            }}>
-              {p.status === "IN_PROGRESS" ? "In Progress" : "Complete"}
-            </span>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <span style={{
+                fontSize: 10, padding: "2px 8px",
+                background: p.status === "IN_PROGRESS" ? "#ffffcc" : "#ccffcc",
+                color: p.status === "IN_PROGRESS" ? "#806000" : "#006000",
+                border: `1px solid ${p.status === "IN_PROGRESS" ? "#c0a000" : "#00a000"}`,
+                fontWeight: 600,
+              }}>{p.status === "IN_PROGRESS" ? "In Progress" : "Complete"}</span>
+              <span style={{ fontSize: 10, padding: "2px 8px", background: "#000080", color: "#fff", fontWeight: 600, border: "1px solid #000060" }}>
+                View Details {"\u2192"}
+              </span>
+            </div>
           </div>
           <div style={{ fontSize: 11, color: "#777", marginBottom: 4 }}>{p.subtitle} - {p.date}</div>
           <div style={{ fontSize: 12, color: "#555", marginBottom: 8 }}>{p.desc}</div>
-          {p.impact.map((item, j) => (
+          {p.impact.slice(0, 2).map((item, j) => (
             <div key={j} style={{ fontSize: 12, color: "#444", padding: "2px 0", paddingLeft: 12, position: "relative" }}>
               <span style={{ position: "absolute", left: 0, color: "#800080" }}>{">"}</span>
               {item}
             </div>
           ))}
+          {p.impact.length > 2 && (
+            <div style={{ fontSize: 11, color: "#000080", marginTop: 4, fontWeight: 600 }}>+ {p.impact.length - 2} more...</div>
+          )}
           <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 8 }}>
             {p.stack.map((t) => (
               <span key={t} style={{ background: "#f0e0ff", border: "1px solid #c0a0e0", padding: "2px 6px", fontSize: 10, color: "#600080" }}>{t}</span>
@@ -839,6 +1151,10 @@ function ProjectsApp() {
           </div>
         </div>
       ))}
+
+      {selectedProject && (
+        <ProjectDetailModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+      )}
     </div>
   );
 }
@@ -1202,43 +1518,13 @@ function LocationApp() {
   const timeText = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
   return (
-    <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, height: "100%" }}>
-      <div style={{ fontSize: 16, fontWeight: 800, color: "#111" }}>Location</div>
-      <div style={{ fontSize: 12, color: "#333", lineHeight: 1.5 }}>
-        <div><strong>Current location:</strong> Lancaster, PA, USA</div>
-        <div><strong>Date:</strong> {dateText}</div>
-        <div><strong>Time:</strong> {timeText}</div>
-        <div><strong>Timezone:</strong> {timezone}</div>
-      </div>
-      <div
-        style={{
-          flex: 1,
-          minHeight: 180,
-          border: "2px inset #c0c0c0",
-          background: "#b8d4f0",
-          padding: 8,
-          display: "flex",
-          flexDirection: "column",
-          gap: 6,
-        }}
-      >
-        <div style={{ fontSize: 11, color: "#1a2f50", fontWeight: 700 }}>United States Map (Retro)</div>
-        <div style={{ flex: 1, border: "1px solid #6a6a6a", background: "#7ea3cc", position: "relative" }}>
-          <svg viewBox="0 0 320 170" width="100%" height="100%" style={{ display: "block" }}>
-            <rect x="0" y="0" width="320" height="170" fill="#7ea3cc" />
-            <path
-              d="M22 77 L40 60 L68 55 L92 44 L122 50 L149 45 L171 56 L191 54 L219 58 L238 72 L264 74 L286 89 L276 106 L250 109 L233 124 L206 127 L182 119 L152 121 L124 116 L96 117 L72 111 L47 99 L32 92 Z"
-              fill="#d6d3ae"
-              stroke="#3d3d3d"
-              strokeWidth="2"
-            />
-            <circle cx="228" cy="86" r="5" fill="#c42a2a" stroke="#5a0000" strokeWidth="1.5" />
-            <text x="236" y="83" fontSize="9" fill="#111" fontFamily="monospace">Lancaster, PA</text>
-          </svg>
-        </div>
-      </div>
-      <div style={{ fontSize: 12, color: "#111", background: "#ece8bb", border: "1px solid #b8ac57", padding: "6px 8px" }}>
-        Open to work anywhere in the U.S. and remote opportunities.
+    <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 12, height: "100%" }}>
+      <div style={{ fontSize: 16, fontWeight: 800, color: "#111" }}>Jacobs Time</div>
+      <div style={{ fontSize: 12, color: "#555" }}>Current system date and time.</div>
+      <div style={{ border: "2px inset #c0c0c0", background: "#f6f8ff", padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ fontSize: 12, color: "#333" }}><strong>Date:</strong> {dateText}</div>
+        <div style={{ fontSize: 12, color: "#333" }}><strong>Time:</strong> {timeText}</div>
+        <div style={{ fontSize: 12, color: "#333" }}><strong>Timezone:</strong> {timezone}</div>
       </div>
     </div>
   );
@@ -1557,7 +1843,7 @@ function TopMenuBar({
       { label: "Open Projects", action: () => openWindow("projects") },
       { label: "Open GitHub", action: () => openWindow("github") },
       { label: "Open Contact", action: () => openWindow("contact") },
-      { label: "Open Location", action: () => openWindow("location") },
+      { label: "Open Jacobs Time", action: () => openWindow("location") },
       { label: "Open Terminal", action: () => openWindow("terminal") },
       { label: "Open File Explorer", action: () => openWindow("explorer") },
       { label: "Open Settings", action: () => openWindow("settings") },
@@ -1759,7 +2045,7 @@ export default function HeroDesktopComputerComponent() {
     { id: "projects", title: "Projects", glyph: Icons.projects, windowId: "projects", itemType: "app", system: true },
     { id: "github", title: "GitHub", glyph: Icons.github, windowId: "github", itemType: "app", system: true },
     { id: "contact", title: "Contact", glyph: Icons.contact, windowId: "contact", itemType: "app", system: true },
-    { id: "location", title: "Location", glyph: Icons.location, windowId: "location", itemType: "app", system: true },
+    { id: "location", title: "Jacobs Time", glyph: Icons.location, windowId: "location", itemType: "app", system: true },
     { id: "terminal", title: "Terminal", glyph: Icons.terminal, windowId: "terminal", itemType: "app", system: true },
     { id: "explorer", title: "File Explorer", glyph: Icons.folder, windowId: "explorer", itemType: "app", system: true },
     { id: "settings", title: "Settings", glyph: Icons.settings, windowId: "settings", itemType: "app", system: true },
@@ -1781,7 +2067,7 @@ export default function HeroDesktopComputerComponent() {
     projects:   { id: "projects",   title: "Projects",                 x: 140, y: 30,  w: 540, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
     github:     { id: "github",     title: "GitHub",                   x: 220, y: 70,  w: 460, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 6 },
     contact:    { id: "contact",    title: "Contact",                  x: 260, y: 80,  w: 400, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
-    location:   { id: "location",   title: "Location",                 x: 280, y: 110, w: 560, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
+    location:   { id: "location",   title: "Jacobs Time",              x: 280, y: 110, w: 560, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
     terminal:   { id: "terminal",   title: "Terminal",                 x: 120, y: 50,  w: 500, h: 350, isOpen: false, isMinimized: false, isMaximized: false, z: 4 },
     trash:      { id: "trash",      title: "Recycle Bin",              x: 300, y: 100, w: 320, h: 260, isOpen: false, isMinimized: false, isMaximized: false, z: 3 },
     explorer:   { id: "explorer",   title: "File Explorer",            x: 260, y: 90,  w: 460, h: 360, isOpen: false, isMinimized: false, isMaximized: false, z: 2 },
