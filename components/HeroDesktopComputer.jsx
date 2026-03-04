@@ -725,13 +725,13 @@ function AboutApp({ openWindow }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>About Me</div>
           <div style={{ fontSize: 12, color: "#333", lineHeight: 1.75 }}>
-            Hi, I'm Jacob Rushinski! I'm currently attending Thaddeus Stevens College of Technology, graduating with an Associate's in Computer Software Engineering Technology in May 2026. I'm open to Backend, Full-Stack, or related roles near Philadelphia, PA (≤50mi) or nationwide remote. Right now I'm rebuilding a{" "}
+            Hi, I'm Jacob Rushinski!<br /><br />I'm currently attending Thaddeus Stevens College of Technology, graduating with an Associate's in Computer Software Engineering Technology in May 2026. I'm looking for Backend, Full-Stack, or related roles near Philadelphia, PA (≤50mi) or nationwide remote.<br /><br />Right now I'm rebuilding a{" "}
             <button onClick={() => openWindow?.("projects")} style={{
               background: "none", border: "none", padding: 0, color: "#000080",
               fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 12,
               textDecoration: "underline",
             }}>multi-tenant sneaker marketplace</button>
-            {" "}from the ground up. I'm a motivated engineer who takes pride in their code — feel free to reach out!
+            {" "}from the ground up. I enjoy working on production-grade systems and the level of detail required to build software that is reliable and maintainable. I take pride in writing clean code and designing systems that perform well under real-world usage. If you'd like to connect or learn more about my work, feel free to reach out.
           </div>
         </div>
       </div>
@@ -857,7 +857,7 @@ function AboutApp({ openWindow }) {
                     background: "transparent", border: "none", padding: 0, fontSize: 10,
                     color: "#000080", fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     textDecoration: "underline", textAlign: "left", marginTop: 2,
-                  }}>All skills {"\u2192"}</button>
+                  }}>All skills</button>
                 </div>
               </div>
 
