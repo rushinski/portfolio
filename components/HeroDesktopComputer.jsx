@@ -2130,7 +2130,7 @@ export default function HeroDesktopComputerComponent() {
     projects:   { id: "projects",   title: "Projects",                 x: 140, y: 30,  w: 540, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
     github:     { id: "github",     title: "GitHub",                   x: 220, y: 70,  w: 460, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 6 },
     contact:    { id: "contact",    title: "Contact",                  x: 260, y: 80,  w: 400, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
-    location:   { id: "location",   title: "Jacobs Time",              x: 280, y: 110, w: 560, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
+    location:   { id: "location",   title: "Jacobs Time",              x: 280, y: 110, w: 560, h: 300, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
     terminal:   { id: "terminal",   title: "Terminal",                 x: 120, y: 50,  w: 500, h: 350, isOpen: false, isMinimized: false, isMaximized: false, z: 4 },
     trash:      { id: "trash",      title: "Recycle Bin",              x: 300, y: 100, w: 320, h: 260, isOpen: false, isMinimized: false, isMaximized: false, z: 3 },
     explorer:   { id: "explorer",   title: "File Explorer",            x: 260, y: 90,  w: 460, h: 360, isOpen: false, isMinimized: false, isMaximized: false, z: 2 },
