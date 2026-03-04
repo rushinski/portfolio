@@ -279,7 +279,7 @@ const ICON_VIEW_MODES = {
   large: { tileW: 94, tileH: 112, glyphScale: 1.2, labelSize: 12, cellX: 108, cellY: 126, maxLabel: 100 },
 };
 const MENU_TEXT_COLOR = "#162133";
-const FULLSCREEN_WINDOW_IDS = new Set(["skills", "experience", "projects", "github", "contact"]);
+const FULLSCREEN_WINDOW_IDS = new Set(["skills", "experience", "projects", "contact"]);
 const DEFAULT_PINNED_TASKBAR_IDS = ["about", "skills", "experience", "projects", "contact"];
 const canPinItemToTaskbar = (item) => item?.itemType === "app" && !!item.windowId;
 const snapIconToGrid = (x, y, mode = "medium", marginX = 12, marginY = 8) => {
@@ -607,7 +607,6 @@ function WelcomeApp({ openWindow }) {
     { id: "experience", title: "Experience", description: "for work history" },
     { id: "projects", title: "Projects", description: "for shipped and in-progress work" },
     { id: "contact", title: "Contact", description: "to reach out" },
-    { id: "github", title: "GitHub", description: "to view activity charts" },
   ];
 
   return (
@@ -653,6 +652,15 @@ function WelcomeApp({ openWindow }) {
 
 function AboutApp({ openWindow }) {
   const TOP_SKILLS = ["JavaScript", "Python", "PostgreSQL", "Next.js"];
+  const [ghData, setGhData] = useState(null);
+  const [ghHovered, setGhHovered] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/github")
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d && !d.error) setGhData(d); })
+      .catch(() => {});
+  }, []);
 
   const SOCIALS = [
     { label: "Email", value: "jacobrushinski@gmail.com", href: "mailto:jacobrushinski@gmail.com", icon: "email.png" },
@@ -663,95 +671,202 @@ function AboutApp({ openWindow }) {
 
   return (
     <div style={{ padding: "16px 24px" }}>
-      {/* Open to work banner */}
-      <div style={{
-        background: "#eaffea", border: "1px solid #66bb6a",
-        padding: "7px 14px", fontSize: 12, color: "#2e7d32", fontWeight: 600,
-        marginBottom: 16,
-      }}>
-        I am looking for Backend, Full-Stack, or related technical roles near Philadelphia, PA (up to 50 miles) and open to nationwide remote opportunities.
-      </div>
 
-      {/* Profile row */}
-      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 8 }}>
-        <div style={{
-          width: 64, height: 64, background: "linear-gradient(135deg, #000080, #0000c0)",
-          display: "grid", placeItems: "center", color: "#fff", fontSize: 24, fontWeight: 800,
-          flexShrink: 0, border: "2px solid #808080",
-        }}>JR</div>
-        <div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "#111" }}>{PERSONAL.name}</div>
-          <div style={{ fontSize: 13, color: "#555", fontWeight: 600 }}>{PERSONAL.title}</div>
-          <div style={{ fontSize: 12, color: "#777" }}>{PERSONAL.location}</div>
+      {/* ── Top: two-column (identity left | bio right) ── */}
+      <div style={{ display: "flex", gap: 24, marginBottom: 16, alignItems: "flex-start" }}>
+
+        {/* Left column: avatar, name, socials, skills, buttons */}
+        <div style={{ flex: "0 0 270px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+            <div style={{
+              width: 56, height: 56, background: "linear-gradient(135deg, #000080, #0000c0)",
+              display: "grid", placeItems: "center", color: "#fff", fontSize: 22, fontWeight: 800,
+              flexShrink: 0, border: "2px solid #808080",
+            }}>JR</div>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: "#111" }}>{PERSONAL.name}</div>
+              <div style={{ fontSize: 12, color: "#000080", fontWeight: 600 }}>{PERSONAL.title}</div>
+              <div style={{ fontSize: 11, color: "#777" }}>{PERSONAL.location}</div>
+            </div>
+          </div>
+
+          {/* Socials stacked */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid #c0c0c0" }}>
+            {SOCIALS.map((s) => (
+              <a key={s.label} href={s.href}
+                target={s.href.startsWith("mailto") || s.href.startsWith("tel") ? undefined : "_blank"}
+                rel="noopener noreferrer"
+                style={{ display: "flex", alignItems: "center", gap: 6, textDecoration: "none", color: "#000080", fontSize: 11 }}
+              >
+                <img src={`/socials/${s.icon}`} alt={s.label} width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
+                {s.value}
+              </a>
+            ))}
+          </div>
+
+          {/* Action buttons */}
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={() => window.open(PERSONAL.resumeUrl, "_blank")} style={{
+              background: "#000080", color: "#fff", border: "none",
+              borderTop: "2px solid #3366cc", borderLeft: "2px solid #3366cc",
+              borderRight: "2px solid #000040", borderBottom: "2px solid #000040",
+              padding: "5px 14px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+            }}>View Resume</button>
+            <button onClick={() => openWindow?.("contact")} style={{
+              background: "#c0c0c0", color: "#111", border: "none",
+              borderTop: "2px solid #fff", borderLeft: "2px solid #fff",
+              borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
+              padding: "5px 14px", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+            }}>Contact Me</button>
+          </div>
+        </div>
+
+        {/* Right column: bio */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>About Me</div>
+          <div style={{ fontSize: 12, color: "#333", lineHeight: 1.75 }}>
+            Hi, I'm Jacob Rushinski! I'm currently attending Thaddeus Stevens College of Technology, graduating with an Associate's in Computer Software Engineering Technology in May 2026. I'm open to Backend, Full-Stack, or related roles near Philadelphia, PA (≤50mi) or nationwide remote. Right now I'm rebuilding a{" "}
+            <button onClick={() => openWindow?.("projects")} style={{
+              background: "none", border: "none", padding: 0, color: "#000080",
+              fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 12,
+              textDecoration: "underline",
+            }}>multi-tenant sneaker marketplace</button>
+            {" "}from the ground up. I'm a motivated engineer who takes pride in their code — feel free to reach out!
+          </div>
         </div>
       </div>
 
-      {/* Socials inline */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 6 }}>
-        {SOCIALS.map((s) => (
-          <a key={s.label} href={s.href}
-            target={s.href.startsWith("mailto") || s.href.startsWith("tel") ? undefined : "_blank"}
-            rel="noopener noreferrer"
-            style={{
-              display: "flex", alignItems: "center", gap: 5, padding: "3px 2px",
-              textDecoration: "none", color: "#000080", fontSize: 11, fontWeight: 600,
-            }}
-          >
-            <img src={`/socials/${s.icon}`} alt={s.label} width={13} height={13} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
-            {s.value}
-          </a>
-        ))}
-      </div>
+      {/* ── Bottom: GitHub Activity ── */}
+      {ghData && (() => {
+        const CELL = 10, GAP = 2, STEP = 12;
+        const CHART_COLORS = ["#c0c0c0", "#cce8cc", "#7dbf7d", "#3a8a3a", "#1a5c1a"];
+        const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const cal = ghData.contributionCalendar || {};
+        const allWeeks = cal.weeks || [];
+        const total = cal.totalContributions || 0;
+        const langs = ghData.topLanguages || [];
+        const totalLangCount = langs.reduce((s, l) => s + l.count, 0);
+        const getLevel = (n) => n === 0 ? 0 : n <= 2 ? 1 : n <= 5 ? 2 : n <= 9 ? 3 : 4;
 
-      {/* Top Skills inline */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 16 }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 0.5 }}>Top Skills:</span>
-        {TOP_SKILLS.map((s) => {
-          const file = SKILL_ICON_FILES[s];
-          return (
-            <div key={s} style={{ display: "flex", alignItems: "center", gap: 4, background: "#f0f4f8", border: "1px solid #c0c0c0", padding: "2px 6px" }}>
-              {file ? (
-                <img src={`/skills/${file}`} alt={s} width={13} height={13} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
-              ) : (
-                <div style={{ width: 13, height: 13, background: "#c0c0c0", display: "grid", placeItems: "center", fontSize: 6, fontWeight: 700 }}>{s.slice(0, 2)}</div>
-              )}
-              <span style={{ fontSize: 10, fontWeight: 600, color: "#333" }}>{s}</span>
+        // Month markers for full year
+        const monthMarkers = [];
+        allWeeks.forEach((week, wi) => {
+          if (!week.contributionDays?.length) return;
+          const d = new Date(week.contributionDays[0].date + "T12:00:00");
+          const m = d.getMonth();
+          const prevM = wi > 0 && allWeeks[wi - 1].contributionDays?.length
+            ? new Date(allWeeks[wi - 1].contributionDays[0].date + "T12:00:00").getMonth() : -1;
+          if (m !== prevM) monthMarkers.push({ wi, label: MONTHS[m] });
+        });
+
+        return (
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, borderBottom: "2px solid #000080", paddingBottom: 4, marginBottom: 10 }}>
+              Coding Stats
             </div>
-          );
-        })}
-        <button onClick={() => openWindow?.("skills")} style={{
-          background: "transparent", border: "none", padding: 0, fontSize: 10,
-          color: "#000080", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline",
-        }}>All skills {"\u2192"}</button>
-      </div>
+            <div style={{ overflowX: "auto" }}>
+            <div style={{ display: "flex", gap: 12, alignItems: "stretch", width: "max-content" }}>
 
-      {/* About Me */}
-      <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>About Me</div>
-      <div style={{ fontSize: 12, color: "#333", lineHeight: 1.75, marginBottom: 16 }}>
-        Hi, I'm Jacob Rushinski! I'm currently attending Thaddeus Stevens College of Technology and will be graduating with an Associate's in Computer Software Engineering Technology in May 2026. Right now I'm rebuilding a{" "}
-        <button onClick={() => openWindow?.("projects")} style={{
-          background: "none", border: "none", padding: 0, color: "#000080",
-          fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 12,
-          textDecoration: "underline",
-        }}>multi-tenant sneaker marketplace platform</button>
-        {" "}from the ground up. I'm looking for a backend, full-stack, or any other role that you think may be a good fit for me. I'm a really excited and motivated engineer and take pride over my code, I feel my code is my identity, so I own that. Feel free to reach out, I'd love to hear from you!
-      </div>
+              {/* Contribution chart — naturally sized to grid width */}
+              <div style={{ flexShrink: 0, background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px", display: "flex", flexDirection: "column" }}>
+                <div style={{ fontSize: 11, color: "#555", marginBottom: 8 }}>
+                  {total.toLocaleString()} contributions in the last year
+                </div>
+                {/* Month labels */}
+                <div style={{ position: "relative", marginLeft: 24, height: 14, marginBottom: 3 }}>
+                  {monthMarkers.map(({ wi, label }) => (
+                    <span key={wi} style={{ position: "absolute", left: wi * STEP, fontSize: 9, color: "#000080", opacity: 0.8 }}>{label}</span>
+                  ))}
+                </div>
+                {/* Grid */}
+                <div style={{ display: "flex" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: GAP, width: 20, marginRight: 4, flexShrink: 0 }}>
+                    {["S","M","T","W","T","F","S"].map((d, i) => (
+                      <div key={i} style={{ height: CELL, fontSize: 9, color: i % 2 === 1 ? "#000080" : "transparent", lineHeight: `${CELL}px`, textAlign: "right", opacity: 0.7 }}>{d}</div>
+                    ))}
+                  </div>
+                  <div style={{ display: "flex", gap: GAP }}>
+                    {allWeeks.map((week, wi) => (
+                      <div key={wi} style={{ display: "flex", flexDirection: "column", gap: GAP, flexShrink: 0 }}>
+                        {week.contributionDays.map((day, di) => (
+                          <div
+                            key={di}
+                            onMouseEnter={() => setGhHovered(day)}
+                            onMouseLeave={() => setGhHovered(null)}
+                            style={{ width: CELL, height: CELL, background: CHART_COLORS[getLevel(day.contributionCount)], border: "1px solid rgba(0,0,0,0.08)", cursor: "default", flexShrink: 0 }}
+                          />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Tooltip + legend */}
+                <div style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                  <div style={{ fontSize: 10, color: "#555", minHeight: 13 }}>
+                    {ghHovered ? `${ghHovered.date} — ${ghHovered.contributionCount} contribution${ghHovered.contributionCount !== 1 ? "s" : ""}` : "\u00A0"}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, color: "#777", flexShrink: 0 }}>
+                    <span>Less</span>
+                    {CHART_COLORS.map((c, i) => (
+                      <div key={i} style={{ width: 9, height: 9, background: c, border: "1px solid rgba(0,0,0,0.12)" }} />
+                    ))}
+                    <span>More</span>
+                  </div>
+                </div>
+              </div>
 
-      {/* Action buttons */}
-      <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={() => window.open(PERSONAL.resumeUrl, "_blank")} style={{
-          background: "#000080", color: "#fff", border: "none",
-          borderTop: "2px solid #3366cc", borderLeft: "2px solid #3366cc",
-          borderRight: "2px solid #000040", borderBottom: "2px solid #000040",
-          padding: "6px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-        }}>View Resume</button>
-        <button onClick={() => openWindow?.("contact")} style={{
-          background: "#c0c0c0", color: "#111", border: "none",
-          borderTop: "2px solid #fff", borderLeft: "2px solid #fff",
-          borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
-          padding: "6px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-        }}>Contact Me</button>
-      </div>
+              {/* Repo languages */}
+              {langs.length > 0 && (
+                <div style={{ flexShrink: 0, background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px" }}>
+                  <div style={{ fontSize: 11, color: "#555", marginBottom: 2 }}>Repo Languages</div>
+                  <div style={{ fontSize: 9, color: "#888", marginBottom: 8 }}>by number of repos</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <DonutChart langs={langs} size={80} />
+                    <div>
+                      {langs.slice(0, 6).map((l) => (
+                        <div key={l.lang} style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 5 }}>
+                          <div style={{ width: 8, height: 8, background: LANG_COLORS[l.lang] || "#999", flexShrink: 0, border: "1px solid rgba(0,0,0,0.15)" }} />
+                          <div style={{ fontSize: 10, color: "#333", whiteSpace: "nowrap" }}>{l.lang}</div>
+                          <div style={{ fontSize: 10, color: "#777", flexShrink: 0, marginLeft: 4 }}>{Math.round((l.count / totalLangCount) * 100)}%</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Top Skills */}
+              <div style={{ flexShrink: 0, background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px" }}>
+                <div style={{ fontSize: 11, color: "#555", marginBottom: 2 }}>Top Skills</div>
+                <div style={{ fontSize: 9, color: "#888", marginBottom: 8 }}>my strongest technologies</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                  {TOP_SKILLS.map((s) => {
+                    const file = SKILL_ICON_FILES[s];
+                    return (
+                      <div key={s} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        {file ? (
+                          <img src={`/skills/${file}`} alt={s} width={14} height={14} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
+                        ) : (
+                          <div style={{ width: 14, height: 14, background: "#c0c0c0", display: "grid", placeItems: "center", fontSize: 7, fontWeight: 700, flexShrink: 0 }}>{s.slice(0, 2)}</div>
+                        )}
+                        <span style={{ fontSize: 11, color: "#333", fontWeight: 600 }}>{s}</span>
+                      </div>
+                    );
+                  })}
+                  <button onClick={() => openWindow?.("skills")} style={{
+                    background: "transparent", border: "none", padding: 0, fontSize: 10,
+                    color: "#000080", fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                    textDecoration: "underline", textAlign: "left", marginTop: 2,
+                  }}>All skills {"\u2192"}</button>
+                </div>
+              </div>
+
+            </div>
+            </div>
+          </div>
+        );
+      })()}
+
     </div>
   );
 }
@@ -927,298 +1042,139 @@ function ExperienceApp() {
   );
 }
 
-function ProjectDetailModal({ project, onClose }) {
-  const scrollRef = useRef(null);
-  const [activeTab, setActiveTab] = useState("overview");
-
-  if (!project) return null;
-
-  const tabs = [
-    { id: "overview", label: "Overview" },
-    { id: "architecture", label: "How It's Built" },
-    { id: "links", label: "Links & Demos" },
-  ];
-
-  const RetroButton = ({ children, onClick, href, primary = false, style: extraStyle = {} }) => {
-    const baseStyle = {
-      background: primary ? "#000080" : "#c0c0c0",
-      color: primary ? "#fff" : "#111",
-      border: "none",
-      borderTop: primary ? "2px solid #3366cc" : "2px solid #fff",
-      borderLeft: primary ? "2px solid #3366cc" : "2px solid #fff",
-      borderRight: primary ? "2px solid #000040" : "2px solid #404040",
-      borderBottom: primary ? "2px solid #000040" : "2px solid #404040",
-      padding: "5px 14px",
-      fontSize: 12,
-      cursor: "pointer",
-      fontFamily: "inherit",
-      fontWeight: primary ? 700 : 400,
-      textDecoration: "none",
-      display: "inline-flex",
-      alignItems: "center",
-      gap: 6,
-      ...extraStyle,
-    };
-    if (href) {
-      return <a href={href} target="_blank" rel="noopener noreferrer" style={baseStyle}>{children}</a>;
-    }
-    return <button onClick={onClick} style={baseStyle}>{children}</button>;
-  };
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "rgba(0,0,0,0.45)",
-        zIndex: 99990,
-      }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div
-        style={{
-          width: 760,
-          height: 580,
-          background: "#c0c0c0",
-          borderTop: "2px solid #fff",
-          borderLeft: "2px solid #fff",
-          borderRight: "2px solid #404040",
-          borderBottom: "2px solid #404040",
-          boxShadow: "4px 8px 24px rgba(0,0,0,0.6)",
-          display: "flex",
-          flexDirection: "column",
-          flexShrink: 0,
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Title bar */}
-        <div style={{
-          background: "linear-gradient(180deg, #1a56c9, #0b3b8f)",
-          color: "#fff", fontWeight: 700, fontSize: 12,
-          padding: "5px 8px",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          userSelect: "none",
-          flexShrink: 0,
-        }}>
-          <span>{project.title} - Project Details</span>
-          <button onClick={onClose} style={{
-            width: 28, height: 22, background: "#c0c0c0", border: "none",
-            borderTop: "1px solid #fff", borderLeft: "1px solid #fff",
-            borderRight: "1px solid #404040", borderBottom: "1px solid #404040",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#111", fontSize: 14, cursor: "pointer", fontFamily: "inherit", padding: 0,
-          }}>{"\u00D7"}</button>
-        </div>
-
-        {/* Tab strip */}
-        <div style={{ display: "flex", gap: 0, padding: "6px 8px 0", background: "#c0c0c0", flexShrink: 0 }}>
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-                background: isActive ? "#fff" : "#c0c0c0",
-                border: "none",
-                borderTop: isActive ? "2px solid #404040" : "1px solid #808080",
-                borderLeft: isActive ? "2px solid #404040" : "1px solid #808080",
-                borderRight: isActive ? "2px solid #fff" : "1px solid #808080",
-                borderBottom: isActive ? "2px solid #fff" : "1px solid #808080",
-                padding: "5px 14px", fontSize: 11, fontFamily: "inherit",
-                fontWeight: isActive ? 700 : 400, cursor: "pointer",
-                color: isActive ? "#000080" : "#333",
-                position: "relative", top: isActive ? 1 : 0,
-              }}>{tab.label}</button>
-            );
-          })}
-        </div>
-
-        {/* Content area */}
-        <div ref={scrollRef} style={{
-          flex: 1, overflow: "auto", background: "#fff",
-          border: "2px inset #c0c0c0", margin: "0 3px 3px", minHeight: 0,
-        }}>
-
-          {/* OVERVIEW TAB */}
-          {activeTab === "overview" && (
-            <div style={{ padding: "16px 20px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
-                <div style={{ fontWeight: 800, fontSize: 18, color: "#111" }}>{project.title}</div>
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <span style={{
-                    fontSize: 10, padding: "3px 10px", fontWeight: 700,
-                    background: "#e8eef6", color: "#1f3763", border: "1px solid #9bb2d9",
-                  }}>{project.date}</span>
-                  <span style={{
-                    fontSize: 10, padding: "3px 10px", fontWeight: 700,
-                    background: project.status === "IN_PROGRESS" ? "#ffffcc" : "#ccffcc",
-                    color: project.status === "IN_PROGRESS" ? "#806000" : "#006000",
-                    border: `1px solid ${project.status === "IN_PROGRESS" ? "#c0a000" : "#00a000"}`,
-                  }}>{project.status === "IN_PROGRESS" ? "In Progress" : "Complete"}</span>
-                </div>
-              </div>
-
-              {/* Why I Built This */}
-              <div style={{ background: "#f0f4ff", border: "1px solid #c0cce8", padding: "12px 14px", marginBottom: 14 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Why I Built This</div>
-                <div style={{ fontSize: 12, color: "#333", lineHeight: 1.7 }}>{project.narrative}</div>
-              </div>
-
-              <div style={{ fontSize: 13, color: "#444", marginBottom: 14, lineHeight: 1.6 }}>{project.desc}</div>
-
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#800080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Impact</div>
-              {project.impact.map((item, j) => (
-                <div key={j} style={{ fontSize: 12, color: "#444", padding: "3px 0", paddingLeft: 14, position: "relative" }}>
-                  <span style={{ position: "absolute", left: 0, color: "#800080", fontWeight: 700 }}>{">"}</span>
-                  {item}
-                </div>
-              ))}
-
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginTop: 16, marginBottom: 8 }}>Tech Stack</div>
-              <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-                {project.stack.map((t) => (
-                  <span key={t} style={{ background: "#f0e0ff", border: "1px solid #c0a0e0", padding: "3px 8px", fontSize: 11, color: "#600080", fontWeight: 600 }}>{t}</span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* HOW IT'S BUILT TAB */}
-          {activeTab === "architecture" && (
-            <div style={{ padding: "16px 20px" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 12, borderBottom: "2px solid #000080", paddingBottom: 4 }}>
-                How It's Built
-              </div>
-              {project.architecture?.map((item, j) => (
-                <div key={j} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "8px 0", borderBottom: j < project.architecture.length - 1 ? "1px solid #e8e8e8" : "none" }}>
-                  <span style={{ color: "#000080", fontWeight: 700, flexShrink: 0, fontSize: 12, marginTop: 1 }}>{">"}</span>
-                  <div style={{ fontSize: 12, color: "#333", lineHeight: 1.6, flex: 1 }}>{item}</div>
-                </div>
-              ))}
-              {(!project.architecture || project.architecture.length === 0) && (
-                <div style={{ fontSize: 12, color: "#888", fontStyle: "italic" }}>Details coming soon.</div>
-              )}
-            </div>
-          )}
-
-          {/* LINKS & DEMOS TAB */}
-          {activeTab === "links" && (
-            <div style={{ padding: "16px 20px" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 14, borderBottom: "2px solid #000080", paddingBottom: 4 }}>
-                Links & Demos
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {project.links?.github && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f4f4f8", border: "2px inset #c0c0c0" }}>
-                    <div style={{ width: 36, height: 36, background: "#24292e", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 14, fontWeight: 800, flexShrink: 0 }}>GH</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>Source Code</div>
-                      <div style={{ fontSize: 11, color: "#666", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.links.github.replace("https://", "")}</div>
-                    </div>
-                    <RetroButton href={project.links.github} primary>Open Repo</RetroButton>
-                  </div>
-                )}
-                {project.links?.live && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f0fff0", border: "2px inset #c0c0c0" }}>
-                    <div style={{ width: 36, height: 36, background: "#006000", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 12, fontWeight: 800, flexShrink: 0 }}>WWW</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>Live Site</div>
-                      <div style={{ fontSize: 11, color: "#666", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.links.live.replace("https://", "")}</div>
-                    </div>
-                    <RetroButton href={project.links.live} primary>Visit Site</RetroButton>
-                  </div>
-                )}
-                {project.links?.landing && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f5f0ff", border: "2px inset #c0c0c0" }}>
-                    <div style={{ width: 36, height: 36, background: "#6b21a8", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 11, fontWeight: 800, flexShrink: 0 }}>LP</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>Landing Page</div>
-                      <div style={{ fontSize: 11, color: "#666", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.links.landing.replace("https://", "")}</div>
-                    </div>
-                    <RetroButton href={project.links.landing} primary>View Page</RetroButton>
-                  </div>
-                )}
-                {project.links?.youtube?.map((video, idx) => (
-                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#fff5f5", border: "2px inset #c0c0c0" }}>
-                    <div style={{ width: 36, height: 36, background: "#cc0000", borderRadius: 4, display: "grid", placeItems: "center", color: "#fff", fontSize: 16, fontWeight: 800, flexShrink: 0 }}>{"\u25B6"}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 2 }}>{video.label}</div>
-                      <div style={{ fontSize: 11, color: "#666" }}>YouTube Demo</div>
-                    </div>
-                    <RetroButton href={video.url} primary style={{ background: "#cc0000", borderTop: "2px solid #ff3333", borderLeft: "2px solid #ff3333", borderRight: "2px solid #800000", borderBottom: "2px solid #800000" }}>Watch</RetroButton>
-                  </div>
-                ))}
-                {!project.links && (
-                  <div style={{ fontSize: 12, color: "#888", fontStyle: "italic" }}>Links available at the next milestone.</div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ProjectsApp() {
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [expanded, setExpanded] = useState(null);
+
+  const RetroBtn = ({ href, children, style: s = {} }) => (
+    <a
+      href={href} target="_blank" rel="noopener noreferrer"
+      style={{
+        display: "inline-flex", alignItems: "center", gap: 4,
+        background: "#c0c0c0", color: "#111", textDecoration: "none",
+        border: "none",
+        borderTop: "2px solid #fff", borderLeft: "2px solid #fff",
+        borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
+        padding: "3px 10px", fontSize: 11, fontFamily: "inherit", fontWeight: 600,
+        cursor: "pointer", ...s,
+      }}
+    >{children}</a>
+  );
+
+  const SH = ({ children }) => (
+    <div style={{
+      fontSize: 12, fontWeight: 700, color: "#000080",
+      textTransform: "uppercase", letterSpacing: 1,
+      borderBottom: "2px solid #000080", paddingBottom: 4, marginBottom: 12,
+    }}>{children}</div>
+  );
 
   return (
-    <div style={{ padding: "16px 20px", position: "relative" }}>
-      <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4, color: "#111" }}>Projects</div>
-      <div style={{ fontSize: 11, color: "#666", marginBottom: 14 }}>Click a project to view full details, architecture, and demos.</div>
+    <div style={{ padding: "16px 20px" }}>
+      <SH>Projects</SH>
 
-      {PROJECTS.map((p, i) => (
-        <div
-          key={i}
-          onClick={() => setSelectedProject(p)}
-          style={{
-            marginBottom: 16, cursor: "pointer",
-            padding: "10px 12px",
-            border: "2px outset #c0c0c0",
-            background: "#fafafa",
-            transition: "background 0.1s",
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#eef0ff"; e.currentTarget.style.borderColor = "#9090c0"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "#fafafa"; e.currentTarget.style.borderColor = ""; }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 4 }}>
-            <div style={{ fontWeight: 700, fontSize: 14, color: "#111" }}>{p.title}</div>
-            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-              <span style={{
-                fontSize: 10, padding: "2px 8px",
-                background: "#e8eef6", color: "#1f3763", border: "1px solid #9bb2d9",
-                fontWeight: 600,
-              }}>{p.date}</span>
-              <span style={{ fontSize: 10, padding: "2px 8px", background: "#000080", color: "#fff", fontWeight: 600, border: "1px solid #000060", cursor: "pointer" }}>
-                Details
-              </span>
-            </div>
-          </div>
-          <div style={{ fontSize: 12, color: "#555", marginBottom: 8 }}>{p.desc}</div>
-          {p.impact.slice(0, 2).map((item, j) => (
-            <div key={j} style={{ fontSize: 12, color: "#444", padding: "2px 0", paddingLeft: 12, position: "relative" }}>
-              <span style={{ position: "absolute", left: 0, color: "#800080" }}>{">"}</span>
-              {item}
-            </div>
-          ))}
-          {p.impact.length > 2 && (
-            <div style={{ fontSize: 11, color: "#000080", marginTop: 4, fontWeight: 600 }}>+ {p.impact.length - 2} more...</div>
-          )}
-          <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 8 }}>
-            {p.stack.map((t) => (
-              <span key={t} style={{ background: "#f0e0ff", border: "1px solid #c0a0e0", padding: "2px 6px", fontSize: 10, color: "#600080" }}>{t}</span>
-            ))}
-          </div>
-        </div>
-      ))}
+      {PROJECTS.map((p, i) => {
+        const isOpen = expanded === i;
+        const isInProgress = p.status === "IN_PROGRESS";
+        return (
+          <div
+            key={i}
+            style={{
+              marginBottom: 12,
+              background: "#f0f4f8",
+              border: "2px outset #c0c0c0",
+            }}
+          >
+            {/* Card header */}
+            <div style={{ padding: "10px 12px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
+                <div style={{ fontWeight: 800, fontSize: 14, color: "#111", flex: 1, minWidth: 0 }}>{p.title}</div>
+                <div style={{ display: "flex", gap: 5, alignItems: "center", flexShrink: 0 }}>
+                  <span style={{
+                    fontSize: 10, padding: "2px 8px", fontWeight: 700,
+                    background: "#e8eef6", color: "#1f3763", border: "1px solid #9bb2d9",
+                  }}>{p.date}</span>
+                  <span style={{
+                    fontSize: 10, padding: "2px 8px", fontWeight: 700,
+                    background: isInProgress ? "#fff8dc" : "#e0ece0",
+                    color: isInProgress ? "#7a5000" : "#2d6a4f",
+                    border: "1px solid " + (isInProgress ? "#c8a800" : "#b0d0b0"),
+                  }}>{isInProgress ? "In Progress" : "Complete"}</span>
+                </div>
+              </div>
 
-      {selectedProject && (
-        <ProjectDetailModal project={selectedProject} onClose={() => setSelectedProject(null)} />
-      )}
+              <div style={{ fontSize: 12, color: "#444", lineHeight: 1.6, marginBottom: 8 }}>{p.desc}</div>
+
+              {/* Impact bullets */}
+              <div style={{ marginBottom: 8 }}>
+                {p.impact.map((item, j) => (
+                  <div key={j} style={{ fontSize: 12, color: "#444", padding: "2px 0", paddingLeft: 14, position: "relative" }}>
+                    <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>-</span>
+                    {item}
+                  </div>
+                ))}
+              </div>
+
+              {/* Stack badges */}
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 10 }}>
+                {p.stack.map((t) => (
+                  <span key={t} style={{ background: "#e0ece0", border: "1px solid #b0d0b0", padding: "2px 6px", fontSize: 10, color: "#2d6a4f", fontWeight: 600 }}>{t}</span>
+                ))}
+              </div>
+
+              {/* Action row */}
+              <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                {p.links?.github && (
+                  <RetroBtn href={p.links.github}>GH Repo</RetroBtn>
+                )}
+                {p.links?.live && (
+                  <RetroBtn href={p.links.live}>Live Site</RetroBtn>
+                )}
+                {p.links?.landing && (
+                  <RetroBtn href={p.links.landing}>Landing Page</RetroBtn>
+                )}
+                {p.links?.youtube?.map((v, idx) => (
+                  <RetroBtn key={idx} href={v.url}>{v.label}</RetroBtn>
+                ))}
+                {p.architecture?.length > 0 && (
+                  <button
+                    onClick={() => setExpanded(isOpen ? null : i)}
+                    style={{
+                      background: isOpen ? "#000080" : "#c0c0c0",
+                      color: isOpen ? "#fff" : "#111",
+                      border: "none",
+                      borderTop: isOpen ? "2px solid #3366cc" : "2px solid #fff",
+                      borderLeft: isOpen ? "2px solid #3366cc" : "2px solid #fff",
+                      borderRight: isOpen ? "2px solid #000040" : "2px solid #404040",
+                      borderBottom: isOpen ? "2px solid #000040" : "2px solid #404040",
+                      padding: "3px 10px", fontSize: 11, cursor: "pointer",
+                      fontFamily: "inherit", fontWeight: 600, marginLeft: "auto",
+                    }}
+                  >
+                    {isOpen ? "Hide Details" : "How It's Built"}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Expandable architecture section */}
+            {isOpen && (
+              <div style={{
+                borderTop: "2px inset #c0c0c0",
+                background: "#fff",
+                padding: "10px 12px",
+              }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Architecture</div>
+                {p.architecture.map((item, j) => (
+                  <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "5px 0", borderBottom: j < p.architecture.length - 1 ? "1px solid #e8eef0" : "none" }}>
+                    <span style={{ color: "#000080", fontWeight: 700, flexShrink: 0, fontSize: 11, marginTop: 1 }}>»</span>
+                    <div style={{ fontSize: 11, color: "#333", lineHeight: 1.6 }}>{item}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -1263,262 +1219,6 @@ function DonutChart({ langs, size = 84 }) {
   );
 }
 
-function GitHubApp() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [hovered, setHovered] = useState(null);
-
-  useEffect(() => {
-    fetch("/api/github")
-      .then((r) => { if (!r.ok) throw new Error("Failed to fetch"); return r.json(); })
-      .then((d) => { setData(d); setLoading(false); })
-      .catch((e) => { setError(e.message); setLoading(false); });
-  }, []);
-
-  // Contribution chart constants — Windows-palette greens
-  const CELL = 8, GAP = 1, STEP = 9;
-  const CHART_COLORS = ["#c0c0c0", "#cce8cc", "#7dbf7d", "#3a8a3a", "#1a5c1a"];
-  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-  const relDate = (dateStr) => {
-    const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
-    if (days === 0) return "today";
-    if (days === 1) return "1d ago";
-    if (days < 7) return `${days}d ago`;
-    if (days < 30) return `${Math.floor(days / 7)}w ago`;
-    return `${Math.floor(days / 30)}mo ago`;
-  };
-
-  // Shared section header matching the rest of the site (Skills, Experience, etc.)
-  const SH = ({ children }) => (
-    <div style={{
-      fontSize: 12, fontWeight: 700, color: "#000080",
-      textTransform: "uppercase", letterSpacing: 1,
-      borderBottom: "2px solid #000080", paddingBottom: 4, marginBottom: 10,
-    }}>
-      {children}
-    </div>
-  );
-
-  if (loading) {
-    return (
-      <div style={{ padding: "16px 20px" }}>
-        <div style={{ fontSize: 18, fontWeight: 800, color: "#111", marginBottom: 16 }}>GitHub Profile</div>
-        <div style={{ fontSize: 12, color: "#777" }}>Loading profile data...</div>
-      </div>
-    );
-  }
-
-  if (error || !data || data.error) {
-    return (
-      <div style={{ padding: "16px 20px" }}>
-        <div style={{ fontSize: 18, fontWeight: 800, color: "#111", marginBottom: 16 }}>GitHub Profile</div>
-        <div style={{ fontSize: 12, color: "#555", marginBottom: 6 }}>Could not load GitHub data.</div>
-        <a href={PERSONAL.github} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#000080" }}>{PERSONAL.github}</a>
-      </div>
-    );
-  }
-
-  const cal = data.contributionCalendar || {};
-  const weeks = cal.weeks || [];
-  const total = cal.totalContributions || 0;
-  const langs = data.topLanguages || [];
-  const commits = data.recentCommits || [];
-  const pinned = data.pinnedRepos || [];
-  const totalLangCount = langs.reduce((s, l) => s + l.count, 0);
-
-  const getLevel = (count) => {
-    if (count === 0) return 0;
-    if (count <= 2) return 1;
-    if (count <= 5) return 2;
-    if (count <= 9) return 3;
-    return 4;
-  };
-
-  const displayWeeks = weeks;
-
-  const monthMarkers = [];
-  displayWeeks.forEach((week, wi) => {
-    if (!week.contributionDays?.length) return;
-    const d = new Date(week.contributionDays[0].date + "T12:00:00");
-    const m = d.getMonth();
-    const prevM = wi > 0 && displayWeeks[wi - 1].contributionDays?.length
-      ? new Date(displayWeeks[wi - 1].contributionDays[0].date + "T12:00:00").getMonth() : -1;
-    if (m !== prevM) monthMarkers.push({ wi, label: MONTHS[m] });
-  });
-
-  return (
-    <div style={{ padding: "16px 20px" }}>
-
-      {/* ── 1. Profile header ── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid #c0c0c0" }}>
-        {data.avatarUrl && (
-          <img
-            src={data.avatarUrl}
-            alt="GitHub avatar"
-            style={{ width: 56, height: 56, border: "2px inset #c0c0c0", flexShrink: 0 }}
-          />
-        )}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 16, fontWeight: 800, color: "#111", marginBottom: 2 }}>{data.name || "rushinski"}</div>
-          {data.bio && <div style={{ fontSize: 12, color: "#555", lineHeight: 1.45, marginBottom: 4 }}>{data.bio}</div>}
-          <a href={PERSONAL.github} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "#000080", textDecoration: "none" }}>
-            github.com/rushinski ↗
-          </a>
-        </div>
-      </div>
-
-      {/* ── 2. Commit Activity + Recent Commits ── */}
-      <div style={{ marginBottom: 20 }}>
-        <SH>Commit Activity</SH>
-        <div style={{ background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px", userSelect: "none" }}>
-          {/* Count line above chart */}
-          <div style={{ fontSize: 11, color: "#555", marginBottom: 8 }}>
-            {total.toLocaleString()} contributions in the last year
-          </div>
-
-          <div style={{ display: "flex", gap: 0 }}>
-
-            {/* Chart column — full year */}
-            <div style={{ flexShrink: 0, paddingRight: 12, borderRight: "1px solid #c8d4e0" }}>
-              {/* Month labels */}
-              <div style={{ position: "relative", marginLeft: 22, height: 13, marginBottom: 3 }}>
-                {monthMarkers.map(({ wi, label }) => (
-                  <span key={wi} style={{ position: "absolute", left: wi * STEP, fontSize: 8, color: "#000080", opacity: 0.8 }}>
-                    {label}
-                  </span>
-                ))}
-              </div>
-              {/* Grid */}
-              <div style={{ display: "flex" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: GAP, width: 18, marginRight: 4, flexShrink: 0 }}>
-                  {["S","M","T","W","T","F","S"].map((d, i) => (
-                    <div key={i} style={{ height: CELL, fontSize: 8, color: i % 2 === 1 ? "#000080" : "transparent", lineHeight: `${CELL}px`, textAlign: "right", opacity: 0.7 }}>{d}</div>
-                  ))}
-                </div>
-                <div style={{ display: "flex", gap: GAP }}>
-                  {displayWeeks.map((week, wi) => (
-                    <div key={wi} style={{ display: "flex", flexDirection: "column", gap: GAP, flexShrink: 0 }}>
-                      {week.contributionDays.map((day, di) => {
-                        const lvl = getLevel(day.contributionCount);
-                        return (
-                          <div
-                            key={di}
-                            onMouseEnter={() => setHovered(day)}
-                            onMouseLeave={() => setHovered(null)}
-                            style={{
-                              width: CELL, height: CELL,
-                              background: CHART_COLORS[lvl],
-                              flexShrink: 0,
-                              border: "1px solid rgba(0,0,0,0.08)",
-                              cursor: "default",
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {/* Tooltip + legend */}
-              <div style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                <div style={{ fontSize: 10, color: "#555", minHeight: 13 }}>
-                  {hovered && `${hovered.date} — ${hovered.contributionCount} contribution${hovered.contributionCount !== 1 ? "s" : ""}`}
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, color: "#777", flexShrink: 0 }}>
-                  <span>Less</span>
-                  {CHART_COLORS.map((c, i) => (
-                    <div key={i} style={{ width: 8, height: 8, background: c, border: "1px solid rgba(0,0,0,0.12)" }} />
-                  ))}
-                  <span>More</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Commits column */}
-            <div style={{ flex: 1, paddingLeft: 12, minWidth: 0 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", marginBottom: 10 }}>Recent Commits</div>
-              {commits.length === 0 ? (
-                <div style={{ fontSize: 11, color: "#777" }}>No recent activity</div>
-              ) : commits.slice(0, 7).map((c, i) => (
-                <div key={i} style={{ paddingBottom: 5, marginBottom: 5, borderBottom: i < 6 ? "1px solid #dde4ee" : "none" }}>
-                  <div style={{ fontSize: 11, color: "#333", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 1 }}>
-                    {c.message}
-                  </div>
-                  <div style={{ fontSize: 10, color: "#777" }}>
-                    <span style={{ color: "#000080", fontWeight: 600 }}>{c.repo}</span> · {relDate(c.date)}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      {/* ── 3. Top Languages (left) + Pinned Repos (right) ── */}
-      <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-
-        {/* Languages */}
-        <div style={{ flex: "0 0 220px" }}>
-          <SH>Top Languages</SH>
-          <div style={{ background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <DonutChart langs={langs} size={80} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                {langs.slice(0, 6).map((l) => (
-                  <div key={l.lang} style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
-                    <div style={{ width: 8, height: 8, background: LANG_COLORS[l.lang] || "#999", flexShrink: 0, border: "1px solid rgba(0,0,0,0.15)" }} />
-                    <div style={{ fontSize: 10, color: "#333", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.lang}</div>
-                    <div style={{ fontSize: 10, color: "#777", flexShrink: 0 }}>{Math.round((l.count / totalLangCount) * 100)}%</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Pinned Repos */}
-        {pinned.length > 0 && (
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <SH>Pinned</SH>
-            <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
-              {pinned.map((repo) => (
-                <a
-                  key={repo.name}
-                  href={repo.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ flex: 1, display: "flex", flexDirection: "column", background: "#f0f4f8", border: "2px outset #c0c0c0", padding: "8px 10px", textDecoration: "none", minWidth: 0 }}
-                >
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {repo.name}
-                  </div>
-                  {repo.description && (
-                    <div style={{ fontSize: 10, color: "#555", marginBottom: 6, lineHeight: 1.35, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                      {repo.description}
-                    </div>
-                  )}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10, color: "#666" }}>
-                    {repo.language && (
-                      <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                        <span style={{ width: 7, height: 7, borderRadius: "50%", background: LANG_COLORS[repo.language] || "#999", display: "inline-block" }} />
-                        {repo.language}
-                      </span>
-                    )}
-                    {repo.stars > 0 && <span>★ {repo.stars}</span>}
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
-      </div>
-    </div>
-  );
-}
 
 function ContactApp() {
   return (
@@ -2123,7 +1823,6 @@ function TopMenuBar({
       { label: "Open Skills", action: () => openWindow("skills") },
       { label: "Open Experience", action: () => openWindow("experience") },
       { label: "Open Projects", action: () => openWindow("projects") },
-      { label: "Open GitHub", action: () => openWindow("github") },
       { label: "Open Contact", action: () => openWindow("contact") },
       { label: "Open Jacobs Time", action: () => openWindow("location") },
       { label: "Open Terminal", action: () => openWindow("terminal") },
@@ -2325,7 +2024,6 @@ export default function HeroDesktopComputerComponent() {
     { id: "skills", title: "Skills", glyph: Icons.skills, windowId: "skills", itemType: "app", system: true },
     { id: "experience", title: "Experience", glyph: Icons.experience, windowId: "experience", itemType: "app", system: true },
     { id: "projects", title: "Projects", glyph: Icons.projects, windowId: "projects", itemType: "app", system: true },
-    { id: "github", title: "GitHub", glyph: Icons.github, windowId: "github", itemType: "app", system: true },
     { id: "contact", title: "Contact", glyph: Icons.contact, windowId: "contact", itemType: "app", system: true },
     { id: "location", title: "Jacobs Time", glyph: Icons.location, windowId: "location", itemType: "app", system: true },
     { id: "terminal", title: "Terminal", glyph: Icons.terminal, windowId: "terminal", itemType: "app", system: true },
@@ -2343,11 +2041,10 @@ export default function HeroDesktopComputerComponent() {
   //  Windows state (Welcome open by default) 
   const [windows, setWindows] = useState({
     welcome:    { id: "welcome",    title: "Welcome",                  x: 250, y: 95,  w: 800, h: 500, isOpen: true,  isMinimized: false, isMaximized: false, z: 11 },
-    about:      { id: "about",      title: "About",                    x: 30, y: 20,  w: 1200, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 10 },
+    about:      { id: "about",      title: "About",                    x: 30, y: 20,  w: 1200, h: 600, isOpen: false, isMinimized: false, isMaximized: false, z: 10 },
     skills:     { id: "skills",     title: "Skills",                   x: 200, y: 60,  w: 480, h: 400, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
     experience: { id: "experience", title: "Experience",               x: 180, y: 50,  w: 560, h: 480, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
-    projects:   { id: "projects",   title: "Projects",                 x: 140, y: 30,  w: 540, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
-    github:     { id: "github",     title: "GitHub",                   x: 160, y: 40,  w: 760, h: 580, isOpen: false, isMinimized: false, isMaximized: false, z: 6 },
+    projects:   { id: "projects",   title: "Projects",                 x: 100, y: 20,  w: 600, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
     contact:    { id: "contact",    title: "Contact",                  x: 260, y: 80,  w: 400, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
     location:   { id: "location",   title: "Jacobs Time",              x: 280, y: 110, w: 560, h: 300, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
     terminal:   { id: "terminal",   title: "Terminal",                 x: 120, y: 50,  w: 500, h: 350, isOpen: false, isMinimized: false, isMaximized: false, z: 4 },
@@ -3226,7 +2923,6 @@ export default function HeroDesktopComputerComponent() {
     skills: <SkillsApp />,
     experience: <ExperienceApp />,
     projects: <ProjectsApp />,
-    github: <GitHubApp />,
     contact: <ContactApp />,
     location: <LocationApp />,
     terminal: <TerminalApp />,
