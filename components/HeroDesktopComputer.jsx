@@ -80,7 +80,6 @@ const PROJECTS = [
       "PayRilla Gateway (white-labeled Accept.Blue) replacing Stripe after account closure",
       "AWS Cognito for auth, Doppler for secrets management, New Relic APM for observability",
       "Digital Ocean infrastructure replacing Vercel + Supabase with parallel build/hard cutover migration",
-      "TaxJar API-only tier for tax calculation, Signifyd for fraud prevention",
     ],
     links: {
       github: "https://github.com/rushinski/rdk-webstore",
@@ -93,17 +92,17 @@ const PROJECTS = [
     status: "COMPLETE",
     desc: "Orchestrated a Discord-to-device automation pipeline that mapped Discord user IDs to MongoDB player records.",
     impact: [
-      "Reduced manual title assignment from 1 minute -> 5 seconds",
+      "Reduced manual title assignment from ~45 seconds -> 10-15 seconds",
       "95% success rate via image-based UI state detection",
       "100% conflict-free processing with role-based bucket queue",
     ],
-    stack: ["JavaScript", "MongoDB", "ADBKit", "Tesseract.js", "Discord.js"],
-    narrative: "I built this bot because of a game I was playing called Rise of Kingdoms. In this game you can assign titles to players for buffs, but manually doing this took a lot of time. In the culture of the game, the solution was a title bot — they already existed, but building my own gave me the chance to learn new technologies like ADB device automation and OCR, while also saving our kingdom money and giving us full control over the system. The project ended up generating two paid offers from other kingdoms wanting similar solutions.",
+    stack: ["Node.js", "MongoDB", "ADBKit", "Tesseract.js", "Discord.js"],
+    narrative: "I built this bot because of a game I was playing called Rise of Kingdoms. In this game you can assign titles to players for buffs, but manually doing this took a lot of time. In the culture of the game, the solution was a title bot - they already existed, but building my own gave me the chance to learn new technologies like ADB device automation and OCR, while also saving our kingdom money and giving us full control over the system. The project ended up generating two paid offers from other kingdoms wanting similar solutions.",
     architecture: [
       "Modular Node.js application integrating Discord, MongoDB, ADB, and OCR libraries",
       "Discord.js slash command interface (/title, /set-location, /locate-bot) with permissions enforcement",
       "MongoDB + Mongoose for player location persistence and bot state tracking",
-      "ADBKit for communicating with Android emulator — executes taps, text inputs, screenshots",
+      "ADBKit for communicating with Android emulator - executes taps, text inputs, screenshots",
       "Sharp + Pixelmatch + PNG.js for image comparison and reference UI element detection",
       "Tesseract.js OCR engine to extract in-game coordinates from screenshots",
       "Resilient queueing system with cooldowns to prevent overlapping title assignments",
@@ -127,7 +126,7 @@ const PROJECTS = [
       "3 paid bot development offers generated from this project",
     ],
     stack: ["Node.js", "Discord.js", "MongoDB", "GitHub Gist API"],
-    narrative: "I built this bot for a project in Rise of Kingdoms where I was organizing a large group of 900+ players. Creating my own bot allowed me to have full control over Discord's features while personalizing everything to our project's exact needs. I was also able to combine the functionality of multiple bots into one, reducing the server from 10+ bots down to 2-3. The bot grew to be deployed across 8 servers and generated 3 paid development offers.",
+    narrative: "I built this bot for a project in Rise of Kingdoms where I was organizing a large group of 900+ players. Creating my own bot allowed me to have full control over Discord's features while personalizing everything to our project's exact needs. I was also able to combine the functionality of multiple bots into one, reducing the server from 10+ bots down to 2-3. The bot grew to support +900 users and generated 3 paid development offers.",
     architecture: [
       "Event-driven Node.js architecture with discord.js v14 and modular subsystem design",
       "6 independent subsystems: Ticketing & Verification, Moderation, Leveling, Roles & Counts, Giveaways, Logging",
