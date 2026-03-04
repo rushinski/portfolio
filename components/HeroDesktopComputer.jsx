@@ -1223,10 +1223,51 @@ function ProjectsApp() {
   );
 }
 
+const LANG_COLORS = {
+  JavaScript: "#f1e05a", TypeScript: "#3178c6", Python: "#3572A5",
+  Go: "#00ADD8", Java: "#b07219", PHP: "#4F5D95",
+  "C++": "#f34b7d", HTML: "#e34c26", CSS: "#563d7c",
+  Shell: "#89e051", Dockerfile: "#384d54",
+};
+
+function DonutChart({ langs, size = 84 }) {
+  if (!langs?.length) return null;
+  const totalCount = langs.reduce((s, l) => s + l.count, 0);
+  if (totalCount === 0) return null;
+
+  const cx = size / 2, cy = size / 2;
+  const R = size / 2 - 2;
+  const ri = R * 0.52;
+  let a = -Math.PI / 2;
+
+  const paths = langs.map((l) => {
+    const sweep = Math.min((l.count / totalCount) * 2 * Math.PI, 2 * Math.PI * 0.9999);
+    const start = a;
+    const end = a + sweep;
+    a += (l.count / totalCount) * 2 * Math.PI;
+    const cos = Math.cos, sin = Math.sin;
+    const large = sweep > Math.PI ? 1 : 0;
+    const fmt = (n) => n.toFixed(2);
+    return {
+      d: `M ${fmt(cx + R * cos(start))} ${fmt(cy + R * sin(start))} A ${R} ${R} 0 ${large} 1 ${fmt(cx + R * cos(end))} ${fmt(cy + R * sin(end))} L ${fmt(cx + ri * cos(end))} ${fmt(cy + ri * sin(end))} A ${ri} ${ri} 0 ${large} 0 ${fmt(cx + ri * cos(start))} ${fmt(cy + ri * sin(start))} Z`,
+      color: LANG_COLORS[l.lang] || "#999",
+    };
+  });
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: "block", flexShrink: 0 }}>
+      {paths.map((p, i) => (
+        <path key={i} d={p.d} fill={p.color} stroke="#f0f4f8" strokeWidth={1} />
+      ))}
+    </svg>
+  );
+}
+
 function GitHubApp() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [hovered, setHovered] = useState(null);
 
   useEffect(() => {
     fetch("/api/github")
@@ -1235,68 +1276,246 @@ function GitHubApp() {
       .catch((e) => { setError(e.message); setLoading(false); });
   }, []);
 
-  if (loading) return <div style={{ padding: 20, color: "#555" }}>Fetching GitHub data...</div>;
-  if (error || !data || data.error) {
+  // Contribution chart constants — Windows-palette greens
+  const CELL = 8, GAP = 1, STEP = 9;
+  const CHART_COLORS = ["#c0c0c0", "#cce8cc", "#7dbf7d", "#3a8a3a", "#1a5c1a"];
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  const relDate = (dateStr) => {
+    const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+    if (days === 0) return "today";
+    if (days === 1) return "1d ago";
+    if (days < 7) return `${days}d ago`;
+    if (days < 30) return `${Math.floor(days / 7)}w ago`;
+    return `${Math.floor(days / 30)}mo ago`;
+  };
+
+  // Shared section header matching the rest of the site (Skills, Experience, etc.)
+  const SH = ({ children }) => (
+    <div style={{
+      fontSize: 12, fontWeight: 700, color: "#000080",
+      textTransform: "uppercase", letterSpacing: 1,
+      borderBottom: "2px solid #000080", paddingBottom: 4, marginBottom: 10,
+    }}>
+      {children}
+    </div>
+  );
+
+  if (loading) {
     return (
-      <div style={{ padding: 20 }}>
-        <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12, color: "#111" }}>GitHub Stats</div>
-        <div style={{ color: "#999", fontSize: 13 }}>Could not load GitHub data. Visit my profile directly:</div>
-        <a href={PERSONAL.github} target="_blank" rel="noopener noreferrer" style={{ color: "#000080", fontSize: 13 }}>{PERSONAL.github}</a>
+      <div style={{ padding: "16px 20px" }}>
+        <div style={{ fontSize: 18, fontWeight: 800, color: "#111", marginBottom: 16 }}>GitHub Profile</div>
+        <div style={{ fontSize: 12, color: "#777" }}>Loading profile data...</div>
       </div>
     );
   }
 
-  const langColors = { JavaScript: "#f1e05a", TypeScript: "#3178c6", Python: "#3572A5", Java: "#b07219", PHP: "#4F5D95", "C++": "#f34b7d", HTML: "#e34c26", CSS: "#563d7c" };
+  if (error || !data || data.error) {
+    return (
+      <div style={{ padding: "16px 20px" }}>
+        <div style={{ fontSize: 18, fontWeight: 800, color: "#111", marginBottom: 16 }}>GitHub Profile</div>
+        <div style={{ fontSize: 12, color: "#555", marginBottom: 6 }}>Could not load GitHub data.</div>
+        <a href={PERSONAL.github} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#000080" }}>{PERSONAL.github}</a>
+      </div>
+    );
+  }
+
+  const cal = data.contributionCalendar || {};
+  const weeks = cal.weeks || [];
+  const total = cal.totalContributions || 0;
+  const langs = data.topLanguages || [];
+  const commits = data.recentCommits || [];
+  const pinned = data.pinnedRepos || [];
+  const totalLangCount = langs.reduce((s, l) => s + l.count, 0);
+
+  const getLevel = (count) => {
+    if (count === 0) return 0;
+    if (count <= 2) return 1;
+    if (count <= 5) return 2;
+    if (count <= 9) return 3;
+    return 4;
+  };
+
+  const displayWeeks = weeks;
+
+  const monthMarkers = [];
+  displayWeeks.forEach((week, wi) => {
+    if (!week.contributionDays?.length) return;
+    const d = new Date(week.contributionDays[0].date + "T12:00:00");
+    const m = d.getMonth();
+    const prevM = wi > 0 && displayWeeks[wi - 1].contributionDays?.length
+      ? new Date(displayWeeks[wi - 1].contributionDays[0].date + "T12:00:00").getMonth() : -1;
+    if (m !== prevM) monthMarkers.push({ wi, label: MONTHS[m] });
+  });
 
   return (
     <div style={{ padding: "16px 20px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-        {data.avatarUrl && <img src={data.avatarUrl} alt="" style={{ width: 48, height: 48, borderRadius: "50%", border: "2px inset #c0c0c0" }} />}
-        <div>
-          <div style={{ fontSize: 15, fontWeight: 700 }}>{data.name || data.username}</div>
-          <div style={{ fontSize: 11, color: "#666" }}>{data.bio}</div>
+
+      {/* ── 1. Profile header ── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid #c0c0c0" }}>
+        {data.avatarUrl && (
+          <img
+            src={data.avatarUrl}
+            alt="GitHub avatar"
+            style={{ width: 56, height: 56, border: "2px inset #c0c0c0", flexShrink: 0 }}
+          />
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "#111", marginBottom: 2 }}>{data.name || "rushinski"}</div>
+          {data.bio && <div style={{ fontSize: 12, color: "#555", lineHeight: 1.45, marginBottom: 4 }}>{data.bio}</div>}
+          <a href={PERSONAL.github} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "#000080", textDecoration: "none" }}>
+            github.com/rushinski ↗
+          </a>
         </div>
       </div>
-      <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
-        {[
-          { label: "Repos", value: data.publicRepos },
-          { label: "Stars", value: data.totalStars },
-          { label: "Followers", value: data.followers },
-        ].map((s) => (
-          <div key={s.label} style={{ background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "8px 14px", textAlign: "center", minWidth: 80 }}>
-            <div style={{ fontSize: 18, fontWeight: 800, color: "#24292e" }}>{s.value}</div>
-            <div style={{ fontSize: 10, color: "#666" }}>{s.label}</div>
+
+      {/* ── 2. Commit Activity + Recent Commits ── */}
+      <div style={{ marginBottom: 20 }}>
+        <SH>Commit Activity</SH>
+        <div style={{ background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px", userSelect: "none" }}>
+          {/* Count line above chart */}
+          <div style={{ fontSize: 11, color: "#555", marginBottom: 8 }}>
+            {total.toLocaleString()} contributions in the last year
           </div>
-        ))}
-      </div>
-      {data.topLanguages?.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6, color: "#333" }}>Top Languages</div>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {data.topLanguages.map((l) => (
-              <span key={l.lang} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, background: "#f6f8fa", padding: "3px 8px", border: "1px solid #c0c0c0" }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", background: langColors[l.lang] || "#999" }} />
-                {l.lang} ({l.count})
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-      {data.featuredRepos?.length > 0 && (
-        <div>
-          <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6, color: "#333" }}>Recent Repos</div>
-          {data.featuredRepos.slice(0, 4).map((r) => (
-            <div key={r.name} style={{ padding: "6px 0", borderBottom: "1px solid #e0e0e0" }}>
-              <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: "#000080", fontWeight: 600, fontSize: 12, textDecoration: "none" }}>{r.name}</a>
-              {r.description && <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>{r.description}</div>}
-              <div style={{ display: "flex", gap: 8, marginTop: 3, fontSize: 10, color: "#888" }}>
-                {r.language && <span>{r.language}</span>}
-                {r.stars > 0 && <span>* {r.stars}</span>}
+
+          <div style={{ display: "flex", gap: 0 }}>
+
+            {/* Chart column — full year */}
+            <div style={{ flexShrink: 0, paddingRight: 12, borderRight: "1px solid #c8d4e0" }}>
+              {/* Month labels */}
+              <div style={{ position: "relative", marginLeft: 22, height: 13, marginBottom: 3 }}>
+                {monthMarkers.map(({ wi, label }) => (
+                  <span key={wi} style={{ position: "absolute", left: wi * STEP, fontSize: 8, color: "#000080", opacity: 0.8 }}>
+                    {label}
+                  </span>
+                ))}
+              </div>
+              {/* Grid */}
+              <div style={{ display: "flex" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: GAP, width: 18, marginRight: 4, flexShrink: 0 }}>
+                  {["S","M","T","W","T","F","S"].map((d, i) => (
+                    <div key={i} style={{ height: CELL, fontSize: 8, color: i % 2 === 1 ? "#000080" : "transparent", lineHeight: `${CELL}px`, textAlign: "right", opacity: 0.7 }}>{d}</div>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: GAP }}>
+                  {displayWeeks.map((week, wi) => (
+                    <div key={wi} style={{ display: "flex", flexDirection: "column", gap: GAP, flexShrink: 0 }}>
+                      {week.contributionDays.map((day, di) => {
+                        const lvl = getLevel(day.contributionCount);
+                        return (
+                          <div
+                            key={di}
+                            onMouseEnter={() => setHovered(day)}
+                            onMouseLeave={() => setHovered(null)}
+                            style={{
+                              width: CELL, height: CELL,
+                              background: CHART_COLORS[lvl],
+                              flexShrink: 0,
+                              border: "1px solid rgba(0,0,0,0.08)",
+                              cursor: "default",
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Tooltip + legend */}
+              <div style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                <div style={{ fontSize: 10, color: "#555", minHeight: 13 }}>
+                  {hovered && `${hovered.date} — ${hovered.contributionCount} contribution${hovered.contributionCount !== 1 ? "s" : ""}`}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, color: "#777", flexShrink: 0 }}>
+                  <span>Less</span>
+                  {CHART_COLORS.map((c, i) => (
+                    <div key={i} style={{ width: 8, height: 8, background: c, border: "1px solid rgba(0,0,0,0.12)" }} />
+                  ))}
+                  <span>More</span>
+                </div>
               </div>
             </div>
-          ))}
+
+            {/* Recent Commits column */}
+            <div style={{ flex: 1, paddingLeft: 12, minWidth: 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", marginBottom: 10 }}>Recent Commits</div>
+              {commits.length === 0 ? (
+                <div style={{ fontSize: 11, color: "#777" }}>No recent activity</div>
+              ) : commits.slice(0, 7).map((c, i) => (
+                <div key={i} style={{ paddingBottom: 5, marginBottom: 5, borderBottom: i < 6 ? "1px solid #dde4ee" : "none" }}>
+                  <div style={{ fontSize: 11, color: "#333", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 1 }}>
+                    {c.message}
+                  </div>
+                  <div style={{ fontSize: 10, color: "#777" }}>
+                    <span style={{ color: "#000080", fontWeight: 600 }}>{c.repo}</span> · {relDate(c.date)}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+          </div>
         </div>
-      )}
+      </div>
+
+      {/* ── 3. Top Languages (left) + Pinned Repos (right) ── */}
+      <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+
+        {/* Languages */}
+        <div style={{ flex: "0 0 220px" }}>
+          <SH>Top Languages</SH>
+          <div style={{ background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <DonutChart langs={langs} size={80} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {langs.slice(0, 6).map((l) => (
+                  <div key={l.lang} style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
+                    <div style={{ width: 8, height: 8, background: LANG_COLORS[l.lang] || "#999", flexShrink: 0, border: "1px solid rgba(0,0,0,0.15)" }} />
+                    <div style={{ fontSize: 10, color: "#333", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.lang}</div>
+                    <div style={{ fontSize: 10, color: "#777", flexShrink: 0 }}>{Math.round((l.count / totalLangCount) * 100)}%</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Pinned Repos */}
+        {pinned.length > 0 && (
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <SH>Pinned</SH>
+            <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
+              {pinned.map((repo) => (
+                <a
+                  key={repo.name}
+                  href={repo.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ flex: 1, display: "flex", flexDirection: "column", background: "#f0f4f8", border: "2px outset #c0c0c0", padding: "8px 10px", textDecoration: "none", minWidth: 0 }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {repo.name}
+                  </div>
+                  {repo.description && (
+                    <div style={{ fontSize: 10, color: "#555", marginBottom: 6, lineHeight: 1.35, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      {repo.description}
+                    </div>
+                  )}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10, color: "#666" }}>
+                    {repo.language && (
+                      <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                        <span style={{ width: 7, height: 7, borderRadius: "50%", background: LANG_COLORS[repo.language] || "#999", display: "inline-block" }} />
+                        {repo.language}
+                      </span>
+                    )}
+                    {repo.stars > 0 && <span>★ {repo.stars}</span>}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
@@ -2128,7 +2347,7 @@ export default function HeroDesktopComputerComponent() {
     skills:     { id: "skills",     title: "Skills",                   x: 200, y: 60,  w: 480, h: 400, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
     experience: { id: "experience", title: "Experience",               x: 180, y: 50,  w: 560, h: 480, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
     projects:   { id: "projects",   title: "Projects",                 x: 140, y: 30,  w: 540, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
-    github:     { id: "github",     title: "GitHub",                   x: 220, y: 70,  w: 460, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 6 },
+    github:     { id: "github",     title: "GitHub",                   x: 160, y: 40,  w: 760, h: 580, isOpen: false, isMinimized: false, isMaximized: false, z: 6 },
     contact:    { id: "contact",    title: "Contact",                  x: 260, y: 80,  w: 400, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
     location:   { id: "location",   title: "Jacobs Time",              x: 280, y: 110, w: 560, h: 300, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
     terminal:   { id: "terminal",   title: "Terminal",                 x: 120, y: 50,  w: 500, h: 350, isOpen: false, isMinimized: false, isMaximized: false, z: 4 },
