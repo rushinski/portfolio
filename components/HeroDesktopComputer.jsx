@@ -904,6 +904,8 @@ const SKILL_ICON_FILES = {
   GitHub: "github.png",
   "GitHub Actions": "githubactions.png",
   Vercel: "vercel.png",
+  "Upstash Redis": "redis.png",
+  "GitHub Gist API": "github.png",
 };
 
 function SkillCard({ name }) {
@@ -1045,54 +1047,71 @@ function ExperienceApp() {
 function ProjectsApp() {
   const [expanded, setExpanded] = useState(null);
 
+  const GHCard = ({ url, lang }) => {
+    const repoName = url.split("/").pop();
+    const color = LANG_COLORS[lang] || "#ccc";
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: "inline-flex", flexDirection: "column", gap: 5,
+          textDecoration: "none", color: "inherit",
+          background: "#fff", border: "1px solid #c0c0c0",
+          padding: "7px 10px", minWidth: 150,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          <img src="/skills/github.png" alt="github" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+          <span style={{ fontWeight: 700, fontSize: 12, color: "#000080" }}>{repoName}</span>
+        </div>
+        {lang && (
+          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: "#555" }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0 }} />
+            {lang}
+          </div>
+        )}
+      </a>
+    );
+  };
+
   const RetroBtn = ({ href, children, style: s = {} }) => (
-    <a
-      href={href} target="_blank" rel="noopener noreferrer"
+    <button
+      onClick={() => { if (href) window.open(href, "_blank", "noopener,noreferrer"); }}
       style={{
         display: "inline-flex", alignItems: "center", gap: 4,
-        background: "#c0c0c0", color: "#111", textDecoration: "none",
+        background: "#c0c0c0", color: "#111",
         border: "none",
         borderTop: "2px solid #fff", borderLeft: "2px solid #fff",
         borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
         padding: "3px 10px", fontSize: 11, fontFamily: "inherit", fontWeight: 600,
         cursor: "pointer", ...s,
       }}
-    >{children}</a>
-  );
-
-  const SH = ({ children }) => (
-    <div style={{
-      fontSize: 12, fontWeight: 700, color: "#000080",
-      textTransform: "uppercase", letterSpacing: 1,
-      borderBottom: "2px solid #000080", paddingBottom: 4, marginBottom: 12,
-    }}>{children}</div>
+    >{children}</button>
   );
 
   return (
     <div style={{ padding: "16px 20px" }}>
-      <SH>Projects</SH>
+      <div style={{
+        fontSize: 12, fontWeight: 700, color: "#000080",
+        textTransform: "uppercase", letterSpacing: 1,
+        borderBottom: "2px solid #000080", paddingBottom: 4, marginBottom: 12,
+      }}>Projects</div>
 
       {PROJECTS.map((p, i) => {
         const isOpen = expanded === i;
         const isInProgress = p.status === "IN_PROGRESS";
+        const primaryLang = p.stack.find((s) => LANG_COLORS[s]);
         return (
-          <div
-            key={i}
-            style={{
-              marginBottom: 12,
-              background: "#f0f4f8",
-              border: "2px outset #c0c0c0",
-            }}
-          >
-            {/* Card header */}
+          <div key={i} style={{ marginBottom: 12, background: "#f0f4f8", border: "2px outset #c0c0c0" }}>
             <div style={{ padding: "10px 12px" }}>
+
+              {/* Header */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
                 <div style={{ fontWeight: 800, fontSize: 14, color: "#111", flex: 1, minWidth: 0 }}>{p.title}</div>
                 <div style={{ display: "flex", gap: 5, alignItems: "center", flexShrink: 0 }}>
-                  <span style={{
-                    fontSize: 10, padding: "2px 8px", fontWeight: 700,
-                    background: "#e8eef6", color: "#1f3763", border: "1px solid #9bb2d9",
-                  }}>{p.date}</span>
+                  <span style={{ fontSize: 10, padding: "2px 8px", fontWeight: 700, background: "#e8eef6", color: "#1f3763", border: "1px solid #9bb2d9" }}>{p.date}</span>
                   <span style={{
                     fontSize: 10, padding: "2px 8px", fontWeight: 700,
                     background: isInProgress ? "#fff8dc" : "#e0ece0",
@@ -1102,7 +1121,19 @@ function ProjectsApp() {
                 </div>
               </div>
 
-              <div style={{ fontSize: 12, color: "#444", lineHeight: 1.6, marginBottom: 8 }}>{p.desc}</div>
+              {/* Description */}
+              <div style={{ fontSize: 12, color: "#444", lineHeight: 1.6, marginBottom: 6 }}>{p.desc}</div>
+
+              {/* Narrative */}
+              {p.narrative && (
+                <div style={{
+                  fontSize: 11, color: "#555", lineHeight: 1.65, fontStyle: "italic",
+                  marginBottom: 8, borderLeft: "3px solid #b0b0b0",
+                  padding: "4px 6px 4px 8px", background: "#fafafa",
+                }}>
+                  {p.narrative}
+                </div>
+              )}
 
               {/* Impact bullets */}
               <div style={{ marginBottom: 8 }}>
@@ -1114,24 +1145,30 @@ function ProjectsApp() {
                 ))}
               </div>
 
-              {/* Stack badges */}
+              {/* Stack badges with icons */}
               <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 10 }}>
-                {p.stack.map((t) => (
-                  <span key={t} style={{ background: "#e0ece0", border: "1px solid #b0d0b0", padding: "2px 6px", fontSize: 10, color: "#2d6a4f", fontWeight: 600 }}>{t}</span>
-                ))}
+                {p.stack.map((t) => {
+                  const iconFile = SKILL_ICON_FILES[t];
+                  return (
+                    <span key={t} style={{
+                      background: "#e0ece0", border: "1px solid #b0d0b0",
+                      padding: "2px 6px", fontSize: 10, color: "#2d6a4f", fontWeight: 600,
+                      display: "inline-flex", alignItems: "center", gap: 3,
+                    }}>
+                      {iconFile && (
+                        <img src={`/skills/${iconFile}`} alt={t} width={10} height={10} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                      )}
+                      {t}
+                    </span>
+                  );
+                })}
               </div>
 
-              {/* Action row */}
+              {/* Actions */}
               <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
-                {p.links?.github && (
-                  <RetroBtn href={p.links.github}>GH Repo</RetroBtn>
-                )}
-                {p.links?.live && (
-                  <RetroBtn href={p.links.live}>Live Site</RetroBtn>
-                )}
-                {p.links?.landing && (
-                  <RetroBtn href={p.links.landing}>Landing Page</RetroBtn>
-                )}
+                {p.links?.github && <GHCard url={p.links.github} lang={primaryLang} />}
+                {p.links?.live && <RetroBtn href={p.links.live}>Live Site</RetroBtn>}
+                {p.links?.landing && <RetroBtn href={p.links.landing}>Landing Page</RetroBtn>}
                 {p.links?.youtube?.map((v, idx) => (
                   <RetroBtn key={idx} href={v.url}>{v.label}</RetroBtn>
                 ))}
@@ -1156,13 +1193,9 @@ function ProjectsApp() {
               </div>
             </div>
 
-            {/* Expandable architecture section */}
+            {/* Architecture expand */}
             {isOpen && (
-              <div style={{
-                borderTop: "2px inset #c0c0c0",
-                background: "#fff",
-                padding: "10px 12px",
-              }}>
+              <div style={{ borderTop: "2px inset #c0c0c0", background: "#fff", padding: "10px 12px" }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Architecture</div>
                 {p.architecture.map((item, j) => (
                   <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "5px 0", borderBottom: j < p.architecture.length - 1 ? "1px solid #e8eef0" : "none" }}>
@@ -1183,7 +1216,7 @@ const LANG_COLORS = {
   JavaScript: "#f1e05a", TypeScript: "#3178c6", Python: "#3572A5",
   Go: "#00ADD8", Java: "#b07219", PHP: "#4F5D95",
   "C++": "#f34b7d", HTML: "#e34c26", CSS: "#563d7c",
-  Shell: "#89e051", Dockerfile: "#384d54",
+  Shell: "#89e051", Dockerfile: "#384d54", "Node.js": "#68a063",
 };
 
 function DonutChart({ langs, size = 84 }) {
