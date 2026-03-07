@@ -72,7 +72,7 @@ const PROJECTS = [
       "22-week implementation roadmap in active progress",
     ],
     stack: ["Go", "Next.js", "PostgreSQL", "Digital Ocean", "Upstash Redis"],
-    narrative: "I started this project after completing the Realdealkickzsc contract. The interest I received from other sneaker resellers made it clear there was a real market opportunity. Rather than building separate codebases for each client, I decided to architect a proper multi-tenant SaaS platform. This also gave me the chance to fix the bottlenecks and architectural issues I discovered in the v1 system, and to learn Go for the backend rebuild. I currently have 1 seller on the platform and 5 more waiting to join once the full multi-tenant rebuild is complete.",
+    narrative: "While wrapping up the Realdealkickzsc contract, five other sneaker resellers reached out wanting their own stores. I knew five separate backends was the wrong call — a multi-tenant platform was the right architecture. I'm also a genuine sneakerhead, so this is one of those rare projects I'd be building regardless of whether it was commercially viable. Currently 1 seller is live on the platform with 5 more waiting to join.",
     architecture: [
       "Single Go backend with Chi router, domain-driven folder structure (internal/domain/, internal/router/, internal/platform/)",
       "Multi-runtime codebase: Go API + Python image processing service using rembg",
@@ -92,12 +92,15 @@ const PROJECTS = [
     status: "COMPLETE",
     desc: "Orchestrated a Discord-to-device automation pipeline that mapped Discord user IDs to MongoDB player records.",
     impact: [
-      "Reduced manual title assignment from ~45 seconds -> 10-15 seconds",
+      "Reduced manual title assignment from ~45 seconds to 10-15 seconds",
       "95% success rate via image-based UI state detection",
       "100% conflict-free processing with role-based bucket queue",
     ],
     stack: ["Node.js", "MongoDB", "ADBKit", "Tesseract.js", "Discord.js"],
-    narrative: "I built this bot because of a game I was playing called Rise of Kingdoms. In this game you can assign titles to players for buffs, but manually doing this took a lot of time. In the culture of the game, the solution was a title bot - they already existed, but building my own gave me the chance to learn new technologies like ADB device automation and OCR, while also saving our kingdom money and giving us full control over the system. The project ended up generating two paid offers from other kingdoms wanting similar solutions.",
+    narrative: "I was genuinely curious how these bots actually work. It's deliberately kept secret — the bots violate the game's TOS, and since few people know how to build them it's a lucrative niche that nobody publicly documents. I decided to figure it out myself.",
+    highlight: "The hardest part was just figuring out what was even possible. I'd never heard of ADBKit or virtual machines before this project. Two questions drove everything: how do I interact with the game programmatically, and how do I keep the process running 24/7?\n\nThe problem I ultimately couldn't crack was a true in-game approach. Modern title bots operate inside the game's global chat — players never leave the game. I tried having a bot watch kingdom chat via OCR, but when it paused to assign a title it would fall behind on messages. Two bots (one watching, one assigning) still missed simultaneous requests. My suspicion is the real solution involves intercepting network traffic between the game client and server — other bots expose private player stats that would only be possible that way — but I never pursued it and went with a Discord command approach instead.\n\nOn the assignment side: clicking a governor's profile with ADB requires knowing exactly where it appears on screen, but the popup can appear in 4 different positions. I used Pixelmatch, Sharp, and Tesseract to detect the correct position dynamically before each click.",
+    differently: "I'd push harder to find the in-game solution. The Discord command approach works, but it's outdated compared to what the best bots do — and that unsolved problem still bothers me.",
+    outcome: "The bot worked, but not quite as I'd hoped. The Discord-based approach was functional but felt dated, and the kingdom eventually moved to a fully in-game bot. Two other kingdoms offered to pay for a similar build.",
     architecture: [
       "Modular Node.js application integrating Discord, MongoDB, ADB, and OCR libraries",
       "Discord.js slash command interface (/title, /set-location, /locate-bot) with permissions enforcement",
@@ -121,12 +124,15 @@ const PROJECTS = [
     status: "COMPLETE",
     desc: "Engineered a modular, event-driven Discord bot serving 900+ users.",
     impact: [
-      "Consolidated 5+ single-purpose bots into a one unified bot",
+      "Consolidated 5+ single-purpose bots into one unified system",
       "1,000+ transcripts archived with GitHub Gist + MongoDB fallback",
       "3 paid bot development offers generated from this project",
     ],
     stack: ["Node.js", "Discord.js", "MongoDB", "GitHub Gist API"],
-    narrative: "I built this bot for a project in Rise of Kingdoms where I was organizing a large group of 900+ players. Creating my own bot allowed me to have full control over Discord's features while personalizing everything to our project's exact needs. I was also able to combine the functionality of multiple bots into one, reducing the server from 10+ bots down to 2-3. The bot grew to support +900 users and generated 3 paid development offers.",
+    narrative: "This was my first backend project ever — everything I'd built before was frontend. A Discord bot seemed like an approachable entry point, but it quickly opened up an entirely new world: server-side logic, databases, event-driven architecture, and real users counting on the system to stay up.",
+    highlight: "The moment that changed everything was realizing I needed a database. If the bot restarted mid-giveaway, the giveaway was just gone — no persistence. That one problem forced me to learn MongoDB, and once I had it, I kept finding new uses: tracking infractions, custom reaction roles, giveaway state, player message counts. It turned what could have been a stateless script into a real system.\n\nAnother memorable challenge was content moderation. I started by manually listing every banned word and its possible variations — and users would always find creative ways around it. After some research I found the fast-levenshtein package, which scores words using fuzzy matching rather than exact comparisons. One definition replaced hundreds of manual variations and actually worked.",
+    differently: "I'd set up multiple environments from day one. I didn't fully understand dev/prod separation until my contract work, but it would have let me develop and test new features while the live bot stayed online — instead of pushing changes directly to production.",
+    outcome: "The bot ran in a server with 900+ members and was used thousands of times per day. It generated 3 paid development offers from people who wanted similar bots built for their communities.",
     architecture: [
       "Event-driven Node.js architecture with discord.js v14 and modular subsystem design",
       "6 independent subsystems: Ticketing & Verification, Moderation, Leveling, Roles & Counts, Giveaways, Logging",
@@ -1046,49 +1052,39 @@ function ExperienceApp() {
 
 function ProjectsApp() {
   const [expanded, setExpanded] = useState(null);
+  const [repoData, setRepoData] = useState({});
 
-  const GHCard = ({ url, lang }) => {
-    const repoName = url.split("/").pop();
-    const color = LANG_COLORS[lang] || "#ccc";
-    return (
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          display: "inline-flex", flexDirection: "column", gap: 5,
-          textDecoration: "none", color: "inherit",
-          background: "#fff", border: "1px solid #c0c0c0",
-          padding: "7px 10px", minWidth: 150,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-          <img src="/skills/github.png" alt="github" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
-          <span style={{ fontWeight: 700, fontSize: 12, color: "#000080" }}>{repoName}</span>
-        </div>
-        {lang && (
-          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: "#555" }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0 }} />
-            {lang}
-          </div>
-        )}
-      </a>
-    );
-  };
+  useEffect(() => {
+    PROJECTS.forEach((p) => {
+      if (!p.links?.github) return;
+      const m = p.links.github.match(/github\.com\/([^/]+)\/([^/]+)/);
+      if (!m) return;
+      fetch(`https://api.github.com/repos/${m[1]}/${m[2]}`)
+        .then((r) => r.ok ? r.json() : null)
+        .then((d) => { if (d) setRepoData((prev) => ({ ...prev, [p.links.github]: d })); })
+        .catch(() => {});
+    });
+  }, []);
 
-  const RetroBtn = ({ href, children, style: s = {} }) => (
+  const LinkCard = ({ href, icon, title, sub }) => (
     <button
-      onClick={() => { if (href) window.open(href, "_blank", "noopener,noreferrer"); }}
+      onClick={() => window.open(href, "_blank", "noopener,noreferrer")}
       style={{
-        display: "inline-flex", alignItems: "center", gap: 4,
-        background: "#c0c0c0", color: "#111",
-        border: "none",
+        display: "inline-flex", flexDirection: "column", gap: 4, textAlign: "left",
+        background: "#f0f4f8", border: "none",
         borderTop: "2px solid #fff", borderLeft: "2px solid #fff",
         borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
-        padding: "3px 10px", fontSize: 11, fontFamily: "inherit", fontWeight: 600,
-        cursor: "pointer", ...s,
+        padding: "6px 10px", minWidth: 130, cursor: "pointer", fontFamily: "inherit",
       }}
-    >{children}</button>
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+        {icon}
+        <span style={{ fontWeight: 700, fontSize: 11, color: "#000080" }}>{title}</span>
+      </div>
+      {sub != null && (
+        <div style={{ fontSize: 10, color: "#555" }}>{sub}</div>
+      )}
+    </button>
   );
 
   return (
@@ -1102,7 +1098,11 @@ function ProjectsApp() {
       {PROJECTS.map((p, i) => {
         const isOpen = expanded === i;
         const isInProgress = p.status === "IN_PROGRESS";
+        const ghRepo = p.links?.github ? repoData[p.links.github] : null;
         const primaryLang = p.stack.find((s) => LANG_COLORS[s]);
+        const repoLang = ghRepo?.language || primaryLang;
+        const langColor = LANG_COLORS[repoLang] || "#ccc";
+
         return (
           <div key={i} style={{ marginBottom: 12, background: "#f0f4f8", border: "2px outset #c0c0c0" }}>
             <div style={{ padding: "10px 12px" }}>
@@ -1145,7 +1145,7 @@ function ProjectsApp() {
                 ))}
               </div>
 
-              {/* Stack badges with icons */}
+              {/* Stack badges */}
               <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 10 }}>
                 {p.stack.map((t) => {
                   const iconFile = SKILL_ICON_FILES[t];
@@ -1155,22 +1155,53 @@ function ProjectsApp() {
                       padding: "2px 6px", fontSize: 10, color: "#2d6a4f", fontWeight: 600,
                       display: "inline-flex", alignItems: "center", gap: 3,
                     }}>
-                      {iconFile && (
-                        <img src={`/skills/${iconFile}`} alt={t} width={10} height={10} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
-                      )}
+                      {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={10} height={10} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
                       {t}
                     </span>
                   );
                 })}
               </div>
 
-              {/* Actions */}
-              <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
-                {p.links?.github && <GHCard url={p.links.github} lang={primaryLang} />}
-                {p.links?.live && <RetroBtn href={p.links.live}>Live Site</RetroBtn>}
-                {p.links?.landing && <RetroBtn href={p.links.landing}>Landing Page</RetroBtn>}
+              {/* Link cards */}
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "flex-start" }}>
+                {p.links?.github && (
+                  <LinkCard
+                    href={p.links.github}
+                    icon={<img src="/skills/github.png" alt="github" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
+                    title={ghRepo?.name || p.links.github.split("/").pop()}
+                    sub={
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                        {repoLang && <span style={{ width: 8, height: 8, borderRadius: "50%", background: langColor, display: "inline-block", flexShrink: 0 }} />}
+                        {repoLang || ""}
+                        {ghRepo?.stargazers_count != null ? `  ★ ${ghRepo.stargazers_count}` : ""}
+                      </span>
+                    }
+                  />
+                )}
+                {p.links?.live && (
+                  <LinkCard
+                    href={p.links.live}
+                    icon={<span style={{ fontSize: 11 }}>🌐</span>}
+                    title="Live Site"
+                    sub={p.links.live.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
+                  />
+                )}
+                {p.links?.landing && (
+                  <LinkCard
+                    href={p.links.landing}
+                    icon={<span style={{ fontSize: 11 }}>📄</span>}
+                    title="Landing Page"
+                    sub={p.links.landing.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
+                  />
+                )}
                 {p.links?.youtube?.map((v, idx) => (
-                  <RetroBtn key={idx} href={v.url}>{v.label}</RetroBtn>
+                  <LinkCard
+                    key={idx}
+                    href={v.url}
+                    icon={<span style={{ fontSize: 11 }}>▶</span>}
+                    title={v.label}
+                    sub="youtube.com"
+                  />
                 ))}
                 {p.architecture?.length > 0 && (
                   <button
@@ -1185,6 +1216,7 @@ function ProjectsApp() {
                       borderBottom: isOpen ? "2px solid #000040" : "2px solid #404040",
                       padding: "3px 10px", fontSize: 11, cursor: "pointer",
                       fontFamily: "inherit", fontWeight: 600, marginLeft: "auto",
+                      alignSelf: "center",
                     }}
                   >
                     {isOpen ? "Hide Details" : "How It's Built"}
@@ -1193,16 +1225,38 @@ function ProjectsApp() {
               </div>
             </div>
 
-            {/* Architecture expand */}
+            {/* Expandable story + architecture */}
             {isOpen && (
               <div style={{ borderTop: "2px inset #c0c0c0", background: "#fff", padding: "10px 12px" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Architecture</div>
-                {p.architecture.map((item, j) => (
-                  <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "5px 0", borderBottom: j < p.architecture.length - 1 ? "1px solid #e8eef0" : "none" }}>
-                    <span style={{ color: "#000080", fontWeight: 700, flexShrink: 0, fontSize: 11, marginTop: 1 }}>»</span>
-                    <div style={{ fontSize: 11, color: "#333", lineHeight: 1.6 }}>{item}</div>
+                {p.highlight && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>What Was Technically Interesting</div>
+                    <div style={{ fontSize: 11, color: "#333", lineHeight: 1.75, whiteSpace: "pre-line" }}>{p.highlight}</div>
                   </div>
-                ))}
+                )}
+                {p.differently && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>What I'd Do Differently</div>
+                    <div style={{ fontSize: 11, color: "#333", lineHeight: 1.75 }}>{p.differently}</div>
+                  </div>
+                )}
+                {p.outcome && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Outcome</div>
+                    <div style={{ fontSize: 11, color: "#333", lineHeight: 1.75 }}>{p.outcome}</div>
+                  </div>
+                )}
+                {p.architecture?.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Architecture</div>
+                    {p.architecture.map((item, j) => (
+                      <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "5px 0", borderBottom: j < p.architecture.length - 1 ? "1px solid #e8eef0" : "none" }}>
+                        <span style={{ color: "#000080", fontWeight: 700, flexShrink: 0, fontSize: 11, marginTop: 1 }}>»</span>
+                        <div style={{ fontSize: 11, color: "#333", lineHeight: 1.6 }}>{item}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
