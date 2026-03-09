@@ -112,9 +112,17 @@ const PROJECTS = [
     ],
     links: {
       github: "https://github.com/rushinski/Discord-Title-Bot",
-      youtube: [
-        { label: "Set Location Demo", url: "https://www.youtube.com/watch?v=qWGF4W2bfXI" },
-        { label: "Assign Title Demo", url: "https://www.youtube.com/watch?v=NFrKKCJ1rGU" },
+      videos: [
+        {
+          id: "title-bot-set-location",
+          label: "Set Location Demo",
+          src: "/videos/discord-title-bot-set-location.mp4",
+        },
+        {
+          id: "title-bot-assign-title",
+          label: "Assign Title Demo",
+          src: "/videos/discord-title-bot-assign-title.mp4",
+        },
       ],
     },
   },
@@ -149,128 +157,281 @@ const PROJECTS = [
   },
 ];
 
-// Retro Pixel Icon SVGs 
-// These are designed to look like classic Win3.1/95 16-color style icons
+const VIDEO_LIBRARY = PROJECTS.flatMap((project, projectIdx) =>
+  (project.links?.videos || []).map((video, videoIdx) => ({
+    ...video,
+    id: video.id || `video-${projectIdx}-${videoIdx}`,
+    label: video.label || `Video ${videoIdx + 1}`,
+    src: video.src || "",
+    projectTitle: project.title,
+    projectIdx,
+    videoIdx,
+  }))
+);
+const VIDEO_LIBRARY_BY_ID = VIDEO_LIBRARY.reduce((acc, video) => {
+  acc[video.id] = video;
+  return acc;
+}, {});
+
+// Retro Pixel Icon SVGs — Win95/98 16-color style with 3D bevel lighting (top-left = light)
 const Icons = {
   folder: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="1" y="7" width="30" height="22" fill="#c0c000" stroke="#808000" strokeWidth="1"/>
-      <rect x="1" y="5" width="14" height="4" fill="#c0c000" stroke="#808000" strokeWidth="1"/>
-      <rect x="2" y="9" width="28" height="19" fill="#ffff00" stroke="#808000" strokeWidth="1"/>
-      <line x1="2" y1="9" x2="30" y2="9" stroke="#ffff80" strokeWidth="1"/>
+      {/* back panel */}
+      <rect x="1" y="9" width="30" height="20" fill="#c8a000" stroke="#806000" strokeWidth="1"/>
+      {/* tab */}
+      <path d="M1,9 L1,5 L13,5 L16,9 Z" fill="#b89000" stroke="#806000" strokeWidth="1"/>
+      {/* front face */}
+      <rect x="2" y="10" width="28" height="18" fill="#ffd800" stroke="#c8a000" strokeWidth="0.5"/>
+      {/* top-left highlight */}
+      <line x1="3" y1="11" x2="29" y2="11" stroke="#ffe880" strokeWidth="1.5"/>
+      <line x1="3" y1="11" x2="3" y2="27" stroke="#ffe880" strokeWidth="1"/>
+      {/* bottom-right shadow */}
+      <line x1="2" y1="27" x2="30" y2="27" stroke="#806000" strokeWidth="1"/>
+      <line x1="30" y1="10" x2="30" y2="27" stroke="#806000" strokeWidth="1"/>
     </svg>
   ),
   file: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="4" y="2" width="18" height="28" fill="#ffffff" stroke="#000080" strokeWidth="1"/>
-      <polygon points="22,2 28,8 22,8" fill="#c0c0c0" stroke="#000080" strokeWidth="1"/>
-      <rect x="4" y="2" width="24" height="28" fill="none" stroke="#000080" strokeWidth="1"/>
-      <line x1="7" y1="12" x2="25" y2="12" stroke="#000080" strokeWidth="1"/>
-      <line x1="7" y1="16" x2="22" y2="16" stroke="#000080" strokeWidth="1"/>
-      <line x1="7" y1="20" x2="24" y2="20" stroke="#000080" strokeWidth="1"/>
-      <line x1="7" y1="24" x2="18" y2="24" stroke="#000080" strokeWidth="1"/>
+      {/* drop shadow */}
+      <rect x="8" y="4" width="19" height="25" fill="#a0a0a0" opacity="0.5"/>
+      {/* page body */}
+      <rect x="5" y="2" width="19" height="25" fill="#ffffff" stroke="#808080" strokeWidth="0.5"/>
+      {/* folded corner */}
+      <polygon points="24,2 30,8 24,8" fill="#d8d8d8" stroke="#808080" strokeWidth="0.5"/>
+      {/* outer border */}
+      <path d="M5,2 L24,2 L30,8 L30,27 L5,27 Z" fill="none" stroke="#000080" strokeWidth="1"/>
+      {/* fold crease */}
+      <line x1="24" y1="2" x2="24" y2="8" stroke="#808080" strokeWidth="0.8"/>
+      {/* text lines */}
+      <line x1="8" y1="12" x2="21" y2="12" stroke="#000080" strokeWidth="1.2"/>
+      <line x1="8" y1="16" x2="19" y2="16" stroke="#c0c0c0" strokeWidth="1"/>
+      <line x1="8" y1="20" x2="20" y2="20" stroke="#c0c0c0" strokeWidth="1"/>
+      <line x1="8" y1="24" x2="15" y2="24" stroke="#c0c0c0" strokeWidth="1"/>
     </svg>
   ),
   terminal: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="1" y="3" width="30" height="26" fill="#000000" stroke="#808080" strokeWidth="1"/>
-      <rect x="1" y="3" width="30" height="4" fill="#000080"/>
-      <text x="3" y="6.5" fill="#ffffff" fontSize="3.5" fontFamily="monospace">C:\</text>
-      <text x="3" y="15" fill="#00ff00" fontSize="4" fontFamily="monospace">C:\&gt;_</text>
-      <rect x="17" y="12" width="4" height="5" fill="#00ff00" opacity="0.6"/>
+      {/* monitor outer shell */}
+      <rect x="2" y="2" width="28" height="22" rx="1" fill="#c0c0c0" stroke="#808080" strokeWidth="1"/>
+      {/* bevel highlight */}
+      <line x1="3" y1="3" x2="29" y2="3" stroke="#ffffff" strokeWidth="1"/>
+      <line x1="3" y1="3" x2="3" y2="23" stroke="#ffffff" strokeWidth="1"/>
+      {/* screen bezel */}
+      <rect x="4" y="4" width="24" height="18" fill="#404040" stroke="#202020" strokeWidth="0.5"/>
+      {/* screen */}
+      <rect x="5" y="5" width="22" height="16" fill="#000000"/>
+      {/* titlebar stripe */}
+      <rect x="5" y="5" width="22" height="3" fill="#000080"/>
+      {/* green text rows */}
+      <rect x="7" y="11" width="8" height="1.5" fill="#00cc00"/>
+      <rect x="16" y="11" width="4" height="1.5" fill="#00ff00"/>
+      <rect x="7" y="14" width="13" height="1.5" fill="#00cc00" opacity="0.75"/>
+      <rect x="7" y="17" width="9" height="1.5" fill="#00cc00" opacity="0.45"/>
+      {/* monitor neck */}
+      <rect x="11" y="24" width="10" height="3" fill="#b0b0b0" stroke="#808080" strokeWidth="0.5"/>
+      {/* monitor base */}
+      <rect x="8" y="27" width="16" height="2" rx="1" fill="#b0b0b0" stroke="#808080" strokeWidth="0.5"/>
     </svg>
   ),
   trash: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="8" y="6" width="16" height="22" fill="#c0c0c0" stroke="#808080" strokeWidth="1"/>
-      <rect x="6" y="4" width="20" height="3" fill="#808080" stroke="#404040" strokeWidth="1"/>
-      <rect x="12" y="2" width="8" height="3" fill="#808080" stroke="#404040" strokeWidth="1"/>
-      <line x1="12" y1="10" x2="12" y2="25" stroke="#404040" strokeWidth="1.5"/>
-      <line x1="16" y1="10" x2="16" y2="25" stroke="#404040" strokeWidth="1.5"/>
-      <line x1="20" y1="10" x2="20" y2="25" stroke="#404040" strokeWidth="1.5"/>
+      {/* can body */}
+      <path d="M8,9 L7,28 L25,28 L24,9 Z" fill="#d0d0d0" stroke="#808080" strokeWidth="1"/>
+      {/* highlight on left face */}
+      <path d="M8,9 L9,28 L10,28 L11,9 Z" fill="#e8e8e8"/>
+      {/* lid */}
+      <rect x="6" y="6" width="20" height="4" rx="1" fill="#b0b0b0" stroke="#606060" strokeWidth="1"/>
+      <line x1="7" y1="7" x2="25" y2="7" stroke="#d8d8d8" strokeWidth="1"/>
+      {/* handle */}
+      <rect x="13" y="3" width="6" height="4" rx="1" fill="#a0a0a0" stroke="#606060" strokeWidth="1"/>
+      <line x1="14" y1="4" x2="18" y2="4" stroke="#c8c8c8" strokeWidth="1"/>
+      {/* vertical ribs */}
+      <line x1="12" y1="10" x2="11" y2="27" stroke="#b8b8b8" strokeWidth="1.2"/>
+      <line x1="16" y1="10" x2="16" y2="27" stroke="#b8b8b8" strokeWidth="1.2"/>
+      <line x1="20" y1="10" x2="21" y2="27" stroke="#b8b8b8" strokeWidth="1.2"/>
+      {/* bottom shadow */}
+      <line x1="7" y1="27" x2="25" y2="27" stroke="#808080" strokeWidth="1"/>
     </svg>
   ),
   contact: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="2" y="6" width="28" height="20" fill="#ffff80" stroke="#808000" strokeWidth="1"/>
-      <polygon points="2,6 16,18 30,6" fill="none" stroke="#808000" strokeWidth="1.5"/>
-      <line x1="2" y1="26" x2="12" y2="17" stroke="#808000" strokeWidth="1" opacity="0.5"/>
-      <line x1="30" y1="26" x2="20" y2="17" stroke="#808000" strokeWidth="1" opacity="0.5"/>
+      {/* envelope body */}
+      <rect x="2" y="8" width="28" height="18" fill="#fffbe0" stroke="#c0a000" strokeWidth="1"/>
+      {/* inner face highlight */}
+      <rect x="3" y="9" width="26" height="16" fill="#fff8d0"/>
+      <line x1="3" y1="9" x2="3" y2="25" stroke="#fffce8" strokeWidth="1"/>
+      <line x1="3" y1="9" x2="29" y2="9" stroke="#fffce8" strokeWidth="1"/>
+      {/* flap V-shape */}
+      <polygon points="2,8 16,20 30,8" fill="none" stroke="#c0a000" strokeWidth="1.5"/>
+      {/* bottom fold lines */}
+      <line x1="2" y1="26" x2="13" y2="17" stroke="#c0a000" strokeWidth="1"/>
+      <line x1="30" y1="26" x2="19" y2="17" stroke="#c0a000" strokeWidth="1"/>
+      {/* white letter peeking */}
+      <rect x="9" y="15" width="14" height="8" fill="#ffffff" stroke="#d0c070" strokeWidth="0.5" opacity="0.7"/>
     </svg>
   ),
   github: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="1" y="1" width="30" height="30" fill="#000000" stroke="#404040" strokeWidth="1"/>
-      <circle cx="16" cy="14" r="8" fill="none" stroke="#ffffff" strokeWidth="1.5"/>
-      <circle cx="16" cy="14" r="3" fill="#ffffff"/>
-      <path d="M12 22 L12 28 L15 26 L18 28 L18 22" fill="none" stroke="#ffffff" strokeWidth="1.5"/>
+      {/* dark background with bevel */}
+      <rect x="1" y="1" width="30" height="30" fill="#1e1e1e" stroke="#404040" strokeWidth="1"/>
+      <line x1="2" y1="2" x2="30" y2="2" stroke="#303030" strokeWidth="1"/>
+      <line x1="2" y1="2" x2="2" y2="30" stroke="#303030" strokeWidth="1"/>
+      {/* left bracket */}
+      <path d="M8,11 L5,16 L8,21" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* right bracket */}
+      <path d="M24,11 L27,16 L24,21" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* forward slash */}
+      <line x1="20" y1="9" x2="12" y2="23" stroke="#00ff88" strokeWidth="2.2" strokeLinecap="round"/>
     </svg>
   ),
   skills: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="1" y="1" width="30" height="30" fill="#000080" stroke="#0000c0" strokeWidth="1"/>
-      <rect x="4" y="20" width="5" height="8" fill="#00ff00" stroke="#008000" strokeWidth="0.5"/>
-      <rect x="11" y="14" width="5" height="14" fill="#00ff00" stroke="#008000" strokeWidth="0.5"/>
-      <rect x="18" y="8" width="5" height="20" fill="#00ff00" stroke="#008000" strokeWidth="0.5"/>
-      <rect x="25" y="4" width="5" height="24" fill="#00ff00" stroke="#008000" strokeWidth="0.5"/>
+      {/* navy background with bevel */}
+      <rect x="1" y="1" width="30" height="30" fill="#000080" stroke="#0000a0" strokeWidth="1"/>
+      <line x1="2" y1="2" x2="30" y2="2" stroke="#2020c0" strokeWidth="1"/>
+      <line x1="2" y1="2" x2="2" y2="30" stroke="#2020c0" strokeWidth="1"/>
+      {/* chart axes */}
+      <line x1="4" y1="27" x2="29" y2="27" stroke="#80c0ff" strokeWidth="1"/>
+      <line x1="4" y1="4" x2="4" y2="27" stroke="#80c0ff" strokeWidth="1"/>
+      {/* bars with 3D top face */}
+      <rect x="6" y="22" width="5" height="5" fill="#00cc00" stroke="#008000" strokeWidth="0.5"/>
+      <polygon points="6,22 11,22 12,21 7,21" fill="#00ee00"/>
+      <rect x="13" y="16" width="5" height="11" fill="#00cc00" stroke="#008000" strokeWidth="0.5"/>
+      <polygon points="13,16 18,16 19,15 14,15" fill="#00ee00"/>
+      <rect x="20" y="10" width="5" height="17" fill="#00cc00" stroke="#008000" strokeWidth="0.5"/>
+      <polygon points="20,10 25,10 26,9 21,9" fill="#00ee00"/>
     </svg>
   ),
   experience: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="4" y="10" width="24" height="18" rx="2" fill="#804000" stroke="#402000" strokeWidth="1"/>
-      <rect x="10" y="6" width="12" height="6" rx="1" fill="#804000" stroke="#402000" strokeWidth="1"/>
-      <rect x="12" y="4" width="8" height="4" fill="none" stroke="#402000" strokeWidth="1"/>
-      <rect x="6" y="16" width="20" height="2" fill="#c08040"/>
-      <rect x="13" y="14" width="6" height="4" rx="1" fill="#ffc080" stroke="#c08040" strokeWidth="0.5"/>
+      {/* briefcase body */}
+      <rect x="3" y="12" width="26" height="17" rx="1" fill="#c09050" stroke="#806030" strokeWidth="1"/>
+      {/* bevel highlights */}
+      <line x1="4" y1="13" x2="28" y2="13" stroke="#e0b870" strokeWidth="1"/>
+      <line x1="4" y1="13" x2="4" y2="28" stroke="#e0b870" strokeWidth="1"/>
+      {/* shadow edges */}
+      <line x1="4" y1="28" x2="28" y2="28" stroke="#806030" strokeWidth="1"/>
+      <line x1="28" y1="13" x2="28" y2="28" stroke="#806030" strokeWidth="1"/>
+      {/* handle */}
+      <path d="M11,12 L11,8 Q11,6 13,6 L19,6 Q21,6 21,8 L21,12" fill="none" stroke="#806030" strokeWidth="2" strokeLinecap="round"/>
+      {/* horizontal band */}
+      <rect x="3" y="18" width="26" height="3" fill="#b08040"/>
+      <line x1="4" y1="19" x2="28" y2="19" stroke="#d0a060" strokeWidth="0.8"/>
+      {/* clasp */}
+      <rect x="13" y="16" width="6" height="6" rx="1" fill="#e0b870" stroke="#806030" strokeWidth="0.5"/>
+      <rect x="14" y="18" width="4" height="2" rx="0.5" fill="#a07030" stroke="#604010" strokeWidth="0.5"/>
     </svg>
   ),
   about: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="1" y="1" width="30" height="30" fill="#000080" stroke="#0000c0" strokeWidth="1"/>
-      <circle cx="16" cy="12" r="5" fill="#ffffff"/>
-      <ellipse cx="16" cy="26" rx="8" ry="5" fill="#ffffff"/>
-      <rect x="14" y="8" width="4" height="2" fill="#000080"/>
+      {/* navy background with bevel */}
+      <rect x="1" y="1" width="30" height="30" fill="#000080" stroke="#0000a0" strokeWidth="1"/>
+      <line x1="2" y1="2" x2="30" y2="2" stroke="#2020c0" strokeWidth="1"/>
+      <line x1="2" y1="2" x2="2" y2="30" stroke="#2020c0" strokeWidth="1"/>
+      {/* head */}
+      <circle cx="16" cy="12" r="5.5" fill="#ffcc99" stroke="#c09060" strokeWidth="0.8"/>
+      {/* hair */}
+      <path d="M10.5,11 Q10,6 16,6 Q22,6 21.5,11" fill="#5a3010" stroke="none"/>
+      {/* body / shirt */}
+      <path d="M7,31 Q7,22 11,19 Q13,17.5 16,17.5 Q19,17.5 21,19 Q25,22 25,31 Z" fill="#4080ff" stroke="#2060cc" strokeWidth="0.8"/>
+      {/* collar V */}
+      <path d="M13,19 L16,23 L19,19" fill="none" stroke="#6090ff" strokeWidth="1"/>
     </svg>
   ),
   projects: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="1" y="1" width="30" height="30" fill="#800080" stroke="#400040" strokeWidth="1"/>
-      <rect x="4" y="4" width="11" height="11" fill="#ff80ff" stroke="#c000c0" strokeWidth="0.5"/>
-      <rect x="17" y="4" width="11" height="11" fill="#ff80ff" stroke="#c000c0" strokeWidth="0.5" opacity="0.8"/>
-      <rect x="4" y="17" width="11" height="11" fill="#ff80ff" stroke="#c000c0" strokeWidth="0.5" opacity="0.8"/>
-      <rect x="17" y="17" width="11" height="11" fill="#ff80ff" stroke="#c000c0" strokeWidth="0.5" opacity="0.6"/>
+      {/* folder back */}
+      <rect x="1" y="10" width="30" height="20" fill="#800080" stroke="#500050" strokeWidth="1"/>
+      {/* folder tab */}
+      <path d="M1,10 L1,6 L13,6 L16,10 Z" fill="#700070" stroke="#500050" strokeWidth="1"/>
+      {/* folder front face */}
+      <rect x="2" y="11" width="28" height="18" fill="#c030c0" stroke="#a000a0" strokeWidth="0.5"/>
+      {/* bevel highlights */}
+      <line x1="3" y1="12" x2="29" y2="12" stroke="#e080e0" strokeWidth="1.5"/>
+      <line x1="3" y1="12" x2="3" y2="28" stroke="#e080e0" strokeWidth="1"/>
+      {/* shadow edges */}
+      <line x1="2" y1="28" x2="30" y2="28" stroke="#600060" strokeWidth="1"/>
+      <line x1="30" y1="11" x2="30" y2="28" stroke="#600060" strokeWidth="1"/>
+      {/* code brackets  inside folder */}
+      <path d="M10,16 L8,20 L10,24" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M22,16 L24,20 L22,24" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+      <line x1="19" y1="15" x2="13" y2="25" stroke="#ffff80" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  ),
+  videos: (
+    <svg width="32" height="32" viewBox="0 0 32 32">
+      <rect x="1" y="1" width="30" height="30" fill="#005a9c" stroke="#003f6d" strokeWidth="1"/>
+      <line x1="2" y1="2" x2="30" y2="2" stroke="#3b8fc9" strokeWidth="1"/>
+      <line x1="2" y1="2" x2="2" y2="30" stroke="#3b8fc9" strokeWidth="1"/>
+      <rect x="5" y="8" width="22" height="16" fill="#000" stroke="#001a2d" strokeWidth="1"/>
+      <polygon points="13,11 13,21 21,16" fill="#ffffff"/>
+      <rect x="7" y="26" width="18" height="2" fill="#7fb3d6" stroke="#003f6d" strokeWidth="0.5"/>
     </svg>
   ),
   welcome: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="1" y="1" width="30" height="30" fill="#008080" stroke="#004040" strokeWidth="1"/>
-      <text x="16" y="13" textAnchor="middle" fill="#ffffff" fontSize="7" fontWeight="bold" fontFamily="serif">?</text>
-      <rect x="6" y="18" width="20" height="2" fill="#80ffff"/>
-      <rect x="8" y="22" width="16" height="2" fill="#80ffff" opacity="0.7"/>
-      <rect x="10" y="26" width="12" height="2" fill="#80ffff" opacity="0.5"/>
+      {/* monitor outer shell */}
+      <rect x="3" y="2" width="26" height="21" rx="1" fill="#d0d0d0" stroke="#808080" strokeWidth="1"/>
+      {/* bevel */}
+      <line x1="4" y1="3" x2="28" y2="3" stroke="#ffffff" strokeWidth="1"/>
+      <line x1="4" y1="3" x2="4" y2="22" stroke="#ffffff" strokeWidth="1"/>
+      {/* screen */}
+      <rect x="5" y="4" width="22" height="16" fill="#000080"/>
+      {/* screen scanline shimmer */}
+      <line x1="5" y1="4" x2="27" y2="4" stroke="#4040ff" strokeWidth="0.8"/>
+      {/* star / welcome symbol */}
+      <polygon points="16,7 17.5,11.5 22,11.5 18.5,14 20,18.5 16,16 12,18.5 13.5,14 10,11.5 14.5,11.5" fill="#ffff00" stroke="#c0c000" strokeWidth="0.5"/>
+      {/* monitor neck */}
+      <rect x="12" y="23" width="8" height="3" fill="#b8b8b8" stroke="#808080" strokeWidth="0.5"/>
+      {/* base */}
+      <rect x="8" y="26" width="16" height="2" rx="1" fill="#b8b8b8" stroke="#808080" strokeWidth="0.5"/>
     </svg>
   ),
   settings: (
     <svg width="32" height="32" viewBox="0 0 32 32">
-      <rect x="1" y="1" width="30" height="30" fill="#c0c0c0" stroke="#404040" strokeWidth="1"/>
-      <circle cx="16" cy="16" r="7" fill="#909090" stroke="#404040" strokeWidth="1"/>
-      <circle cx="16" cy="16" r="3" fill="#d8d8d8" stroke="#404040" strokeWidth="1"/>
-      <rect x="15" y="4" width="2" height="4" fill="#606060"/>
-      <rect x="15" y="24" width="2" height="4" fill="#606060"/>
-      <rect x="4" y="15" width="4" height="2" fill="#606060"/>
-      <rect x="24" y="15" width="4" height="2" fill="#606060"/>
-      <rect x="7" y="7" width="3" height="2" transform="rotate(-45 8.5 8)" fill="#606060"/>
-      <rect x="22" y="22" width="3" height="2" transform="rotate(-45 23.5 23)" fill="#606060"/>
-      <rect x="22" y="7" width="3" height="2" transform="rotate(45 23.5 8)" fill="#606060"/>
-      <rect x="7" y="22" width="3" height="2" transform="rotate(45 8.5 23)" fill="#606060"/>
+      {/* gray background with bevel */}
+      <rect x="1" y="1" width="30" height="30" fill="#c0c0c0" stroke="#808080" strokeWidth="1"/>
+      <line x1="2" y1="2" x2="30" y2="2" stroke="#ffffff" strokeWidth="1"/>
+      <line x1="2" y1="2" x2="2" y2="30" stroke="#ffffff" strokeWidth="1"/>
+      {/* outer gear ring */}
+      <circle cx="16" cy="16" r="10" fill="#909090" stroke="#606060" strokeWidth="1"/>
+      {/* gear highlight arc */}
+      <path d="M9,10 Q12,7 16,7" fill="none" stroke="#b8b8b8" strokeWidth="1.2"/>
+      {/* inner hole */}
+      <circle cx="16" cy="16" r="4" fill="#d0d0d0" stroke="#808080" strokeWidth="1"/>
+      {/* 8 gear teeth */}
+      <rect x="14.5" y="4" width="3" height="4" rx="0.5" fill="#808080"/>
+      <rect x="14.5" y="24" width="3" height="4" rx="0.5" fill="#808080"/>
+      <rect x="4" y="14.5" width="4" height="3" rx="0.5" fill="#808080"/>
+      <rect x="24" y="14.5" width="4" height="3" rx="0.5" fill="#808080"/>
+      <rect x="7.5" y="7.5" width="3" height="3" rx="0.5" transform="rotate(45 9 9)" fill="#808080"/>
+      <rect x="21.5" y="7.5" width="3" height="3" rx="0.5" transform="rotate(45 23 9)" fill="#808080"/>
+      <rect x="7.5" y="21.5" width="3" height="3" rx="0.5" transform="rotate(45 9 23)" fill="#808080"/>
+      <rect x="21.5" y="21.5" width="3" height="3" rx="0.5" transform="rotate(45 23 23)" fill="#808080"/>
     </svg>
   ),
   location: (
     <svg width="32" height="32" viewBox="0 0 32 32">
+      {/* teal background with bevel */}
       <rect x="1" y="1" width="30" height="30" fill="#008080" stroke="#004040" strokeWidth="1"/>
-      <ellipse cx="16" cy="24" rx="9" ry="4" fill="#004b4b" opacity="0.55"/>
-      <path d="M16 5 C11 5 8 8.6 8 13 c0 5.2 4.2 9.3 8 14 3.8-4.7 8-8.8 8-14 0-4.4-3-8-8-8z" fill="#f8f8f8" stroke="#004040" strokeWidth="1"/>
-      <circle cx="16" cy="13" r="3.2" fill="#d33535" stroke="#7a0000" strokeWidth="0.8"/>
+      <line x1="2" y1="2" x2="30" y2="2" stroke="#00a0a0" strokeWidth="1"/>
+      <line x1="2" y1="2" x2="2" y2="30" stroke="#00a0a0" strokeWidth="1"/>
+      {/* clock face */}
+      <circle cx="16" cy="16" r="11" fill="#ffffff" stroke="#004040" strokeWidth="1.5"/>
+      {/* highlight arc */}
+      <path d="M9,10 Q12,7 16,7" fill="none" stroke="#e8e8e8" strokeWidth="1"/>
+      {/* tick marks */}
+      <line x1="16" y1="6" x2="16" y2="8.5" stroke="#404040" strokeWidth="1.5"/>
+      <line x1="16" y1="23.5" x2="16" y2="26" stroke="#404040" strokeWidth="1.5"/>
+      <line x1="6" y1="16" x2="8.5" y2="16" stroke="#404040" strokeWidth="1.5"/>
+      <line x1="23.5" y1="16" x2="26" y2="16" stroke="#404040" strokeWidth="1.5"/>
+      {/* hour hand (pointing ~12) */}
+      <line x1="16" y1="16" x2="16" y2="9" stroke="#000000" strokeWidth="2" strokeLinecap="round"/>
+      {/* minute hand (pointing ~3) */}
+      <line x1="16" y1="16" x2="23" y2="16" stroke="#c00000" strokeWidth="1.5" strokeLinecap="round"/>
+      {/* center dot */}
+      <circle cx="16" cy="16" r="1.5" fill="#000000"/>
     </svg>
   ),
 };
@@ -285,8 +446,8 @@ const ICON_VIEW_MODES = {
   large: { tileW: 94, tileH: 112, glyphScale: 1.2, labelSize: 12, cellX: 108, cellY: 126, maxLabel: 100 },
 };
 const MENU_TEXT_COLOR = "#162133";
-const FULLSCREEN_WINDOW_IDS = new Set(["skills", "experience", "projects", "contact"]);
-const DEFAULT_PINNED_TASKBAR_IDS = ["about", "skills", "experience", "projects", "contact"];
+const FULLSCREEN_WINDOW_IDS = new Set(["skills", "experience", "projects", "videos", "contact"]);
+const DEFAULT_PINNED_TASKBAR_IDS = ["about", "skills", "experience", "projects", "videos", "contact"];
 const canPinItemToTaskbar = (item) => item?.itemType === "app" && !!item.windowId;
 const snapIconToGrid = (x, y, mode = "medium", marginX = 12, marginY = 8) => {
   const grid = ICON_VIEW_MODES[mode] || ICON_VIEW_MODES.medium;
@@ -612,6 +773,7 @@ function WelcomeApp({ openWindow }) {
     { id: "skills", title: "Skills", description: "for technologies and tools" },
     { id: "experience", title: "Experience", description: "for work history" },
     { id: "projects", title: "Projects", description: "for shipped and in-progress work" },
+    { id: "videos", title: "Videos", description: "for local demos and walkthroughs" },
     { id: "contact", title: "Contact", description: "to reach out" },
   ];
 
@@ -917,61 +1079,31 @@ const SKILL_ICON_FILES = {
 function SkillCard({ name }) {
   const file = SKILL_ICON_FILES[name];
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 5,
-        padding: "10px 4px 8px",
-        background: "#f0f4f8",
-        border: "2px outset #c0c0c0",
-      }}
-    >
+    <div style={{
+      display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+      padding: "8px 4px 6px", background: "#d4d0c8",
+      border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+      cursor: "default",
+    }}>
       {file ? (
-        <img
-          src={`/skills/${file}`}
-          alt={name}
-          width={32}
-          height={32}
-          style={{
-            imageRendering: "pixelated",
-            width: 32,
-            height: 32,
-            objectFit: "contain",
-          }}
+        <img src={`/skills/${file}`} alt={name} width={28} height={28}
+          style={{ imageRendering: "pixelated", objectFit: "contain", width: 28, height: 28 }}
         />
       ) : (
-        // Fallback: just show initials until you create the icon
-        <div
-          style={{
-            width: 32,
-            height: 32,
-            background: "#c0c0c0",
-            border: "1px solid #808080",
-            display: "grid",
-            placeItems: "center",
-            fontSize: 9,
-            fontWeight: 700,
-            color: "#333",
-          }}
-        >
+        <div style={{
+          width: 28, height: 28, background: "#c0c0c0",
+          border: "1px solid", borderColor: "#808080 #ffffff #ffffff #808080",
+          display: "grid", placeItems: "center",
+          fontSize: 8, fontWeight: 700, color: "#333",
+        }}>
           {name.slice(0, 3)}
         </div>
       )}
-      <span
-        style={{
-          fontSize: 10,
-          color: "#333",
-          textAlign: "center",
-          fontWeight: 600,
-          lineHeight: 1.2,
-          maxWidth: 82,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}
-      >
+      <span style={{
+        fontSize: 9, color: "#000", textAlign: "center", fontWeight: 600,
+        lineHeight: 1.2, maxWidth: 76, overflow: "hidden",
+        textOverflow: "ellipsis", whiteSpace: "nowrap",
+      }}>
         {name}
       </span>
     </div>
@@ -982,33 +1114,23 @@ function SkillCard({ name }) {
 
 function SkillsApp() {
   return (
-    <div style={{ padding: "20px 24px" }}>
-      <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 20, color: "#111" }}>
-        Skills & Technologies
-      </div>
+    <div style={{ padding: "12px 16px", background: "#c0c0c0", minHeight: "100%" }}>
       {Object.entries(SKILLS).map(([cat, items]) => (
-        <div key={cat} style={{ marginBottom: 20 }}>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#000080",
-              marginBottom: 10,
-              textTransform: "uppercase",
-              letterSpacing: 1,
-              borderBottom: "2px solid #000080",
-              paddingBottom: 4,
-            }}
-          >
-            {cat}
+        <div key={cat} style={{ marginBottom: 14 }}>
+          <div style={{
+            fontSize: 10, fontWeight: 700, color: "#000080",
+            textTransform: "uppercase", letterSpacing: 1,
+            borderBottom: "1px solid #808080", paddingBottom: 3, marginBottom: 8,
+            display: "flex", alignItems: "center", gap: 6,
+          }}>
+            <div style={{ flex: 1 }}>{cat}</div>
+            <div style={{
+              fontSize: 9, background: "#c0c0c0",
+              border: "1px solid", borderColor: "#808080 #ffffff #ffffff #808080",
+              padding: "0 4px", color: "#444",
+            }}>{items.length}</div>
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(88px, 1fr))",
-              gap: 6,
-            }}
-          >
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))", gap: 4 }}>
             {items.map((s) => (
               <SkillCard key={s} name={s} />
             ))}
@@ -1021,38 +1143,564 @@ function SkillsApp() {
 
 function ExperienceApp() {
   return (
-    <div style={{ padding: "16px 20px" }}>
-      <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12, color: "#111" }}>Work Experience</div>
+    <div style={{ padding: "12px 16px", background: "#c0c0c0", minHeight: "100%" }}>
       {EXPERIENCE.map((exp, i) => (
-        <div key={i} style={{ marginBottom: 18, paddingBottom: 16, borderBottom: i < EXPERIENCE.length - 1 ? "1px solid #c0c0c0" : "none" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 4 }}>
-            <div style={{ fontWeight: 700, fontSize: 14, color: "#111" }}>{exp.company}</div>
-            <div style={{ fontSize: 11, color: "#777" }}>{exp.period}</div>
+        <div key={i} style={{
+          marginBottom: 10,
+          border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+          background: "#d4d0c8",
+        }}>
+          {/* entry header bar */}
+          <div style={{
+            background: "linear-gradient(to right, #000080, #1084d0)",
+            padding: "3px 8px", display: "flex", alignItems: "center",
+            justifyContent: "space-between", flexWrap: "wrap", gap: 4,
+          }}>
+            <div style={{ fontWeight: 700, fontSize: 11, color: "#fff" }}>{exp.company}</div>
+            <div style={{ fontSize: 10, color: "#cce" }}>{exp.period}</div>
           </div>
-          <div style={{ fontSize: 12, color: "#000080", fontWeight: 600, marginBottom: 4 }}>{exp.role}</div>
-          <div style={{ fontSize: 12, color: "#555", marginBottom: 8 }}>{exp.desc}</div>
-          {exp.bullets.map((b, j) => (
-            <div key={j} style={{ fontSize: 12, color: "#444", padding: "2px 0", paddingLeft: 12, position: "relative" }}>
-              <span style={{ position: "absolute", left: 0, color: "#000080" }}>-</span>
-              {b}
-            </div>
-          ))}
-          {exp.stack.length > 0 && (
-            <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 8 }}>
-              {exp.stack.map((t) => (
-                <span key={t} style={{ background: "#e0ece0", border: "1px solid #b0d0b0", padding: "2px 6px", fontSize: 10, color: "#2d6a4f" }}>{t}</span>
-              ))}
-            </div>
-          )}
+          {/* entry body */}
+          <div style={{ padding: "6px 10px" }}>
+            <div style={{ fontSize: 11, color: "#000080", fontWeight: 700, marginBottom: 3 }}>{exp.role}</div>
+            <div style={{ fontSize: 11, color: "#333", marginBottom: 6, lineHeight: 1.55 }}>{exp.desc}</div>
+            {exp.bullets.map((b, j) => (
+              <div key={j} style={{ fontSize: 11, color: "#222", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.5 }}>
+                <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+                {b}
+              </div>
+            ))}
+            {exp.stack.length > 0 && (
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 7 }}>
+                {exp.stack.map((t) => (
+                  <span key={t} style={{
+                    padding: "1px 6px", fontSize: 10, background: "#c0c0c0",
+                    border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                  }}>{t}</span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       ))}
     </div>
   );
 }
 
-function ProjectsApp() {
-  const [expanded, setExpanded] = useState(null);
+// ─── Video previews + player app ───────────────────────────────────────────
+const formatVideoTime = (seconds) => {
+  if (!Number.isFinite(seconds) || seconds < 0) return "00:00";
+  const totalSeconds = Math.floor(seconds);
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+};
+
+function VideoPreviewCard({ video, onOpen }) {
+  return (
+    <button
+      onClick={() => onOpen?.(video.id)}
+      style={{
+        border: "2px solid",
+        borderColor: "#ffffff #808080 #808080 #ffffff",
+        background: "#c0c0c0",
+        padding: 4,
+        cursor: "pointer",
+        textAlign: "left",
+      }}
+    >
+      <div style={{ position: "relative", background: "#000", paddingTop: "56.25%", overflow: "hidden" }}>
+        <video
+          src={video.src}
+          poster={video.poster || undefined}
+          muted
+          preload="metadata"
+          playsInline
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            right: 6,
+            bottom: 6,
+            background: "rgba(0, 0, 0, 0.65)",
+            color: "#fff",
+            padding: "2px 5px",
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: 0.4,
+            textTransform: "uppercase",
+          }}
+        >
+          Open in Videos
+        </div>
+      </div>
+      <div style={{ marginTop: 5, fontSize: 10, fontWeight: 700, color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        {video.label}
+      </div>
+      <div style={{ fontSize: 9, color: "#333", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        {video.projectTitle}
+      </div>
+    </button>
+  );
+}
+
+function VideosApp({ initialVideoId }) {
+  const fallbackVideoId = VIDEO_LIBRARY[0]?.id || null;
+  const normalizeVideoId = useCallback(
+    (id) => {
+      if (id && VIDEO_LIBRARY_BY_ID[id]) return id;
+      return fallbackVideoId;
+    },
+    [fallbackVideoId]
+  );
+  const [currentVideoId, setCurrentVideoId] = useState(() => normalizeVideoId(initialVideoId));
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.75);
+  const [isMuted, setIsMuted] = useState(false);
+  const [videoError, setVideoError] = useState("");
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const nextId = normalizeVideoId(initialVideoId);
+    if (nextId && nextId !== currentVideoId) {
+      setCurrentVideoId(nextId);
+    }
+  }, [initialVideoId, normalizeVideoId, currentVideoId]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.volume = volume;
+    video.muted = isMuted;
+  }, [volume, isMuted, currentVideoId]);
+
+  useEffect(() => {
+    setVideoError("");
+    setCurrentTime(0);
+    setDuration(0);
+    setIsPlaying(false);
+  }, [currentVideoId]);
+
+  const currentIndex = VIDEO_LIBRARY.findIndex((video) => video.id === currentVideoId);
+  const currentVideo = currentIndex >= 0 ? VIDEO_LIBRARY[currentIndex] : null;
+
+  const stepToVideo = (delta) => {
+    if (!VIDEO_LIBRARY.length) return;
+    const baseIndex = currentIndex >= 0 ? currentIndex : 0;
+    const nextIndex = clamp(baseIndex + delta, 0, VIDEO_LIBRARY.length - 1);
+    setCurrentVideoId(VIDEO_LIBRARY[nextIndex].id);
+  };
+
+  const togglePlayPause = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.play().catch(() => {});
+      return;
+    }
+    video.pause();
+  };
+
+  const stopPlayback = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.pause();
+    video.currentTime = 0;
+    setIsPlaying(false);
+    setCurrentTime(0);
+  };
+
+  const rewindTenSeconds = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.currentTime = Math.max(0, video.currentTime - 10);
+  };
+
+  const controlBtnStyle = {
+    width: 22,
+    height: 18,
+    padding: 0,
+    fontSize: 9,
+    background: "#c0c0c0",
+    fontFamily: "inherit",
+    border: "1px solid",
+    borderColor: "#ffffff #808080 #808080 #ffffff",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
+  if (!VIDEO_LIBRARY.length) {
+    return (
+      <div style={{ height: "100%", display: "grid", placeItems: "center", padding: 20, background: "#c0c0c0" }}>
+        <div style={{ maxWidth: 420, fontSize: 11, lineHeight: 1.6, color: "#333" }}>
+          No local videos configured yet.
+          <br />
+          Add files to <strong>/public/videos</strong> and map them in <strong>PROJECTS[].links.videos</strong>.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#c0c0c0", minHeight: 0 }}>
+      <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, padding: "7px 10px 5px", borderBottom: "1px solid #808080" }}>
+        Videos
+      </div>
+      <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: "220px 1fr", gap: 6, padding: 6 }}>
+        <div style={{ border: "2px inset #c0c0c0", background: "#fff", overflowY: "auto", minHeight: 0 }}>
+          {VIDEO_LIBRARY.map((video, idx) => {
+            const selected = video.id === currentVideoId;
+            return (
+              <button
+                key={video.id}
+                onClick={() => setCurrentVideoId(video.id)}
+                style={{
+                  width: "100%",
+                  border: "none",
+                  borderBottom: idx < VIDEO_LIBRARY.length - 1 ? "1px solid #e4e4e4" : "none",
+                  background: selected ? "#000080" : "transparent",
+                  color: selected ? "#fff" : "#111",
+                  textAlign: "left",
+                  padding: "7px 8px",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
+              >
+                <div style={{ fontSize: 10, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{video.label}</div>
+                <div style={{ fontSize: 9, opacity: selected ? 0.9 : 0.75, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{video.projectTitle}</div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div style={{ border: "2px inset #c0c0c0", background: "#d4d0c8", minHeight: 0, display: "flex", flexDirection: "column" }}>
+          <div style={{ background: "linear-gradient(to right, #000080, #1084d0)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 6px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            Windows Media Player - {currentVideo?.label || "No Video Selected"}
+          </div>
+
+          <div style={{ flex: 1, background: "#000", margin: 3, position: "relative", minHeight: 0 }}>
+            {currentVideo ? (
+              <video
+                key={currentVideo.id}
+                ref={videoRef}
+                src={currentVideo.src}
+                poster={currentVideo.poster || undefined}
+                preload="metadata"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                onLoadedMetadata={(e) => {
+                  const mediaDuration = Number.isFinite(e.currentTarget.duration) ? e.currentTarget.duration : 0;
+                  setDuration(mediaDuration);
+                }}
+                onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onEnded={() => setIsPlaying(false)}
+                onError={() => setVideoError(`Unable to load file: ${currentVideo.src}`)}
+              />
+            ) : (
+              <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: "#b0b0b0", fontSize: 11 }}>
+                Select a video
+              </div>
+            )}
+          </div>
+
+          <div style={{ padding: "4px 6px 6px" }}>
+            <input
+              type="range"
+              min={0}
+              max={duration > 0 ? duration : 1}
+              step={0.1}
+              value={Math.min(currentTime, duration || 1)}
+              onChange={(e) => {
+                const next = Number(e.target.value);
+                const video = videoRef.current;
+                if (!video) return;
+                video.currentTime = next;
+                setCurrentTime(next);
+              }}
+              style={{ width: "100%", marginBottom: 4 }}
+            />
+            <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <button onClick={() => stepToVideo(-1)} style={controlBtnStyle} title="Previous clip">⏮</button>
+              <button onClick={rewindTenSeconds} style={controlBtnStyle} title="Rewind 10 seconds">⏪</button>
+              <button onClick={togglePlayPause} style={controlBtnStyle} title={isPlaying ? "Pause" : "Play"}>{isPlaying ? "⏸" : "▶"}</button>
+              <button onClick={stopPlayback} style={controlBtnStyle} title="Stop">⏹</button>
+              <button onClick={() => stepToVideo(1)} style={controlBtnStyle} title="Next clip">⏭</button>
+              <span style={{ marginLeft: 6, fontSize: 10, color: "#222", minWidth: 80 }}>
+                {formatVideoTime(currentTime)} / {formatVideoTime(duration)}
+              </span>
+              <button
+                onClick={() => setIsMuted((prev) => !prev)}
+                style={{ ...controlBtnStyle, marginLeft: "auto", width: 24 }}
+                title={isMuted ? "Unmute" : "Mute"}
+              >
+                {isMuted ? "🔇" : "🔊"}
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={volume}
+                onChange={(e) => setVolume(Number(e.target.value))}
+                style={{ width: 90 }}
+              />
+            </div>
+            <div style={{ fontSize: 9, color: videoError ? "#8b0000" : "#1f4a1f", marginTop: 3, minHeight: 12 }}>
+              {videoError || (currentVideo ? `Ready: ${currentVideo.projectTitle}` : "Ready")}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Project detail "page" (shown when navigating into a project) ──────────
+function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) {
+  const ghRepo = p.links?.github ? repoData[p.links.github] : null;
+  const primaryLang = p.stack.find((s) => LANG_COLORS[s]);
+  const repoLang = ghRepo?.language || primaryLang;
+  const langColor = LANG_COLORS[repoLang] || "#ccc";
+  const isIP = p.status === "IN_PROGRESS";
+
+  const Section = ({ title, children }) => (
+    <fieldset style={{
+      border: "1px solid", borderColor: "#808080 #ffffff #ffffff #808080",
+      padding: "4px 8px 8px", marginBottom: 7, background: "#fff",
+    }}>
+      <legend style={{ fontSize: 10, fontWeight: 700, padding: "0 3px", background: "#fff" }}>{title}</legend>
+      {children}
+    </fieldset>
+  );
+
+  return (
+    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, background: "#fff", padding: "10px 12px" }}>
+      {onBackToList && (
+        <div style={{ marginBottom: 8 }}>
+          <button
+            onClick={onBackToList}
+            style={{
+              padding: "2px 10px",
+              fontSize: 10,
+              background: "#c0c0c0",
+              fontFamily: "inherit",
+              border: "2px solid",
+              borderColor: "#ffffff #808080 #808080 #ffffff",
+              cursor: "pointer",
+            }}
+          >
+            {"<"} Back to Projects
+          </button>
+        </div>
+      )}
+      {/* header badge row */}
+      <div style={{ display: "flex", gap: 5, marginBottom: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <span style={{
+          padding: "1px 7px", fontSize: 10, fontWeight: 700,
+          background: isIP ? "#ffff80" : "#80ff80", border: "1px solid #808080",
+        }}>
+          {isIP ? "In Progress" : "Complete"}
+        </span>
+        <span style={{
+          fontSize: 10, border: "1px solid", padding: "1px 6px",
+          borderColor: "#808080 #ffffff #ffffff #808080", background: "#c0c0c0",
+        }}>{p.date}</span>
+        {repoLang && (
+          <span style={{ fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}>
+            <span style={{ width: 9, height: 9, borderRadius: "50%", background: langColor, display: "inline-block" }} />
+            {repoLang}
+          </span>
+        )}
+        {ghRepo?.stargazers_count != null && (
+          <span style={{ fontSize: 10, color: "#000080", fontWeight: 700 }}>★ {ghRepo.stargazers_count}</span>
+        )}
+      </div>
+
+      {/* Video previews */}
+      {p.links?.videos?.length > 0 && (
+        <div style={{ marginBottom: 10 }}>
+          <div style={{
+            fontSize: 10, fontWeight: 700, color: "#000080",
+            textTransform: "uppercase", letterSpacing: 1,
+            borderBottom: "1px solid #c0c0c0", paddingBottom: 3, marginBottom: 6,
+          }}>Video Previews</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 8 }}>
+            {p.links.videos.map((video, idx) => {
+              const previewVideo = VIDEO_LIBRARY_BY_ID[video.id] || {
+                ...video,
+                id: video.id || `preview-${idx}`,
+                projectTitle: p.title,
+              };
+              return (
+                <VideoPreviewCard
+                  key={previewVideo.id}
+                  video={previewVideo}
+                  onOpen={onOpenVideo}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <Section title="Description">
+        <div style={{ fontSize: 11, lineHeight: 1.65, color: "#111" }}>{p.desc}</div>
+      </Section>
+
+      {p.narrative && (
+        <Section title="Background">
+          <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", fontStyle: "italic" }}>{p.narrative}</div>
+        </Section>
+      )}
+
+      <Section title="Key Points">
+        {p.impact.map((item, j) => (
+          <div key={j} style={{ fontSize: 11, color: "#111", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.55 }}>
+            <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+            {item}
+          </div>
+        ))}
+      </Section>
+
+      <Section title="Stack">
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+          {p.stack.map((t) => {
+            const iconFile = SKILL_ICON_FILES[t];
+            return (
+              <span key={t} style={{
+                padding: "1px 6px", fontSize: 10, background: "#c0c0c0",
+                border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                display: "inline-flex", alignItems: "center", gap: 3,
+              }}>
+                {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={11} height={11} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
+                {t}
+              </span>
+            );
+          })}
+        </div>
+      </Section>
+
+      {(p.highlight || p.differently || p.outcome) && (
+        <Section title="Notes">
+          {p.highlight && (
+            <div style={{ marginBottom: p.differently || p.outcome ? 8 : 0 }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>What Was Technically Interesting</div>
+              <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", whiteSpace: "pre-line" }}>{p.highlight}</div>
+            </div>
+          )}
+          {p.differently && (
+            <div style={{ marginBottom: p.outcome ? 8 : 0 }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>What I&apos;d Do Differently</div>
+              <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.differently}</div>
+            </div>
+          )}
+          {p.outcome && (
+            <div>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>Outcome</div>
+              <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.outcome}</div>
+            </div>
+          )}
+        </Section>
+      )}
+
+      {p.architecture?.length > 0 && (
+        <Section title="Architecture">
+          {p.architecture.map((item, j) => (
+            <div key={j} style={{
+              fontSize: 11, color: "#111", lineHeight: 1.6,
+              padding: "3px 0 3px 14px", position: "relative",
+              borderBottom: j < p.architecture.length - 1 ? "1px dotted #d0d0d0" : "none",
+            }}>
+              <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>»</span>
+              {item}
+            </div>
+          ))}
+        </Section>
+      )}
+
+      {/* links */}
+      {(p.links?.github || p.links?.live || p.links?.landing) && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 5, paddingTop: 2 }}>
+          {p.links?.github && (
+            <button
+              onClick={() => window.open(p.links.github, "_blank", "noopener,noreferrer")}
+              style={{
+                padding: "3px 12px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
+                border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4,
+              }}
+            >
+              <img src="/skills/github.png" alt="github" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+              {ghRepo?.name || p.links.github.split("/").pop()}
+            </button>
+          )}
+          {p.links?.live && (
+            <button
+              onClick={() => window.open(p.links.live, "_blank", "noopener,noreferrer")}
+              style={{
+                padding: "3px 12px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
+                border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4,
+              }}
+            >
+              🌐 Live Site
+            </button>
+          )}
+          {p.links?.landing && (
+            <button
+              onClick={() => window.open(p.links.landing, "_blank", "noopener,noreferrer")}
+              style={{
+                padding: "3px 12px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
+                border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4,
+              }}
+            >
+              📄 Landing Page
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ProjectsApp({ onOpenVideo }) {
+  const [navigation, setNavigation] = useState({
+    history: [{ type: "list" }],
+    idx: 0,
+  });
+  const [selected, setSelected] = useState(null);
   const [repoData, setRepoData] = useState({});
+
+  const currentView = navigation.history[navigation.idx] || { type: "list" };
+  const canGoBack = navigation.idx > 0;
+  const canGoForward = navigation.idx < navigation.history.length - 1;
+  const currentProject = currentView.type === "detail" ? PROJECTS[currentView.projectIdx] : null;
+
+  const navigate = useCallback((view) => {
+    setNavigation((prev) => {
+      const history = [...prev.history.slice(0, prev.idx + 1), view];
+      return { history, idx: history.length - 1 };
+    });
+  }, []);
+  const goBack = useCallback(() => {
+    setNavigation((prev) => (prev.idx > 0 ? { ...prev, idx: prev.idx - 1 } : prev));
+  }, []);
+  const goForward = useCallback(() => {
+    setNavigation((prev) => (prev.idx < prev.history.length - 1 ? { ...prev, idx: prev.idx + 1 } : prev));
+  }, []);
 
   useEffect(() => {
     PROJECTS.forEach((p) => {
@@ -1066,202 +1714,190 @@ function ProjectsApp() {
     });
   }, []);
 
-  const LinkCard = ({ href, icon, title, sub }) => (
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.altKey && e.key === "ArrowLeft") {
+        e.preventDefault();
+        goBack();
+      }
+      if (e.altKey && e.key === "ArrowRight") {
+        e.preventDefault();
+        goForward();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [goBack, goForward]);
+
+  const currentPath = currentView.type === "list" || !currentProject
+    ? "C:\\Portfolio\\Projects"
+    : `C:\\Portfolio\\Projects\\${currentProject.title}`;
+
+  const NavBtn = ({ onClick, disabled, title, children }) => (
     <button
-      onClick={() => window.open(href, "_blank", "noopener,noreferrer")}
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
       style={{
-        display: "inline-flex", flexDirection: "column", gap: 4, textAlign: "left",
-        background: "#f0f4f8", border: "none",
-        borderTop: "2px solid #fff", borderLeft: "2px solid #fff",
-        borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
-        padding: "6px 10px", minWidth: 130, cursor: "pointer", fontFamily: "inherit",
+        width: 26, height: 22, padding: 0, fontSize: 11,
+        background: disabled ? "#d4d4d4" : "#c0c0c0",
+        border: "1px solid", borderColor: disabled
+          ? "#c0c0c0 #a0a0a0 #a0a0a0 #c0c0c0"
+          : "#ffffff #808080 #808080 #ffffff",
+        cursor: disabled ? "default" : "pointer",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        color: disabled ? "#a0a0a0" : "#000", fontFamily: "inherit",
       }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-        {icon}
-        <span style={{ fontWeight: 700, fontSize: 11, color: "#000080" }}>{title}</span>
-      </div>
-      {sub != null && (
-        <div style={{ fontSize: 10, color: "#555" }}>{sub}</div>
-      )}
-    </button>
+    >{children}</button>
   );
 
   return (
-    <div style={{ padding: "16px 20px" }}>
+    <div style={{
+      height: "100%", display: "flex", flexDirection: "column",
+      background: "#c0c0c0", fontFamily: "inherit", overflow: "hidden",
+    }}>
+      {/* ── Toolbar ── */}
       <div style={{
-        fontSize: 12, fontWeight: 700, color: "#000080",
-        textTransform: "uppercase", letterSpacing: 1,
-        borderBottom: "2px solid #000080", paddingBottom: 4, marginBottom: 12,
-      }}>Projects</div>
+        display: "flex", alignItems: "center", gap: 2, flexShrink: 0,
+        padding: "2px 4px", borderBottom: "1px solid #808080", background: "#c0c0c0",
+      }}>
+        <NavBtn onClick={goBack} disabled={!canGoBack} title="Back (Alt+Left)">◄</NavBtn>
+        <NavBtn onClick={goForward} disabled={!canGoForward} title="Forward (Alt+Right)">►</NavBtn>
+        {currentView.type === "detail" && (
+          <>
+            <div style={{ width: 1, height: 18, background: "#808080", margin: "0 2px", flexShrink: 0 }} />
+            <NavBtn onClick={() => navigate({ type: "list" })} title="Up to Projects">↑</NavBtn>
+          </>
+        )}
+      </div>
 
-      {PROJECTS.map((p, i) => {
-        const isOpen = expanded === i;
-        const isInProgress = p.status === "IN_PROGRESS";
-        const ghRepo = p.links?.github ? repoData[p.links.github] : null;
-        const primaryLang = p.stack.find((s) => LANG_COLORS[s]);
-        const repoLang = ghRepo?.language || primaryLang;
-        const langColor = LANG_COLORS[repoLang] || "#ccc";
+      {/* ── Address bar ── */}
+      <div style={{
+        display: "flex", alignItems: "center", gap: 4, flexShrink: 0,
+        padding: "2px 4px", borderBottom: "1px solid #808080",
+      }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: "#000", flexShrink: 0 }}>Address</span>
+        <div style={{
+          flex: 1, padding: "1px 5px", fontSize: 10, background: "#fff",
+          border: "1px solid", borderColor: "#808080 #dfdfdf #dfdfdf #808080",
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+        }}>
+          {currentPath}
+        </div>
+      </div>
 
-        return (
-          <div key={i} style={{ marginBottom: 12, background: "#f0f4f8", border: "2px outset #c0c0c0" }}>
-            <div style={{ padding: "10px 12px" }}>
+      {/* ── Content area ── */}
+      {currentView.type === "list" ? (
+        <>
+          {/* Column headers */}
+          <div style={{
+            display: "grid", gridTemplateColumns: "1fr 82px 110px",
+            background: "#c0c0c0", userSelect: "none", flexShrink: 0,
+          }}>
+            {["Name", "Status", "Date"].map((col) => (
+              <div key={col} style={{
+                padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "default",
+                border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                background: "#c0c0c0",
+              }}>{col}</div>
+            ))}
+          </div>
 
-              {/* Header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
-                <div style={{ fontWeight: 800, fontSize: 14, color: "#111", flex: 1, minWidth: 0 }}>{p.title}</div>
-                <div style={{ display: "flex", gap: 5, alignItems: "center", flexShrink: 0 }}>
-                  <span style={{ fontSize: 10, padding: "2px 8px", fontWeight: 700, background: "#e8eef6", color: "#1f3763", border: "1px solid #9bb2d9" }}>{p.date}</span>
-                  <span style={{
-                    fontSize: 10, padding: "2px 8px", fontWeight: 700,
-                    background: isInProgress ? "#fff8dc" : "#e0ece0",
-                    color: isInProgress ? "#7a5000" : "#2d6a4f",
-                    border: "1px solid " + (isInProgress ? "#c8a800" : "#b0d0b0"),
-                  }}>{isInProgress ? "In Progress" : "Complete"}</span>
-                </div>
-              </div>
-
-              {/* Description */}
-              <div style={{ fontSize: 12, color: "#444", lineHeight: 1.6, marginBottom: 6 }}>{p.desc}</div>
-
-              {/* Narrative */}
-              {p.narrative && (
-                <div style={{
-                  fontSize: 11, color: "#555", lineHeight: 1.65, fontStyle: "italic",
-                  marginBottom: 8, borderLeft: "3px solid #b0b0b0",
-                  padding: "4px 6px 4px 8px", background: "#fafafa",
-                }}>
-                  {p.narrative}
-                </div>
-              )}
-
-              {/* Impact bullets */}
-              <div style={{ marginBottom: 8 }}>
-                {p.impact.map((item, j) => (
-                  <div key={j} style={{ fontSize: 12, color: "#444", padding: "2px 0", paddingLeft: 14, position: "relative" }}>
-                    <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>-</span>
-                    {item}
+          {/* Project rows */}
+          <div style={{
+            flex: 1, overflowY: "auto", minHeight: 0, background: "#fff",
+            border: "1px solid", borderColor: "#808080 #ffffff #ffffff #808080",
+            margin: "0 2px",
+          }}>
+            {PROJECTS.map((p, i) => {
+              const isSel = selected === i;
+              const isIP = p.status === "IN_PROGRESS";
+              return (
+                <div
+                  key={i}
+                  onClick={() => setSelected(isSel ? null : i)}
+                  onDoubleClick={() => navigate({ type: "detail", projectIdx: i })}
+                  style={{
+                    display: "grid", gridTemplateColumns: "1fr 82px 110px",
+                    background: isSel ? "#000080" : "transparent",
+                    color: isSel ? "#fff" : "#000",
+                    cursor: "default", userSelect: "none",
+                    borderBottom: "1px solid #f0f0f0",
+                  }}
+                >
+                  <div style={{ padding: "4px 8px", display: "flex", alignItems: "center", gap: 6, fontSize: 11, minWidth: 0 }}>
+                    {/* small inline project icon */}
+                    <svg width="16" height="16" viewBox="0 0 32 32" style={{ flexShrink: 0 }}>
+                      <rect x="1" y="10" width="30" height="20" fill="#800080" stroke="#500050" strokeWidth="1"/>
+                      <path d="M1,10 L1,6 L13,6 L16,10 Z" fill="#700070" stroke="#500050" strokeWidth="1"/>
+                      <rect x="2" y="11" width="28" height="18" fill="#c030c0"/>
+                      <line x1="3" y1="12" x2="29" y2="12" stroke="#e080e0" strokeWidth="1.5"/>
+                      <path d="M10,16 L8,20 L10,24" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M22,16 L24,20 L22,24" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                      <line x1="19" y1="15" x2="13" y2="25" stroke="#ffff80" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</span>
                   </div>
-                ))}
-              </div>
-
-              {/* Stack badges */}
-              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 10 }}>
-                {p.stack.map((t) => {
-                  const iconFile = SKILL_ICON_FILES[t];
-                  return (
-                    <span key={t} style={{
-                      background: "#e0ece0", border: "1px solid #b0d0b0",
-                      padding: "2px 6px", fontSize: 10, color: "#2d6a4f", fontWeight: 600,
-                      display: "inline-flex", alignItems: "center", gap: 3,
+                  <div style={{ padding: "4px 8px", fontSize: 10, display: "flex", alignItems: "center" }}>
+                    <span style={{
+                      padding: "0 5px", fontWeight: 700, fontSize: 9,
+                      background: isSel ? "transparent" : (isIP ? "#ffff80" : "#80ff80"),
+                      color: isSel ? "#fff" : "#000",
+                      border: isSel ? "1px solid transparent" : "1px solid #808080",
                     }}>
-                      {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={10} height={10} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
-                      {t}
+                      {isIP ? "In Progress" : "Complete"}
                     </span>
-                  );
-                })}
-              </div>
+                  </div>
+                  <div style={{ padding: "4px 8px", fontSize: 10, display: "flex", alignItems: "center" }}>
+                    {p.date}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-              {/* Link cards */}
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "flex-start" }}>
-                {p.links?.github && (
-                  <LinkCard
-                    href={p.links.github}
-                    icon={<img src="/skills/github.png" alt="github" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
-                    title={ghRepo?.name || p.links.github.split("/").pop()}
-                    sub={
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
-                        {repoLang && <span style={{ width: 8, height: 8, borderRadius: "50%", background: langColor, display: "inline-block", flexShrink: 0 }} />}
-                        {repoLang || ""}
-                        {ghRepo?.stargazers_count != null ? `  ★ ${ghRepo.stargazers_count}` : ""}
-                      </span>
-                    }
-                  />
-                )}
-                {p.links?.live && (
-                  <LinkCard
-                    href={p.links.live}
-                    icon={<span style={{ fontSize: 11 }}>🌐</span>}
-                    title="Live Site"
-                    sub={p.links.live.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
-                  />
-                )}
-                {p.links?.landing && (
-                  <LinkCard
-                    href={p.links.landing}
-                    icon={<span style={{ fontSize: 11 }}>📄</span>}
-                    title="Landing Page"
-                    sub={p.links.landing.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
-                  />
-                )}
-                {p.links?.youtube?.map((v, idx) => (
-                  <LinkCard
-                    key={idx}
-                    href={v.url}
-                    icon={<span style={{ fontSize: 11 }}>▶</span>}
-                    title={v.label}
-                    sub="youtube.com"
-                  />
-                ))}
-                {p.architecture?.length > 0 && (
-                  <button
-                    onClick={() => setExpanded(isOpen ? null : i)}
-                    style={{
-                      background: isOpen ? "#000080" : "#c0c0c0",
-                      color: isOpen ? "#fff" : "#111",
-                      border: "none",
-                      borderTop: isOpen ? "2px solid #3366cc" : "2px solid #fff",
-                      borderLeft: isOpen ? "2px solid #3366cc" : "2px solid #fff",
-                      borderRight: isOpen ? "2px solid #000040" : "2px solid #404040",
-                      borderBottom: isOpen ? "2px solid #000040" : "2px solid #404040",
-                      padding: "3px 10px", fontSize: 11, cursor: "pointer",
-                      fontFamily: "inherit", fontWeight: 600, marginLeft: "auto",
-                      alignSelf: "center",
-                    }}
-                  >
-                    {isOpen ? "Hide Details" : "How It's Built"}
-                  </button>
-                )}
-              </div>
+          {/* Status bar */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: 3, flexShrink: 0,
+            padding: "2px 4px", borderTop: "1px solid #808080", background: "#c0c0c0",
+          }}>
+            <div style={{
+              flex: 1, padding: "0 4px", fontSize: 10,
+              border: "1px solid", borderColor: "#808080 #dfdfdf #dfdfdf #808080",
+              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+            }}>
+              {selected !== null ? PROJECTS[selected].title : `${PROJECTS.length} object(s) — double-click to open`}
             </div>
-
-            {/* Expandable story + architecture */}
-            {isOpen && (
-              <div style={{ borderTop: "2px inset #c0c0c0", background: "#fff", padding: "10px 12px" }}>
-                {p.highlight && (
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>What Was Technically Interesting</div>
-                    <div style={{ fontSize: 11, color: "#333", lineHeight: 1.75, whiteSpace: "pre-line" }}>{p.highlight}</div>
-                  </div>
-                )}
-                {p.differently && (
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>What I'd Do Differently</div>
-                    <div style={{ fontSize: 11, color: "#333", lineHeight: 1.75 }}>{p.differently}</div>
-                  </div>
-                )}
-                {p.outcome && (
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Outcome</div>
-                    <div style={{ fontSize: 11, color: "#333", lineHeight: 1.75 }}>{p.outcome}</div>
-                  </div>
-                )}
-                {p.architecture?.length > 0 && (
-                  <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Architecture</div>
-                    {p.architecture.map((item, j) => (
-                      <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "5px 0", borderBottom: j < p.architecture.length - 1 ? "1px solid #e8eef0" : "none" }}>
-                        <span style={{ color: "#000080", fontWeight: 700, flexShrink: 0, fontSize: 11, marginTop: 1 }}>»</span>
-                        <div style={{ fontSize: 11, color: "#333", lineHeight: 1.6 }}>{item}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+            {selected !== null && (
+              <button
+                onClick={() => navigate({ type: "detail", projectIdx: selected })}
+                style={{
+                  fontSize: 10, padding: "1px 10px", background: "#c0c0c0",
+                  fontFamily: "inherit", flexShrink: 0,
+                  border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                  cursor: "pointer",
+                }}
+              >
+                Open
+              </button>
             )}
           </div>
-        );
-      })}
+        </>
+      ) : (
+        /* ── Detail page ── */
+        currentProject ? (
+          <ProjectDetailView
+            project={currentProject}
+            repoData={repoData}
+            onOpenVideo={onOpenVideo}
+            onBackToList={() => navigate({ type: "list" })}
+          />
+        ) : (
+          <div style={{ padding: "16px 20px", fontSize: 11, color: "#666" }}>
+            Unable to load project details.
+          </div>
+        )
+      )}
     </div>
   );
 }
@@ -1308,29 +1944,54 @@ function DonutChart({ langs, size = 84 }) {
 
 
 function ContactApp() {
+  const contacts = [
+    { label: "Email", value: PERSONAL.email, href: `mailto:${PERSONAL.email}`, icon: "/socials/email.png" },
+    { label: "GitHub", value: PERSONAL.github.replace("https://", ""), href: PERSONAL.github, icon: "/socials/github.png" },
+    { label: "LinkedIn", value: PERSONAL.linkedin.replace("https://", ""), href: PERSONAL.linkedin, icon: "/socials/linkedin.png" },
+    { label: "Phone", value: PERSONAL.phone || "(717) 216-9005", href: `tel:+17172169005`, icon: "/socials/phone.png" },
+    { label: "Location", value: PERSONAL.location, href: null, icon: null },
+  ];
   return (
-    <div style={{ padding: "16px 20px" }}>
-      <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12, color: "#111" }}>Contact</div>
-      <div style={{ marginBottom: 16, fontSize: 13, color: "#333" }}>Interested in working together? Reach out through any of the channels below.</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
-        {[
-          { label: "Email", value: PERSONAL.email, href: `mailto:${PERSONAL.email}`, icon: "@" },
-          { label: "GitHub", value: PERSONAL.github.replace("https://", ""), href: PERSONAL.github, icon: "GH" },
-          { label: "LinkedIn", value: PERSONAL.linkedin.replace("https://", ""), href: PERSONAL.linkedin, icon: "in" },
-          { label: "Location", value: PERSONAL.location, href: null, icon: "US" },
-        ].map((c) => (
-          <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: "#f8f9fb", border: "2px inset #c0c0c0" }}>
-            <span style={{ fontSize: 16, width: 24, textAlign: "center" }}>{c.icon}</span>
-            <div>
-              <div style={{ fontSize: 11, color: "#888", fontWeight: 600 }}>{c.label}</div>
+    <div style={{ padding: "12px 16px", background: "#c0c0c0", minHeight: "100%" }}>
+      <div style={{
+        fontSize: 10, fontWeight: 700, color: "#000080",
+        textTransform: "uppercase", letterSpacing: 1,
+        borderBottom: "1px solid #808080", paddingBottom: 3, marginBottom: 10,
+      }}>
+        Contact Information
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+        {contacts.map((c) => (
+          <div key={c.label} style={{
+            display: "flex", alignItems: "center", gap: 8, padding: "5px 8px",
+            background: "#d4d0c8",
+            border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+          }}>
+            <div style={{ width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              {c.icon
+                ? <img src={c.icon} alt={c.label} width={16} height={16} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                : <span style={{ fontSize: 11 }}>📍</span>
+              }
+            </div>
+            <div style={{ minWidth: 52, fontSize: 10, fontWeight: 700, color: "#444", flexShrink: 0 }}>{c.label}</div>
+            <div style={{
+              flex: 1, padding: "1px 5px", fontSize: 10, background: "#fff",
+              border: "1px solid", borderColor: "#808080 #dfdfdf #dfdfdf #808080",
+            }}>
               {c.href ? (
-                <a href={c.href} target={c.href.startsWith("mailto") ? undefined : "_blank"} rel="noopener noreferrer" style={{ color: "#000080", fontSize: 12, textDecoration: "none" }}>{c.value}</a>
+                <a href={c.href} target={c.href.startsWith("mailto") || c.href.startsWith("tel") ? undefined : "_blank"}
+                  rel="noopener noreferrer"
+                  style={{ color: "#000080", textDecoration: "none" }}
+                >{c.value}</a>
               ) : (
-                <div style={{ fontSize: 12, color: "#333" }}>{c.value}</div>
+                <span style={{ color: "#333" }}>{c.value}</span>
               )}
             </div>
           </div>
         ))}
+      </div>
+      <div style={{ marginTop: 12, fontSize: 10, color: "#666", fontStyle: "italic" }}>
+        Open to backend, full-stack, or related roles — Philadelphia area or nationwide remote.
       </div>
     </div>
   );
@@ -1910,6 +2571,7 @@ function TopMenuBar({
       { label: "Open Skills", action: () => openWindow("skills") },
       { label: "Open Experience", action: () => openWindow("experience") },
       { label: "Open Projects", action: () => openWindow("projects") },
+      { label: "Open Videos", action: () => openWindow("videos") },
       { label: "Open Contact", action: () => openWindow("contact") },
       { label: "Open Jacobs Time", action: () => openWindow("location") },
       { label: "Open Terminal", action: () => openWindow("terminal") },
@@ -2085,6 +2747,7 @@ export default function HeroDesktopComputerComponent() {
   const [customItems, setCustomItems] = useState([]);
   const [recycleBinItems, setRecycleBinItems] = useState([]);
   const [activeTextDocId, setActiveTextDocId] = useState(null);
+  const [selectedVideoId, setSelectedVideoId] = useState(VIDEO_LIBRARY[0]?.id || null);
   const [renamingItem, setRenamingItem] = useState(null);
   const [pinnedTaskbarAppIds, setPinnedTaskbarAppIds] = useState(DEFAULT_PINNED_TASKBAR_IDS);
   const [taskbarMenu, setTaskbarMenu] = useState(null);
@@ -2096,6 +2759,7 @@ export default function HeroDesktopComputerComponent() {
     skills: { x: 12, y: 200 },
     experience: { x: 12, y: 296 },
     projects: { x: 12, y: 392 },
+    videos: { x: 112, y: 296 },
     github: { x: 12, y: 488 },
     contact: { x: 12, y: 584 },
     terminal: { x: 12, y: 680 },
@@ -2111,6 +2775,7 @@ export default function HeroDesktopComputerComponent() {
     { id: "skills", title: "Skills", glyph: Icons.skills, windowId: "skills", itemType: "app", system: true },
     { id: "experience", title: "Experience", glyph: Icons.experience, windowId: "experience", itemType: "app", system: true },
     { id: "projects", title: "Projects", glyph: Icons.projects, windowId: "projects", itemType: "app", system: true },
+    { id: "videos", title: "Videos", glyph: Icons.videos, windowId: "videos", itemType: "app", system: true },
     { id: "contact", title: "Contact", glyph: Icons.contact, windowId: "contact", itemType: "app", system: true },
     { id: "location", title: "Jacobs Time", glyph: Icons.location, windowId: "location", itemType: "app", system: true },
     { id: "terminal", title: "Terminal", glyph: Icons.terminal, windowId: "terminal", itemType: "app", system: true },
@@ -2132,6 +2797,7 @@ export default function HeroDesktopComputerComponent() {
     skills:     { id: "skills",     title: "Skills",                   x: 200, y: 60,  w: 480, h: 400, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
     experience: { id: "experience", title: "Experience",               x: 180, y: 50,  w: 560, h: 480, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
     projects:   { id: "projects",   title: "Projects",                 x: 100, y: 20,  w: 600, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
+    videos:     { id: "videos",     title: "Videos",                   x: 140, y: 40,  w: 840, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
     contact:    { id: "contact",    title: "Contact",                  x: 260, y: 80,  w: 400, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
     location:   { id: "location",   title: "Jacobs Time",              x: 280, y: 110, w: 560, h: 300, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
     terminal:   { id: "terminal",   title: "Terminal",                 x: 120, y: 50,  w: 500, h: 350, isOpen: false, isMinimized: false, isMaximized: false, z: 4 },
@@ -2176,6 +2842,16 @@ export default function HeroDesktopComputerComponent() {
       };
     });
   }, []);
+
+  const openVideoApp = useCallback(
+    (videoId = null) => {
+      if (videoId && VIDEO_LIBRARY_BY_ID[videoId]) {
+        setSelectedVideoId(videoId);
+      }
+      openWindow("videos");
+    },
+    [openWindow]
+  );
 
   const showProtectedDeleteAlert = useCallback(() => {
     setSystemAlert("You cannot delete this. These files are essential to JacobOS and cannot be removed.");
@@ -3009,7 +3685,8 @@ export default function HeroDesktopComputerComponent() {
     about: <AboutApp openWindow={openWindow} />,
     skills: <SkillsApp />,
     experience: <ExperienceApp />,
-    projects: <ProjectsApp />,
+    projects: <ProjectsApp onOpenVideo={openVideoApp} />,
+    videos: <VideosApp initialVideoId={selectedVideoId} />,
     contact: <ContactApp />,
     location: <LocationApp />,
     terminal: <TerminalApp />,
