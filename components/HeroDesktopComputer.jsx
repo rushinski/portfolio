@@ -1467,66 +1467,43 @@ function VideosApp({ initialVideoId }) {
 function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) {
   const ghRepo = p.links?.github ? repoData[p.links.github] : null;
   const isIP = p.status === "IN_PROGRESS";
-  const hasBuildSummary = (p.impact?.length || 0) > 0 || (p.architecture?.length || 0) > 0;
   const hasProjectLinks = !!(p.links?.github || p.links?.live || p.links?.landing);
   const hasVideoPreviews = (p.links?.videos?.length || 0) > 0;
   const hasReflection = !!(p.highlight || p.differently || p.outcome);
 
-  const fieldsetStyle = {
-    border: "1px solid",
-    borderColor: "#808080 #ffffff #ffffff #808080",
-    padding: "10px 10px 10px",
-    minWidth: 0,
-    margin: 0,
+  // Matches SkillsApp section label style exactly
+  const secLabel = {
+    fontSize: 10, fontWeight: 700, color: "#000080",
+    textTransform: "uppercase", letterSpacing: 1,
+    borderBottom: "1px solid #808080", paddingBottom: 3,
+    marginBottom: 7, marginTop: 12,
   };
+  // Sub-labels inside a section (no border, smaller)
+  const subLabel = { fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 };
 
-  const legendStyle = {
-    fontSize: 10,
-    fontWeight: 700,
-    color: "#000080",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    padding: "0 4px",
-  };
-
-  const subLabelStyle = {
-    fontSize: 9,
-    fontWeight: 700,
-    color: "#000080",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 5,
-  };
-
-  const linkBtnStyle = {
-    padding: "4px 8px",
-    fontSize: 10,
-    background: "#c0c0c0",
-    fontFamily: "inherit",
-    border: "2px solid",
-    borderColor: "#ffffff #808080 #808080 #ffffff",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    textAlign: "left",
-    width: "100%",
+  // Render an architecture item — split "Bold Title: body text" if colon present
+  const archItem = (text, key) => {
+    const ci = text.indexOf(": ");
+    const hasPrefix = ci > 0 && ci < 55;
+    return (
+      <div key={key} style={{ fontSize: 11, color: "#222", padding: "2px 0 3px 13px", position: "relative", lineHeight: 1.6 }}>
+        <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+        {hasPrefix
+          ? <><strong style={{ color: "#111" }}>{text.slice(0, ci)}:</strong>{" "}{text.slice(ci + 2)}</>
+          : text}
+      </div>
+    );
   };
 
   return (
-    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, background: "#d4d0c8", padding: "8px 10px 14px" }}>
+    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "10px 12px 14px", background: "#c0c0c0" }}>
       {onBackToList && (
         <div style={{ marginBottom: 8 }}>
           <button
             onClick={onBackToList}
             style={{
-              padding: "2px 10px",
-              fontSize: 10,
-              background: "#c0c0c0",
-              fontFamily: "inherit",
-              border: "2px solid",
-              borderColor: "#ffffff #808080 #808080 #ffffff",
-              cursor: "pointer",
+              padding: "2px 10px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
+              border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer",
             }}
           >
             ◄ Back to Projects
@@ -1534,166 +1511,181 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
         </div>
       )}
 
-      <div style={{ border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8", overflow: "hidden" }}>
+      <div style={{ border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8" }}>
 
-        {/* Header */}
-        <div style={{ background: "linear-gradient(to right, #000080 0%, #1084d0 100%)", padding: "10px 14px 12px" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: "#ffffff", lineHeight: 1.25 }}>{p.title}</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.65)", marginTop: 4 }}>{p.date}</div>
-            </div>
-            <span style={{
-              flexShrink: 0,
-              padding: "2px 8px",
-              fontSize: 10,
-              fontWeight: 700,
-              background: isIP ? "#ffff80" : "#80ff80",
-              color: "#000",
-              border: "1px solid rgba(0,0,0,0.25)",
-              alignSelf: "center",
-            }}>
-              {isIP ? "IN PROGRESS" : "COMPLETE"}
-            </span>
+        {/* Header — same pattern as ExperienceApp entries */}
+        <div style={{
+          background: "linear-gradient(to right, #000080, #1084d0)",
+          padding: "5px 10px", display: "flex", alignItems: "flex-start",
+          justifyContent: "space-between", flexWrap: "wrap", gap: 6,
+        }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 800, fontSize: 13, color: "#fff", lineHeight: 1.3 }}>{p.title}</div>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>{p.date}</div>
           </div>
+          <span style={{
+            padding: "1px 7px", fontSize: 10, fontWeight: 700,
+            background: isIP ? "#ffff80" : "#80ff80", color: "#000",
+            border: "1px solid rgba(0,0,0,0.2)", flexShrink: 0, alignSelf: "center",
+          }}>
+            {isIP ? "In Progress" : "Complete"}
+          </span>
         </div>
 
         {/* Body */}
-        <div style={{ padding: "12px 12px 12px", display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ padding: "4px 10px 10px" }}>
 
           {/* Stack */}
-          <fieldset style={fieldsetStyle}>
-            <legend style={legendStyle}>Stack</legend>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-              {p.stack.map((t) => {
-                const iconFile = SKILL_ICON_FILES[t];
-                return (
-                  <span key={t} style={{ padding: "2px 7px", fontSize: 10, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", display: "inline-flex", alignItems: "center", gap: 3 }}>
-                    {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
-                    {t}
-                  </span>
-                );
-              })}
-            </div>
-          </fieldset>
+          <div style={{ ...secLabel, marginTop: 8 }}>Stack</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {p.stack.map((t) => {
+              const iconFile = SKILL_ICON_FILES[t];
+              return (
+                <span key={t} style={{
+                  padding: "1px 6px", fontSize: 10, background: "#c0c0c0",
+                  border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                  display: "inline-flex", alignItems: "center", gap: 3,
+                }}>
+                  {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={11} height={11} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
+                  {t}
+                </span>
+              );
+            })}
+          </div>
 
-          {/* Links + Videos side-by-side */}
-          {(hasProjectLinks || hasVideoPreviews) && (
-            <div style={{ display: "grid", gridTemplateColumns: hasProjectLinks && hasVideoPreviews ? "1fr 1fr" : "1fr", gap: 10 }}>
-              {hasProjectLinks && (
-                <fieldset style={fieldsetStyle}>
-                  <legend style={legendStyle}>Links</legend>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    {p.links?.github && (
-                      <button onClick={() => window.open(p.links.github, "_blank", "noopener,noreferrer")} style={linkBtnStyle}>
-                        <img src="/skills/github.png" alt="github" width={13} height={13} style={{ imageRendering: "pixelated", flexShrink: 0 }} />
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ fontWeight: 700, color: "#000", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            {ghRepo?.name || p.links.github.split("/").pop()}
-                          </div>
-                          <div style={{ fontSize: 9, color: "#555", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.links.github}</div>
-                        </div>
-                      </button>
-                    )}
-                    {p.links?.live && (
-                      <button onClick={() => window.open(p.links.live, "_blank", "noopener,noreferrer")} style={linkBtnStyle}>
-                        <span style={{ fontSize: 13, flexShrink: 0 }}>🌐</span>
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ fontWeight: 700, color: "#000" }}>Live Site</div>
-                          <div style={{ fontSize: 9, color: "#555", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.links.live}</div>
-                        </div>
-                      </button>
-                    )}
-                    {p.links?.landing && (
-                      <button onClick={() => window.open(p.links.landing, "_blank", "noopener,noreferrer")} style={linkBtnStyle}>
-                        <span style={{ fontSize: 13, flexShrink: 0 }}>📄</span>
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ fontWeight: 700, color: "#000" }}>Landing Page</div>
-                          <div style={{ fontSize: 9, color: "#555", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.links.landing}</div>
-                        </div>
-                      </button>
-                    )}
-                  </div>
-                </fieldset>
-              )}
-              {hasVideoPreviews && (
-                <fieldset style={fieldsetStyle}>
-                  <legend style={legendStyle}>Media</legend>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    {p.links.videos.map((video, idx) => {
-                      const previewVideo = VIDEO_LIBRARY_BY_ID[video.id] || { ...video, id: video.id || `preview-${idx}`, projectTitle: p.title };
-                      return <VideoPreviewCard key={previewVideo.id} video={previewVideo} onOpen={onOpenVideo} />;
-                    })}
-                  </div>
-                </fieldset>
-              )}
-            </div>
+          {/* Links */}
+          {hasProjectLinks && (
+            <>
+              <div style={secLabel}>Links</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {p.links?.github && (
+                  <button
+                    onClick={() => window.open(p.links.github, "_blank", "noopener,noreferrer")}
+                    style={{
+                      padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
+                      border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                      cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5,
+                    }}
+                  >
+                    <img src="/skills/github.png" alt="github" width={11} height={11} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                    {ghRepo?.name || p.links.github.split("/").pop()}
+                  </button>
+                )}
+                {p.links?.live && (
+                  <button
+                    onClick={() => window.open(p.links.live, "_blank", "noopener,noreferrer")}
+                    style={{
+                      padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
+                      border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                      cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5,
+                    }}
+                  >
+                    🌐 Live Site
+                  </button>
+                )}
+                {p.links?.landing && (
+                  <button
+                    onClick={() => window.open(p.links.landing, "_blank", "noopener,noreferrer")}
+                    style={{
+                      padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
+                      border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                      cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5,
+                    }}
+                  >
+                    📄 Landing Page
+                  </button>
+                )}
+              </div>
+            </>
           )}
 
-          {/* Overview */}
-          <fieldset style={fieldsetStyle}>
-            <legend style={legendStyle}>Overview</legend>
-            <div style={{ fontSize: 11, lineHeight: 1.7, color: "#111" }}>{p.desc}</div>
-            {p.narrative && (
-              <div style={{ marginTop: 9, padding: "7px 9px", background: "#c8c4bc", borderTop: "1px solid #808080", borderRight: "1px solid #ffffff", borderBottom: "1px solid #ffffff", borderLeft: "3px solid #000080" }}>
-                <div style={subLabelStyle}>Context</div>
-                <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", fontStyle: "italic" }}>{p.narrative}</div>
+          {/* Media */}
+          {hasVideoPreviews && (
+            <>
+              <div style={secLabel}>Media</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                {p.links.videos.map((video, idx) => {
+                  const vd = VIDEO_LIBRARY_BY_ID[video.id] || { ...video, id: video.id || `preview-${idx}`, projectTitle: p.title };
+                  return (
+                    <button
+                      key={vd.id}
+                      onClick={() => onOpenVideo?.(vd.id)}
+                      style={{
+                        border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                        background: "#c0c0c0", padding: 0, cursor: "pointer",
+                        textAlign: "left", display: "flex", alignItems: "stretch",
+                      }}
+                    >
+                      <div style={{ width: 96, flexShrink: 0, background: "#000", margin: 3, border: "1px solid #606060", overflow: "hidden" }}>
+                        <video src={vd.src} muted preload="metadata" playsInline style={{ width: "100%", height: 54, objectFit: "cover", display: "block", pointerEvents: "none" }} />
+                      </div>
+                      <div style={{ flex: 1, padding: "5px 8px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3 }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "#111" }}>{vd.label}</div>
+                        <div style={{ fontSize: 9, color: "#000080", fontWeight: 700 }}>▶ Open in Videos</div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
-            )}
-          </fieldset>
+            </>
+          )}
 
-          {/* Build & Results */}
-          {hasBuildSummary && (
-            <fieldset style={fieldsetStyle}>
-              <legend style={legendStyle}>Build & Results</legend>
-              {p.impact?.length > 0 && (
-                <div style={{ marginBottom: p.architecture?.length > 0 ? 10 : 0 }}>
-                  <div style={subLabelStyle}>Results</div>
-                  {p.impact.map((item, j) => (
-                    <div key={`impact-${j}`} style={{ fontSize: 11, color: "#111", padding: "2px 0 2px 14px", position: "relative", lineHeight: 1.6 }}>
-                      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
-                      {item}
-                    </div>
-                  ))}
+          {/* Overview — the pitch */}
+          <div style={secLabel}>Overview</div>
+          <div style={{ fontSize: 11, lineHeight: 1.65, color: "#222" }}>{p.desc}</div>
+
+          {/* The Challenge */}
+          {p.narrative && (
+            <>
+              <div style={secLabel}>The Challenge</div>
+              <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.narrative}</div>
+            </>
+          )}
+
+          {/* Technical Deep Dive */}
+          {p.architecture?.length > 0 && (
+            <>
+              <div style={secLabel}>Technical Deep Dive</div>
+              {p.architecture.map((item, j) => archItem(item, `arch-${j}`))}
+            </>
+          )}
+
+          {/* Results / Impact */}
+          {p.impact?.length > 0 && (
+            <>
+              <div style={secLabel}>Results</div>
+              {p.impact.map((item, j) => (
+                <div key={`impact-${j}`} style={{ fontSize: 11, color: "#222", padding: "1px 0 2px 13px", position: "relative", lineHeight: 1.6 }}>
+                  <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+                  {item}
                 </div>
-              )}
-              {p.architecture?.length > 0 && (
-                <div>
-                  <div style={subLabelStyle}>Implementation</div>
-                  {p.architecture.map((item, j) => (
-                    <div key={`arch-${j}`} style={{ fontSize: 11, color: "#111", lineHeight: 1.65, padding: "4px 0 4px 14px", position: "relative", borderBottom: j < p.architecture.length - 1 ? "1px dotted #a0a0a0" : "none" }}>
-                      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>»</span>
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </fieldset>
+              ))}
+            </>
           )}
 
           {/* Reflection */}
           {hasReflection && (
-            <fieldset style={fieldsetStyle}>
-              <legend style={legendStyle}>Reflection</legend>
+            <>
+              <div style={secLabel}>Reflection</div>
               {p.highlight && (
-                <div style={{ marginBottom: p.differently || p.outcome ? 10 : 0 }}>
-                  <div style={subLabelStyle}>Technical Notes</div>
+                <div style={{ marginBottom: p.differently || p.outcome ? 9 : 0 }}>
+                  <div style={subLabel}>Technical Notes</div>
                   <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.highlight}</div>
                 </div>
               )}
               {p.differently && (
-                <div style={{ marginBottom: p.outcome ? 10 : 0 }}>
-                  <div style={subLabelStyle}>What I&apos;d Do Differently</div>
+                <div style={{ marginBottom: p.outcome ? 9 : 0 }}>
+                  <div style={subLabel}>What I&apos;d Do Differently</div>
                   <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.differently}</div>
                 </div>
               )}
               {p.outcome && (
                 <div>
-                  <div style={subLabelStyle}>Outcome</div>
+                  <div style={subLabel}>Outcome</div>
                   <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.outcome}</div>
                 </div>
               )}
-            </fieldset>
+            </>
           )}
 
         </div>
