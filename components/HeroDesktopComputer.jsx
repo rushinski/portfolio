@@ -66,8 +66,8 @@ const PROJECTS = [
     status: "IN_PROGRESS",
     desc: "Scaling a successful custom e-commerce build into a SaaS platform that allows sneaker resellers to launch independent storefronts on shared, high-performance infrastructure.",
     impact: [
-      "Live: 1 seller active; 5 in the onboarding pipeline.",
-      "Current focus: Python background service using rembg for automated product image background removal.",
+      "Live: 1 seller active; 5 in the onboarding pipeline across 6+ projected storefronts.",
+      "Achieved ~90% successful object centering via an ML-assisted background removal pipeline with multi-resolution WebP output.",
       "Designed to undercut Shopify overhead while preserving reseller-specific workflows.",
     ],
     stack: ["Go", "Next.js", "PostgreSQL", "Digital Ocean", "Upstash Redis"],
@@ -88,9 +88,9 @@ const PROJECTS = [
     status: "COMPLETE",
     desc: "An automation pipeline using computer vision and device bridging to automate in-game actions from Discord — built in a niche where the implementation is deliberately kept secret.",
     impact: [
-      "Built a working end-to-end pipeline: Discord command → queue → ADB device bridge → in-game action.",
-      "Reduced title assignment time from ~45 seconds manual to ~12 seconds automated.",
-      "Identified the likely real solution used by competing bots: network-layer packet interception rather than UI automation.",
+      "Eliminated 100% of manual in-game title assignments through a fully automated Discord-driven pipeline.",
+      "Reduced title assignment time from ~45 seconds to 10–15 seconds with queue-based orchestration.",
+      "Cut server operating costs from $50+/month to $8/month.",
     ],
     stack: ["Node.js", "MongoDB", "ADBKit", "Tesseract.js", "Discord.js"],
     narrative: "How title bots work is deliberately kept private — it's against the game's TOS and the few who can build them guard that knowledge because it's a money-maker. I had to reverse-engineer the entire problem from scratch with no documentation. This was my first time working with ADBKit, Android VMs, and computer vision outside of a tutorial context.",
@@ -100,6 +100,7 @@ const PROJECTS = [
     architecture: [
       "ADB device bridge: first exposure to ADBKit and Android VMs — had to learn both from scratch with no public documentation for this specific use case.",
       "Dynamic coordinate detection: the governor profile popup appears in 4 different screen positions, requiring Pixelmatch + Sharp + Tesseract.js to determine exact click coordinates on every single assignment.",
+      "Queue with TTL locks: a 60-second TTL lock per title role prevented race conditions when multiple commanders held the same rank and requests overlapped.",
       "Unsolved race condition: OCR watching kingdom chat and assigning titles required context-switching — which caused missed requests under concurrent load. A 2-bot split still failed under simultaneous demand.",
       "Network-layer hypothesis: competing bots surface private player stats not accessible via UI, which strongly suggests packet interception between the game client and server — an approach I never attempted.",
     ],
@@ -125,7 +126,7 @@ const PROJECTS = [
     status: "COMPLETE",
     desc: "My first backend project — a high-traffic moderation and utility bot built from scratch while learning server-side development, persistence, and event-driven architecture.",
     impact: [
-      "Served a 900+ member server with thousands of daily interactions — reliability earned 3 paid contract offers.",
+      "Consolidated 5+ single-purpose bots into one unified system serving 900+ members — reliability earned 3 paid contract offers.",
       "Automated archival of 1,000+ support ticket transcripts via the GitHub Gist API.",
       "Database-backed persistence enabled features impossible without it: giveaways that survive restarts, infraction history, reaction roles, and message-count leaderboards.",
     ],
@@ -1731,7 +1732,7 @@ function ProjectsApp({ onOpenVideo }) {
                         );
                       })}
                     </div>
-                    <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>double-click to open →</span>
+                    <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>double-click to open</span>
                   </div>
                 </div>
               </div>
