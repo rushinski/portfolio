@@ -1213,20 +1213,6 @@ function VideoPreviewCard({ video, onOpen }) {
     >
       <div
         style={{
-          background: "linear-gradient(to right, #000080, #1084d0)",
-          color: "#fff",
-          fontSize: 9,
-          fontWeight: 700,
-          padding: "2px 5px",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        Windows Media Player
-      </div>
-      <div
-        style={{
           position: "relative",
           background: "#000",
           paddingTop: "56.25%",
@@ -1255,7 +1241,7 @@ function VideoPreviewCard({ video, onOpen }) {
         {video.label}
       </div>
       <div style={{ margin: "0 4px 4px", fontSize: 9, color: "#333", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-        {video.projectTitle}
+        {video.src}
       </div>
       <div
         style={{
@@ -1492,10 +1478,10 @@ function VideosApp({ initialVideoId }) {
 // ─── Project detail "page" (shown when navigating into a project) ──────────
 function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) {
   const ghRepo = p.links?.github ? repoData[p.links.github] : null;
-  const primaryLang = p.stack.find((s) => LANG_COLORS[s]);
-  const repoLang = ghRepo?.language || primaryLang;
-  const langColor = LANG_COLORS[repoLang] || "#ccc";
   const isIP = p.status === "IN_PROGRESS";
+  const hasBuildSummary = (p.impact?.length || 0) > 0 || (p.architecture?.length || 0) > 0;
+  const hasProjectLinks = !!(p.links?.github || p.links?.live || p.links?.landing);
+  const hasVideoPreviews = (p.links?.videos?.length || 0) > 0;
 
   const Section = ({ title, children }) => (
     <fieldset style={{
@@ -1527,95 +1513,225 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
           </button>
         </div>
       )}
-      {/* header badge row */}
-      <div style={{ display: "flex", gap: 5, marginBottom: 9, alignItems: "center", flexWrap: "wrap" }}>
-        <span style={{
-          padding: "1px 7px", fontSize: 10, fontWeight: 700,
-          background: isIP ? "#ffff80" : "#80ff80", border: "1px solid #808080",
-        }}>
-          {isIP ? "In Progress" : "Complete"}
-        </span>
-        <span style={{
-          fontSize: 10, border: "1px solid", padding: "1px 6px",
-          borderColor: "#808080 #ffffff #ffffff #808080", background: "#c0c0c0",
-        }}>{p.date}</span>
-        {repoLang && (
-          <span style={{ fontSize: 10, display: "flex", alignItems: "center", gap: 3 }}>
-            <span style={{ width: 9, height: 9, borderRadius: "50%", background: langColor, display: "inline-block" }} />
-            {repoLang}
+      <div style={{
+        marginBottom: 8,
+        padding: "6px 8px",
+        background: "#c0c0c0",
+        border: "2px solid",
+        borderColor: "#ffffff #808080 #808080 #ffffff",
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 800, color: "#0b2f6b", lineHeight: 1.35 }}>
+          {p.title}
+        </div>
+        <div style={{ display: "flex", gap: 5, marginTop: 5, alignItems: "center", flexWrap: "wrap" }}>
+          <span style={{
+            padding: "1px 7px", fontSize: 10, fontWeight: 700,
+            background: isIP ? "#ffff80" : "#80ff80", border: "1px solid #808080",
+          }}>
+            {isIP ? "In Progress" : "Complete"}
           </span>
-        )}
+          <span style={{
+            fontSize: 10, border: "1px solid", padding: "1px 6px",
+            borderColor: "#808080 #ffffff #ffffff #808080", background: "#d4d0c8",
+          }}>{p.date}</span>
+        </div>
+        <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f", display: "grid", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 6, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, lineHeight: "18px" }}>
+              Stack
+            </span>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, flex: 1, minWidth: 0 }}>
+              {p.stack.map((t) => {
+                const iconFile = SKILL_ICON_FILES[t];
+                return (
+                  <span key={t} style={{
+                    padding: "1px 6px", fontSize: 10, background: "#d4d0c8",
+                    border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                    display: "inline-flex", alignItems: "center", gap: 3,
+                  }}>
+                    {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={11} height={11} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
+                    {t}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          {hasProjectLinks && (
+            <div>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
+                Links
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 6 }}>
+                {p.links?.github && (
+                  <button
+                    onClick={() => window.open(p.links.github, "_blank", "noopener,noreferrer")}
+                    style={{
+                      padding: "5px 7px",
+                      fontSize: 10,
+                      background: "#d4d0c8",
+                      fontFamily: "inherit",
+                      border: "2px solid",
+                      borderColor: "#ffffff #808080 #808080 #ffffff",
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: 2,
+                      textAlign: "left",
+                      minWidth: 0,
+                    }}
+                  >
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111", minWidth: 0 }}>
+                      <img src="/skills/github.png" alt="github" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {ghRepo?.name || p.links.github.split("/").pop()}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {p.links.github}
+                    </div>
+                  </button>
+                )}
+                {p.links?.live && (
+                  <button
+                    onClick={() => window.open(p.links.live, "_blank", "noopener,noreferrer")}
+                    style={{
+                      padding: "5px 7px",
+                      fontSize: 10,
+                      background: "#d4d0c8",
+                      fontFamily: "inherit",
+                      border: "2px solid",
+                      borderColor: "#ffffff #808080 #808080 #ffffff",
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: 2,
+                      textAlign: "left",
+                      minWidth: 0,
+                    }}
+                  >
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111" }}>
+                      <span>🌐</span>
+                      <span>Live Site</span>
+                    </div>
+                    <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {p.links.live}
+                    </div>
+                  </button>
+                )}
+                {p.links?.landing && (
+                  <button
+                    onClick={() => window.open(p.links.landing, "_blank", "noopener,noreferrer")}
+                    style={{
+                      padding: "5px 7px",
+                      fontSize: 10,
+                      background: "#d4d0c8",
+                      fontFamily: "inherit",
+                      border: "2px solid",
+                      borderColor: "#ffffff #808080 #808080 #ffffff",
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: 2,
+                      textAlign: "left",
+                      minWidth: 0,
+                    }}
+                  >
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111" }}>
+                      <span>📄</span>
+                      <span>Landing Page</span>
+                    </div>
+                    <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {p.links.landing}
+                    </div>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {hasVideoPreviews && (
+            <div>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
+                Media
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 6 }}>
+                {p.links.videos.map((video, idx) => {
+                  const previewVideo = VIDEO_LIBRARY_BY_ID[video.id] || {
+                    ...video,
+                    id: video.id || `preview-${idx}`,
+                    projectTitle: p.title,
+                  };
+                  return (
+                    <VideoPreviewCard
+                      key={previewVideo.id}
+                      video={previewVideo}
+                      onOpen={onOpenVideo}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Video previews */}
-      {p.links?.videos?.length > 0 && (
-        <div style={{ marginBottom: 10 }}>
-          <div style={{
-            fontSize: 10, fontWeight: 700, color: "#000080",
-            textTransform: "uppercase", letterSpacing: 1,
-            borderBottom: "1px solid #c0c0c0", paddingBottom: 3, marginBottom: 6,
-          }}>Video Previews</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 8 }}>
-            {p.links.videos.map((video, idx) => {
-              const previewVideo = VIDEO_LIBRARY_BY_ID[video.id] || {
-                ...video,
-                id: video.id || `preview-${idx}`,
-                projectTitle: p.title,
-              };
-              return (
-                <VideoPreviewCard
-                  key={previewVideo.id}
-                  video={previewVideo}
-                  onOpen={onOpenVideo}
-                />
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      <Section title="Description">
+      <Section title="Overview">
         <div style={{ fontSize: 11, lineHeight: 1.65, color: "#111" }}>{p.desc}</div>
+        {p.narrative && (
+          <div style={{ marginTop: 7 }}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>
+              Context
+            </div>
+            <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", fontStyle: "italic" }}>{p.narrative}</div>
+          </div>
+        )}
       </Section>
 
-      {p.narrative && (
-        <Section title="Background">
-          <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", fontStyle: "italic" }}>{p.narrative}</div>
+      {hasBuildSummary && (
+        <Section title="Build & Results">
+          {p.impact?.length > 0 && (
+            <div style={{ marginBottom: p.architecture?.length > 0 ? 8 : 0 }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>
+                Results
+              </div>
+              {p.impact.map((item, j) => (
+                <div key={`impact-${j}`} style={{ fontSize: 11, color: "#111", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.55 }}>
+                  <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {p.architecture?.length > 0 && (
+            <div>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>
+                Implementation
+              </div>
+              {p.architecture.map((item, j) => (
+                <div key={`arch-${j}`} style={{
+                  fontSize: 11, color: "#111", lineHeight: 1.6,
+                  padding: "2px 0 2px 14px", position: "relative",
+                  borderBottom: j < p.architecture.length - 1 ? "1px dotted #d0d0d0" : "none",
+                }}>
+                  <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>»</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+          )}
         </Section>
       )}
 
-      <Section title="Key Points">
-        {p.impact.map((item, j) => (
-          <div key={j} style={{ fontSize: 11, color: "#111", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.55 }}>
-            <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
-            {item}
-          </div>
-        ))}
-      </Section>
-
-      <Section title="Stack">
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-          {p.stack.map((t) => {
-            const iconFile = SKILL_ICON_FILES[t];
-            return (
-              <span key={t} style={{
-                padding: "1px 6px", fontSize: 10, background: "#c0c0c0",
-                border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                display: "inline-flex", alignItems: "center", gap: 3,
-              }}>
-                {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={11} height={11} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
-                {t}
-              </span>
-            );
-          })}
-        </div>
-      </Section>
-
       {(p.highlight || p.differently || p.outcome) && (
-        <Section title="Notes">
+        <Section title="Reflection">
           {p.highlight && (
             <div style={{ marginBottom: p.differently || p.outcome ? 8 : 0 }}>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>What Was Technically Interesting</div>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>Technical Notes</div>
               <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", whiteSpace: "pre-line" }}>{p.highlight}</div>
             </div>
           )}
@@ -1634,63 +1750,6 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
         </Section>
       )}
 
-      {p.architecture?.length > 0 && (
-        <Section title="Architecture">
-          {p.architecture.map((item, j) => (
-            <div key={j} style={{
-              fontSize: 11, color: "#111", lineHeight: 1.6,
-              padding: "3px 0 3px 14px", position: "relative",
-              borderBottom: j < p.architecture.length - 1 ? "1px dotted #d0d0d0" : "none",
-            }}>
-              <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>»</span>
-              {item}
-            </div>
-          ))}
-        </Section>
-      )}
-
-      {/* links */}
-      {(p.links?.github || p.links?.live || p.links?.landing) && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 5, paddingTop: 2 }}>
-          {p.links?.github && (
-            <button
-              onClick={() => window.open(p.links.github, "_blank", "noopener,noreferrer")}
-              style={{
-                padding: "3px 12px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
-                border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4,
-              }}
-            >
-              <img src="/skills/github.png" alt="github" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
-              {ghRepo?.name || p.links.github.split("/").pop()}
-            </button>
-          )}
-          {p.links?.live && (
-            <button
-              onClick={() => window.open(p.links.live, "_blank", "noopener,noreferrer")}
-              style={{
-                padding: "3px 12px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
-                border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4,
-              }}
-            >
-              🌐 Live Site
-            </button>
-          )}
-          {p.links?.landing && (
-            <button
-              onClick={() => window.open(p.links.landing, "_blank", "noopener,noreferrer")}
-              style={{
-                padding: "3px 12px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
-                border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4,
-              }}
-            >
-              📄 Landing Page
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
