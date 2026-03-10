@@ -61,25 +61,21 @@ const EXPERIENCE = [
 
 const PROJECTS = [
   {
-    title: "Multi-Tenant Sneaker Resale Marketplace",
+    title: "Multi-Tenant Sneaker Marketplace",
     date: "Feb 2026 - Present",
     status: "IN_PROGRESS",
-    desc: "Expansion of the Realdealkickzsc platform, enabling other sneaker retailers to spin up their own storefronts on shared infrastructure.",
+    desc: "Scaling a successful custom e-commerce build into a SaaS platform that allows sneaker resellers to launch independent storefronts on shared, high-performance infrastructure.",
     impact: [
-      "Multi-tenant architecture with full per-store data isolation",
-      "Shared infra dramatically reduces per-tenant cost vs Shopify",
-      "Reusing proven payment, webhook, and rate-limiting patterns",
-      "22-week implementation roadmap in active progress",
+      "Live: 1 seller active; 5 in the onboarding pipeline.",
+      "Current focus: Python background service using rembg for automated product image background removal.",
+      "Designed to undercut Shopify overhead while preserving reseller-specific workflows.",
     ],
     stack: ["Go", "Next.js", "PostgreSQL", "Digital Ocean", "Upstash Redis"],
-    narrative: "While wrapping up the Realdealkickzsc contract, five other sneaker resellers reached out wanting their own stores. I knew five separate backends was the wrong call — a multi-tenant platform was the right architecture. I'm also a genuine sneakerhead, so this is one of those rare projects I'd be building regardless of whether it was commercially viable. Currently 1 seller is live on the platform with 5 more waiting to join.",
+    narrative: "While finishing a contract for a sneaker reseller, five other shop owners asked for similar sites. Building five separate backends was an architectural code smell that would not scale. As a sneakerhead, I wanted to build a platform that significantly undercuts Shopify overhead while providing the tools resellers actually need.",
     architecture: [
-      "Single Go backend with Chi router, domain-driven folder structure (internal/domain/, internal/router/, internal/platform/)",
-      "Multi-runtime codebase: Go API + Python image processing service using rembg",
-      "PostgreSQL with Row Level Security for complete tenant data isolation",
-      "PayRilla Gateway (white-labeled Accept.Blue) replacing Stripe after account closure",
-      "AWS Cognito for auth, Doppler for secrets management, New Relic APM for observability",
-      "Digital Ocean infrastructure replacing Vercel + Supabase with parallel build/hard cutover migration",
+      "Multi-tenancy and isolation: single Go backend with Chi router and PostgreSQL Row Level Security (RLS), ensuring tenant-level data isolation.",
+      "Infrastructure migration: moved from Vercel/Supabase to Digital Ocean for tighter CPU/RAM control and stronger Go API performance.",
+      "Payment pivot: replaced Stripe after account closure with a custom PayRilla (Accept.Blue) integration to keep the business operational.",
     ],
     links: {
       github: "https://github.com/rushinski/rdk-webstore",
@@ -87,28 +83,24 @@ const PROJECTS = [
     },
   },
   {
-    title: "Discord Title Automation Bot",
+    title: "Rise of Kingdoms Title Automation",
     date: "Jan 2025 - Mar 2025",
     status: "COMPLETE",
-    desc: "Orchestrated a Discord-to-device automation pipeline that mapped Discord user IDs to MongoDB player records.",
+    desc: "An automation pipeline using computer vision to bridge Discord commands and in-game actions in a mobile strategy game.",
     impact: [
-      "Reduced manual title assignment from ~45 seconds to 10-15 seconds",
-      "95% success rate via image-based UI state detection",
-      "100% conflict-free processing with role-based bucket queue",
+      "Reduced title assignment time from ~45 seconds to ~12 seconds in the working Discord-based flow.",
+      "Built an end-to-end proof-of-concept from command intake to in-game execution with queue-based orchestration.",
+      "Identified where UI automation works and where network-layer approaches are likely more robust.",
     ],
     stack: ["Node.js", "MongoDB", "ADBKit", "Tesseract.js", "Discord.js"],
-    narrative: "I was genuinely curious how these bots actually work. It's deliberately kept secret — the bots violate the game's TOS, and since few people know how to build them it's a lucrative niche that nobody publicly documents. I decided to figure it out myself.",
-    highlight: "The hardest part was just figuring out what was even possible. I'd never heard of ADBKit or virtual machines before this project. Two questions drove everything: how do I interact with the game programmatically, and how do I keep the process running 24/7?\n\nThe problem I ultimately couldn't crack was a true in-game approach. Modern title bots operate inside the game's global chat — players never leave the game. I tried having a bot watch kingdom chat via OCR, but when it paused to assign a title it would fall behind on messages. Two bots (one watching, one assigning) still missed simultaneous requests. My suspicion is the real solution involves intercepting network traffic between the game client and server — other bots expose private player stats that would only be possible that way — but I never pursued it and went with a Discord command approach instead.\n\nOn the assignment side: clicking a governor's profile with ADB requires knowing exactly where it appears on screen, but the popup can appear in 4 different positions. I used Pixelmatch, Sharp, and Tesseract to detect the correct position dynamically before each click.",
-    differently: "I'd push harder to find the in-game solution. The Discord command approach works, but it's outdated compared to what the best bots do — and that unsolved problem still bothers me.",
-    outcome: "The bot worked, but not quite as I'd hoped. The Discord-based approach was functional but felt dated, and the kingdom eventually moved to a fully in-game bot. Two other kingdoms offered to pay for a similar build.",
+    narrative: "In Rise of Kingdoms, titles provide strong buffs but must be assigned manually. I wanted to automate that workflow in a niche where implementation details are guarded because the tooling is lucrative and technically complex. I had to teach myself virtual machines and device bridge protocols from scratch.",
+    highlight: "Technical discovery: this project introduced me to ADBKit and queue-driven automation pipelines.",
+    differently: "The better long-term path likely lives at the network layer through packet interception, not UI-layer automation. If I revisited this, I would prioritize that approach first.",
+    outcome: "The Discord-based proof of concept worked and materially reduced assignment time, while clearly exposing the limits of pure UI automation.",
     architecture: [
-      "Modular Node.js application integrating Discord, MongoDB, ADB, and OCR libraries",
-      "Discord.js slash command interface (/title, /set-location, /locate-bot) with permissions enforcement",
-      "MongoDB + Mongoose for player location persistence and bot state tracking",
-      "ADBKit for communicating with Android emulator - executes taps, text inputs, screenshots",
-      "Sharp + Pixelmatch + PNG.js for image comparison and reference UI element detection",
-      "Tesseract.js OCR engine to extract in-game coordinates from screenshots",
-      "Resilient queueing system with cooldowns to prevent overlapping title assignments",
+      "Computer vision pipeline: Pixelmatch + Sharp for UI state detection and Tesseract.js for coordinate extraction.",
+      "Dynamic UI handling: the bot performs a real-time visual scan because the governor profile popup can appear in four screen quadrants.",
+      "Unsolved race condition: in-game OCR chat watching and title assignment context switching caused missed requests under concurrent demand.",
     ],
     links: {
       github: "https://github.com/rushinski/Discord-Title-Bot",
@@ -127,28 +119,24 @@ const PROJECTS = [
     },
   },
   {
-    title: "Discord Automation & Moderation Bot",
+    title: "\"Unity\" Discord Moderation Bot",
     date: "Oct 2024 - Jan 2025",
     status: "COMPLETE",
-    desc: "Engineered a modular, event-driven Discord bot serving 900+ users.",
+    desc: "A high-traffic moderation and utility bot that served a 900+ member community and handled thousands of interactions daily.",
     impact: [
-      "Consolidated 5+ single-purpose bots into one unified system",
-      "1,000+ transcripts archived with GitHub Gist + MongoDB fallback",
-      "3 paid bot development offers generated from this project",
+      "Real-world success: reliability in a 900-member server led to 3 paid contracts for similar systems.",
+      "Automated archival of 1,000+ support ticket transcripts via the GitHub Gist API.",
+      "Growth outcome: cemented environment-variable discipline and dev/prod separation practices used in contract work.",
     ],
     stack: ["Node.js", "Discord.js", "MongoDB", "GitHub Gist API"],
-    narrative: "This was my first backend project ever — everything I'd built before was frontend. A Discord bot seemed like an approachable entry point, but it quickly opened up an entirely new world: server-side logic, databases, event-driven architecture, and real users counting on the system to stay up.",
-    highlight: "The moment that changed everything was realizing I needed a database. If the bot restarted mid-giveaway, the giveaway was just gone — no persistence. That one problem forced me to learn MongoDB, and once I had it, I kept finding new uses: tracking infractions, custom reaction roles, giveaway state, player message counts. It turned what could have been a stateless script into a real system.\n\nAnother memorable challenge was content moderation. I started by manually listing every banned word and its possible variations — and users would always find creative ways around it. After some research I found the fast-levenshtein package, which scores words using fuzzy matching rather than exact comparisons. One definition replaced hundreds of manual variations and actually worked.",
-    differently: "I'd set up multiple environments from day one. I didn't fully understand dev/prod separation until my contract work, but it would have let me develop and test new features while the live bot stayed online — instead of pushing changes directly to production.",
-    outcome: "The bot ran in a server with 900+ members and was used thousands of times per day. It generated 3 paid development offers from people who wanted similar bots built for their communities.",
+    narrative: "This was my backend hello world. Moving from frontend-only development into bot infrastructure forced me to think about state and durability. I quickly learned that without persistence, a restart wipes active giveaways and user progress, which pushed me into database design and event-driven architecture.",
+    highlight: "The key technical shift was moving from scripts to systems: persistence, event handling, and operational reliability.",
+    differently: "I would have formalized dev/prod separation from day one to reduce risk while iterating on a live production bot.",
+    outcome: "The bot handled thousands of daily interactions in a 900+ member server and directly opened paid opportunities for similar builds.",
     architecture: [
-      "Event-driven Node.js architecture with discord.js v14 and modular subsystem design",
-      "6 independent subsystems: Ticketing & Verification, Moderation, Leveling, Roles & Counts, Giveaways, Logging",
-      "MongoDB persistence layer for users, infractions, tickets, transcripts, giveaways, and role systems",
-      "GitHub Gist integration for external ticket transcript archiving (1000+ stored)",
-      "Moderation escalation policy: warnings -> strikes -> auto-ban with fuzzy banned-word matching (fast-levenshtein)",
-      "Dynamic loaders for auto-registration of commands, events, and UI components",
-      "Deployed on Discloud with backup/rollback support and GitHub Pages landing page",
+      "Persistence and scaling: MongoDB-backed storage for infractions, giveaways, reaction roles, message counts, and ticketing state.",
+      "Algorithmic moderation: replaced massive manual banned-word variants with fuzzy matching via fast-levenshtein.",
+      "Data archiving: generated and stored 1,000+ support ticket transcripts through a GitHub Gist API integration.",
     ],
     links: {
       github: "https://github.com/rushinski/Discord-Bot-Unity",
@@ -1482,16 +1470,14 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
   const hasBuildSummary = (p.impact?.length || 0) > 0 || (p.architecture?.length || 0) > 0;
   const hasProjectLinks = !!(p.links?.github || p.links?.live || p.links?.landing);
   const hasVideoPreviews = (p.links?.videos?.length || 0) > 0;
-
-  const Section = ({ title, children }) => (
-    <fieldset style={{
-      border: "1px solid", borderColor: "#808080 #ffffff #ffffff #808080",
-      padding: "5px 8px 8px", marginBottom: 7, background: "#f7f7f7",
-    }}>
-      <legend style={{ fontSize: 10, fontWeight: 700, padding: "0 3px", background: "#d4d0c8", color: "#111" }}>{title}</legend>
-      {children}
-    </fieldset>
-  );
+  const sectionLabelStyle = {
+    fontSize: 10,
+    fontWeight: 700,
+    color: "#000080",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 4,
+  };
 
   return (
     <div style={{ flex: 1, overflowY: "auto", minHeight: 0, background: "#d4d0c8", padding: "8px 9px" }}>
@@ -1513,243 +1499,244 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
           </button>
         </div>
       )}
-      <div style={{
-        marginBottom: 8,
-        padding: "6px 8px",
-        background: "#c0c0c0",
-        border: "2px solid",
-        borderColor: "#ffffff #808080 #808080 #ffffff",
-      }}>
-        <div style={{ fontSize: 13, fontWeight: 800, color: "#0b2f6b", lineHeight: 1.35 }}>
+
+      <div
+        style={{
+          background: "#c0c0c0",
+          border: "2px solid",
+          borderColor: "#ffffff #808080 #808080 #ffffff",
+          padding: "8px 10px",
+        }}
+      >
+        <div style={{ fontSize: 14, fontWeight: 800, color: "#0b2f6b", lineHeight: 1.35 }}>
           {p.title}
         </div>
         <div style={{ display: "flex", gap: 5, marginTop: 5, alignItems: "center", flexWrap: "wrap" }}>
-          <span style={{
-            padding: "1px 7px", fontSize: 10, fontWeight: 700,
-            background: isIP ? "#ffff80" : "#80ff80", border: "1px solid #808080",
-          }}>
+          <span style={{ padding: "1px 7px", fontSize: 10, fontWeight: 700, background: isIP ? "#ffff80" : "#80ff80", border: "1px solid #808080" }}>
             {isIP ? "In Progress" : "Complete"}
           </span>
-          <span style={{
-            fontSize: 10, border: "1px solid", padding: "1px 6px",
-            borderColor: "#808080 #ffffff #ffffff #808080", background: "#d4d0c8",
-          }}>{p.date}</span>
+          <span style={{ fontSize: 10, border: "1px solid", padding: "1px 6px", borderColor: "#808080 #ffffff #ffffff #808080", background: "#d4d0c8" }}>
+            {p.date}
+          </span>
         </div>
-        <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f", display: "grid", gap: 8 }}>
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 6, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, lineHeight: "18px" }}>
-              Stack
-            </span>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, flex: 1, minWidth: 0 }}>
-              {p.stack.map((t) => {
-                const iconFile = SKILL_ICON_FILES[t];
+
+        <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
+          <div style={{ ...sectionLabelStyle, marginBottom: 5 }}>Stack</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {p.stack.map((t) => {
+              const iconFile = SKILL_ICON_FILES[t];
+              return (
+                <span
+                  key={t}
+                  style={{
+                    padding: "1px 6px",
+                    fontSize: 10,
+                    background: "#d4d0c8",
+                    border: "1px solid",
+                    borderColor: "#ffffff #808080 #808080 #ffffff",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 3,
+                  }}
+                >
+                  {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={11} height={11} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
+                  {t}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+
+        {hasProjectLinks && (
+          <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
+            <div style={sectionLabelStyle}>Links</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 6 }}>
+              {p.links?.github && (
+                <button
+                  onClick={() => window.open(p.links.github, "_blank", "noopener,noreferrer")}
+                  style={{
+                    padding: "5px 7px",
+                    fontSize: 10,
+                    background: "#d4d0c8",
+                    fontFamily: "inherit",
+                    border: "2px solid",
+                    borderColor: "#ffffff #808080 #808080 #ffffff",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: 2,
+                    textAlign: "left",
+                    minWidth: 0,
+                  }}
+                >
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111", minWidth: 0 }}>
+                    <img src="/skills/github.png" alt="github" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {ghRepo?.name || p.links.github.split("/").pop()}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {p.links.github}
+                  </div>
+                </button>
+              )}
+              {p.links?.live && (
+                <button
+                  onClick={() => window.open(p.links.live, "_blank", "noopener,noreferrer")}
+                  style={{
+                    padding: "5px 7px",
+                    fontSize: 10,
+                    background: "#d4d0c8",
+                    fontFamily: "inherit",
+                    border: "2px solid",
+                    borderColor: "#ffffff #808080 #808080 #ffffff",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: 2,
+                    textAlign: "left",
+                    minWidth: 0,
+                  }}
+                >
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111" }}>
+                    <span>🌐</span>
+                    <span>Live Site</span>
+                  </div>
+                  <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {p.links.live}
+                  </div>
+                </button>
+              )}
+              {p.links?.landing && (
+                <button
+                  onClick={() => window.open(p.links.landing, "_blank", "noopener,noreferrer")}
+                  style={{
+                    padding: "5px 7px",
+                    fontSize: 10,
+                    background: "#d4d0c8",
+                    fontFamily: "inherit",
+                    border: "2px solid",
+                    borderColor: "#ffffff #808080 #808080 #ffffff",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: 2,
+                    textAlign: "left",
+                    minWidth: 0,
+                  }}
+                >
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111" }}>
+                    <span>📄</span>
+                    <span>Landing Page</span>
+                  </div>
+                  <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {p.links.landing}
+                  </div>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {hasVideoPreviews && (
+          <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
+            <div style={sectionLabelStyle}>Media</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 6 }}>
+              {p.links.videos.map((video, idx) => {
+                const previewVideo = VIDEO_LIBRARY_BY_ID[video.id] || {
+                  ...video,
+                  id: video.id || `preview-${idx}`,
+                  projectTitle: p.title,
+                };
                 return (
-                  <span key={t} style={{
-                    padding: "1px 6px", fontSize: 10, background: "#d4d0c8",
-                    border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                    display: "inline-flex", alignItems: "center", gap: 3,
-                  }}>
-                    {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={11} height={11} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
-                    {t}
-                  </span>
+                  <VideoPreviewCard
+                    key={previewVideo.id}
+                    video={previewVideo}
+                    onOpen={onOpenVideo}
+                  />
                 );
               })}
             </div>
           </div>
+        )}
 
-          {hasProjectLinks && (
-            <div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
-                Links
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 6 }}>
-                {p.links?.github && (
-                  <button
-                    onClick={() => window.open(p.links.github, "_blank", "noopener,noreferrer")}
-                    style={{
-                      padding: "5px 7px",
-                      fontSize: 10,
-                      background: "#d4d0c8",
-                      fontFamily: "inherit",
-                      border: "2px solid",
-                      borderColor: "#ffffff #808080 #808080 #ffffff",
-                      cursor: "pointer",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: 2,
-                      textAlign: "left",
-                      minWidth: 0,
-                    }}
-                  >
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111", minWidth: 0 }}>
-                      <img src="/skills/github.png" alt="github" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
-                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {ghRepo?.name || p.links.github.split("/").pop()}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {p.links.github}
-                    </div>
-                  </button>
-                )}
-                {p.links?.live && (
-                  <button
-                    onClick={() => window.open(p.links.live, "_blank", "noopener,noreferrer")}
-                    style={{
-                      padding: "5px 7px",
-                      fontSize: 10,
-                      background: "#d4d0c8",
-                      fontFamily: "inherit",
-                      border: "2px solid",
-                      borderColor: "#ffffff #808080 #808080 #ffffff",
-                      cursor: "pointer",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: 2,
-                      textAlign: "left",
-                      minWidth: 0,
-                    }}
-                  >
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111" }}>
-                      <span>🌐</span>
-                      <span>Live Site</span>
-                    </div>
-                    <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {p.links.live}
-                    </div>
-                  </button>
-                )}
-                {p.links?.landing && (
-                  <button
-                    onClick={() => window.open(p.links.landing, "_blank", "noopener,noreferrer")}
-                    style={{
-                      padding: "5px 7px",
-                      fontSize: 10,
-                      background: "#d4d0c8",
-                      fontFamily: "inherit",
-                      border: "2px solid",
-                      borderColor: "#ffffff #808080 #808080 #ffffff",
-                      cursor: "pointer",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: 2,
-                      textAlign: "left",
-                      minWidth: 0,
-                    }}
-                  >
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111" }}>
-                      <span>📄</span>
-                      <span>Landing Page</span>
-                    </div>
-                    <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {p.links.landing}
-                    </div>
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {hasVideoPreviews && (
-            <div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
-                Media
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 6 }}>
-                {p.links.videos.map((video, idx) => {
-                  const previewVideo = VIDEO_LIBRARY_BY_ID[video.id] || {
-                    ...video,
-                    id: video.id || `preview-${idx}`,
-                    projectTitle: p.title,
-                  };
-                  return (
-                    <VideoPreviewCard
-                      key={previewVideo.id}
-                      video={previewVideo}
-                      onOpen={onOpenVideo}
-                    />
-                  );
-                })}
-              </div>
+        <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
+          <div style={sectionLabelStyle}>Overview</div>
+          <div style={{ fontSize: 11, lineHeight: 1.65, color: "#111" }}>{p.desc}</div>
+          {p.narrative && (
+            <div style={{ marginTop: 7 }}>
+              <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>Context</div>
+              <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", fontStyle: "italic" }}>{p.narrative}</div>
             </div>
           )}
         </div>
-      </div>
 
-      <Section title="Overview">
-        <div style={{ fontSize: 11, lineHeight: 1.65, color: "#111" }}>{p.desc}</div>
-        {p.narrative && (
-          <div style={{ marginTop: 7 }}>
-            <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>
-              Context
-            </div>
-            <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", fontStyle: "italic" }}>{p.narrative}</div>
+        {hasBuildSummary && (
+          <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
+            <div style={sectionLabelStyle}>Build & Results</div>
+            {p.impact?.length > 0 && (
+              <div style={{ marginBottom: p.architecture?.length > 0 ? 8 : 0 }}>
+                <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>Results</div>
+                {p.impact.map((item, j) => (
+                  <div key={`impact-${j}`} style={{ fontSize: 11, color: "#111", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.55 }}>
+                    <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+                    {item}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {p.architecture?.length > 0 && (
+              <div>
+                <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>Implementation</div>
+                {p.architecture.map((item, j) => (
+                  <div
+                    key={`arch-${j}`}
+                    style={{
+                      fontSize: 11,
+                      color: "#111",
+                      lineHeight: 1.6,
+                      padding: "2px 0 2px 14px",
+                      position: "relative",
+                      borderBottom: j < p.architecture.length - 1 ? "1px dotted #a8a8a8" : "none",
+                    }}
+                  >
+                    <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>»</span>
+                    {item}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
-      </Section>
 
-      {hasBuildSummary && (
-        <Section title="Build & Results">
-          {p.impact?.length > 0 && (
-            <div style={{ marginBottom: p.architecture?.length > 0 ? 8 : 0 }}>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>
-                Results
+        {(p.highlight || p.differently || p.outcome) && (
+          <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
+            <div style={sectionLabelStyle}>Reflection</div>
+            {p.highlight && (
+              <div style={{ marginBottom: p.differently || p.outcome ? 8 : 0 }}>
+                <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>Technical Notes</div>
+                <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", whiteSpace: "pre-line" }}>{p.highlight}</div>
               </div>
-              {p.impact.map((item, j) => (
-                <div key={`impact-${j}`} style={{ fontSize: 11, color: "#111", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.55 }}>
-                  <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
-                  {item}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {p.architecture?.length > 0 && (
-            <div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>
-                Implementation
+            )}
+            {p.differently && (
+              <div style={{ marginBottom: p.outcome ? 8 : 0 }}>
+                <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>What I&apos;d Do Differently</div>
+                <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.differently}</div>
               </div>
-              {p.architecture.map((item, j) => (
-                <div key={`arch-${j}`} style={{
-                  fontSize: 11, color: "#111", lineHeight: 1.6,
-                  padding: "2px 0 2px 14px", position: "relative",
-                  borderBottom: j < p.architecture.length - 1 ? "1px dotted #d0d0d0" : "none",
-                }}>
-                  <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>»</span>
-                  {item}
-                </div>
-              ))}
-            </div>
-          )}
-        </Section>
-      )}
-
-      {(p.highlight || p.differently || p.outcome) && (
-        <Section title="Reflection">
-          {p.highlight && (
-            <div style={{ marginBottom: p.differently || p.outcome ? 8 : 0 }}>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>Technical Notes</div>
-              <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", whiteSpace: "pre-line" }}>{p.highlight}</div>
-            </div>
-          )}
-          {p.differently && (
-            <div style={{ marginBottom: p.outcome ? 8 : 0 }}>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>What I&apos;d Do Differently</div>
-              <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.differently}</div>
-            </div>
-          )}
-          {p.outcome && (
-            <div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 }}>Outcome</div>
-              <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.outcome}</div>
-            </div>
-          )}
-        </Section>
-      )}
-
+            )}
+            {p.outcome && (
+              <div>
+                <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>Outcome</div>
+                <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.outcome}</div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
