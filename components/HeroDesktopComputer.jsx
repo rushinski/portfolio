@@ -1470,17 +1470,51 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
   const hasBuildSummary = (p.impact?.length || 0) > 0 || (p.architecture?.length || 0) > 0;
   const hasProjectLinks = !!(p.links?.github || p.links?.live || p.links?.landing);
   const hasVideoPreviews = (p.links?.videos?.length || 0) > 0;
-  const sectionLabelStyle = {
+  const hasReflection = !!(p.highlight || p.differently || p.outcome);
+
+  const fieldsetStyle = {
+    border: "1px solid",
+    borderColor: "#808080 #ffffff #ffffff #808080",
+    padding: "10px 10px 10px",
+    minWidth: 0,
+    margin: 0,
+  };
+
+  const legendStyle = {
     fontSize: 10,
     fontWeight: 700,
     color: "#000080",
     textTransform: "uppercase",
     letterSpacing: 1,
-    marginBottom: 4,
+    padding: "0 4px",
+  };
+
+  const subLabelStyle = {
+    fontSize: 9,
+    fontWeight: 700,
+    color: "#000080",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 5,
+  };
+
+  const linkBtnStyle = {
+    padding: "4px 8px",
+    fontSize: 10,
+    background: "#c0c0c0",
+    fontFamily: "inherit",
+    border: "2px solid",
+    borderColor: "#ffffff #808080 #808080 #ffffff",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    textAlign: "left",
+    width: "100%",
   };
 
   return (
-    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, background: "#d4d0c8", padding: "8px 9px" }}>
+    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, background: "#d4d0c8", padding: "8px 10px 14px" }}>
       {onBackToList && (
         <div style={{ marginBottom: 8 }}>
           <button
@@ -1495,247 +1529,174 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
               cursor: "pointer",
             }}
           >
-            {"<"} Back to Projects
+            ◄ Back to Projects
           </button>
         </div>
       )}
 
-      <div
-        style={{
-          background: "#c0c0c0",
-          border: "2px solid",
-          borderColor: "#ffffff #808080 #808080 #ffffff",
-          padding: "8px 10px",
-        }}
-      >
-        <div style={{ fontSize: 14, fontWeight: 800, color: "#0b2f6b", lineHeight: 1.35 }}>
-          {p.title}
-        </div>
-        <div style={{ display: "flex", gap: 5, marginTop: 5, alignItems: "center", flexWrap: "wrap" }}>
-          <span style={{ padding: "1px 7px", fontSize: 10, fontWeight: 700, background: isIP ? "#ffff80" : "#80ff80", border: "1px solid #808080" }}>
-            {isIP ? "In Progress" : "Complete"}
-          </span>
-          <span style={{ fontSize: 10, border: "1px solid", padding: "1px 6px", borderColor: "#808080 #ffffff #ffffff #808080", background: "#d4d0c8" }}>
-            {p.date}
-          </span>
-        </div>
+      <div style={{ border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8", overflow: "hidden" }}>
 
-        <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
-          <div style={{ ...sectionLabelStyle, marginBottom: 5 }}>Stack</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-            {p.stack.map((t) => {
-              const iconFile = SKILL_ICON_FILES[t];
-              return (
-                <span
-                  key={t}
-                  style={{
-                    padding: "1px 6px",
-                    fontSize: 10,
-                    background: "#d4d0c8",
-                    border: "1px solid",
-                    borderColor: "#ffffff #808080 #808080 #ffffff",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 3,
-                  }}
-                >
-                  {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={11} height={11} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
-                  {t}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-
-        {hasProjectLinks && (
-          <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
-            <div style={sectionLabelStyle}>Links</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 6 }}>
-              {p.links?.github && (
-                <button
-                  onClick={() => window.open(p.links.github, "_blank", "noopener,noreferrer")}
-                  style={{
-                    padding: "5px 7px",
-                    fontSize: 10,
-                    background: "#d4d0c8",
-                    fontFamily: "inherit",
-                    border: "2px solid",
-                    borderColor: "#ffffff #808080 #808080 #ffffff",
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    gap: 2,
-                    textAlign: "left",
-                    minWidth: 0,
-                  }}
-                >
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111", minWidth: 0 }}>
-                    <img src="/skills/github.png" alt="github" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
-                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {ghRepo?.name || p.links.github.split("/").pop()}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {p.links.github}
-                  </div>
-                </button>
-              )}
-              {p.links?.live && (
-                <button
-                  onClick={() => window.open(p.links.live, "_blank", "noopener,noreferrer")}
-                  style={{
-                    padding: "5px 7px",
-                    fontSize: 10,
-                    background: "#d4d0c8",
-                    fontFamily: "inherit",
-                    border: "2px solid",
-                    borderColor: "#ffffff #808080 #808080 #ffffff",
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    gap: 2,
-                    textAlign: "left",
-                    minWidth: 0,
-                  }}
-                >
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111" }}>
-                    <span>🌐</span>
-                    <span>Live Site</span>
-                  </div>
-                  <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {p.links.live}
-                  </div>
-                </button>
-              )}
-              {p.links?.landing && (
-                <button
-                  onClick={() => window.open(p.links.landing, "_blank", "noopener,noreferrer")}
-                  style={{
-                    padding: "5px 7px",
-                    fontSize: 10,
-                    background: "#d4d0c8",
-                    fontFamily: "inherit",
-                    border: "2px solid",
-                    borderColor: "#ffffff #808080 #808080 #ffffff",
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    gap: 2,
-                    textAlign: "left",
-                    minWidth: 0,
-                  }}
-                >
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700, color: "#111" }}>
-                    <span>📄</span>
-                    <span>Landing Page</span>
-                  </div>
-                  <div style={{ fontSize: 9, color: "#3d3d3d", width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {p.links.landing}
-                  </div>
-                </button>
-              )}
+        {/* Header */}
+        <div style={{ background: "linear-gradient(to right, #000080 0%, #1084d0 100%)", padding: "10px 14px 12px" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "#ffffff", lineHeight: 1.25 }}>{p.title}</div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.65)", marginTop: 4 }}>{p.date}</div>
             </div>
+            <span style={{
+              flexShrink: 0,
+              padding: "2px 8px",
+              fontSize: 10,
+              fontWeight: 700,
+              background: isIP ? "#ffff80" : "#80ff80",
+              color: "#000",
+              border: "1px solid rgba(0,0,0,0.25)",
+              alignSelf: "center",
+            }}>
+              {isIP ? "IN PROGRESS" : "COMPLETE"}
+            </span>
           </div>
-        )}
+        </div>
 
-        {hasVideoPreviews && (
-          <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
-            <div style={sectionLabelStyle}>Media</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 6 }}>
-              {p.links.videos.map((video, idx) => {
-                const previewVideo = VIDEO_LIBRARY_BY_ID[video.id] || {
-                  ...video,
-                  id: video.id || `preview-${idx}`,
-                  projectTitle: p.title,
-                };
+        {/* Body */}
+        <div style={{ padding: "12px 12px 12px", display: "flex", flexDirection: "column", gap: 10 }}>
+
+          {/* Stack */}
+          <fieldset style={fieldsetStyle}>
+            <legend style={legendStyle}>Stack</legend>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+              {p.stack.map((t) => {
+                const iconFile = SKILL_ICON_FILES[t];
                 return (
-                  <VideoPreviewCard
-                    key={previewVideo.id}
-                    video={previewVideo}
-                    onOpen={onOpenVideo}
-                  />
+                  <span key={t} style={{ padding: "2px 7px", fontSize: 10, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", display: "inline-flex", alignItems: "center", gap: 3 }}>
+                    {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
+                    {t}
+                  </span>
                 );
               })}
             </div>
-          </div>
-        )}
+          </fieldset>
 
-        <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
-          <div style={sectionLabelStyle}>Overview</div>
-          <div style={{ fontSize: 11, lineHeight: 1.65, color: "#111" }}>{p.desc}</div>
-          {p.narrative && (
-            <div style={{ marginTop: 7 }}>
-              <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>Context</div>
-              <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", fontStyle: "italic" }}>{p.narrative}</div>
+          {/* Links + Videos side-by-side */}
+          {(hasProjectLinks || hasVideoPreviews) && (
+            <div style={{ display: "grid", gridTemplateColumns: hasProjectLinks && hasVideoPreviews ? "1fr 1fr" : "1fr", gap: 10 }}>
+              {hasProjectLinks && (
+                <fieldset style={fieldsetStyle}>
+                  <legend style={legendStyle}>Links</legend>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    {p.links?.github && (
+                      <button onClick={() => window.open(p.links.github, "_blank", "noopener,noreferrer")} style={linkBtnStyle}>
+                        <img src="/skills/github.png" alt="github" width={13} height={13} style={{ imageRendering: "pixelated", flexShrink: 0 }} />
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{ fontWeight: 700, color: "#000", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {ghRepo?.name || p.links.github.split("/").pop()}
+                          </div>
+                          <div style={{ fontSize: 9, color: "#555", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.links.github}</div>
+                        </div>
+                      </button>
+                    )}
+                    {p.links?.live && (
+                      <button onClick={() => window.open(p.links.live, "_blank", "noopener,noreferrer")} style={linkBtnStyle}>
+                        <span style={{ fontSize: 13, flexShrink: 0 }}>🌐</span>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{ fontWeight: 700, color: "#000" }}>Live Site</div>
+                          <div style={{ fontSize: 9, color: "#555", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.links.live}</div>
+                        </div>
+                      </button>
+                    )}
+                    {p.links?.landing && (
+                      <button onClick={() => window.open(p.links.landing, "_blank", "noopener,noreferrer")} style={linkBtnStyle}>
+                        <span style={{ fontSize: 13, flexShrink: 0 }}>📄</span>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{ fontWeight: 700, color: "#000" }}>Landing Page</div>
+                          <div style={{ fontSize: 9, color: "#555", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.links.landing}</div>
+                        </div>
+                      </button>
+                    )}
+                  </div>
+                </fieldset>
+              )}
+              {hasVideoPreviews && (
+                <fieldset style={fieldsetStyle}>
+                  <legend style={legendStyle}>Media</legend>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    {p.links.videos.map((video, idx) => {
+                      const previewVideo = VIDEO_LIBRARY_BY_ID[video.id] || { ...video, id: video.id || `preview-${idx}`, projectTitle: p.title };
+                      return <VideoPreviewCard key={previewVideo.id} video={previewVideo} onOpen={onOpenVideo} />;
+                    })}
+                  </div>
+                </fieldset>
+              )}
             </div>
           )}
+
+          {/* Overview */}
+          <fieldset style={fieldsetStyle}>
+            <legend style={legendStyle}>Overview</legend>
+            <div style={{ fontSize: 11, lineHeight: 1.7, color: "#111" }}>{p.desc}</div>
+            {p.narrative && (
+              <div style={{ marginTop: 9, padding: "7px 9px", background: "#c8c4bc", borderTop: "1px solid #808080", borderRight: "1px solid #ffffff", borderBottom: "1px solid #ffffff", borderLeft: "3px solid #000080" }}>
+                <div style={subLabelStyle}>Context</div>
+                <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", fontStyle: "italic" }}>{p.narrative}</div>
+              </div>
+            )}
+          </fieldset>
+
+          {/* Build & Results */}
+          {hasBuildSummary && (
+            <fieldset style={fieldsetStyle}>
+              <legend style={legendStyle}>Build & Results</legend>
+              {p.impact?.length > 0 && (
+                <div style={{ marginBottom: p.architecture?.length > 0 ? 10 : 0 }}>
+                  <div style={subLabelStyle}>Results</div>
+                  {p.impact.map((item, j) => (
+                    <div key={`impact-${j}`} style={{ fontSize: 11, color: "#111", padding: "2px 0 2px 14px", position: "relative", lineHeight: 1.6 }}>
+                      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {p.architecture?.length > 0 && (
+                <div>
+                  <div style={subLabelStyle}>Implementation</div>
+                  {p.architecture.map((item, j) => (
+                    <div key={`arch-${j}`} style={{ fontSize: 11, color: "#111", lineHeight: 1.65, padding: "4px 0 4px 14px", position: "relative", borderBottom: j < p.architecture.length - 1 ? "1px dotted #a0a0a0" : "none" }}>
+                      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>»</span>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </fieldset>
+          )}
+
+          {/* Reflection */}
+          {hasReflection && (
+            <fieldset style={fieldsetStyle}>
+              <legend style={legendStyle}>Reflection</legend>
+              {p.highlight && (
+                <div style={{ marginBottom: p.differently || p.outcome ? 10 : 0 }}>
+                  <div style={subLabelStyle}>Technical Notes</div>
+                  <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.highlight}</div>
+                </div>
+              )}
+              {p.differently && (
+                <div style={{ marginBottom: p.outcome ? 10 : 0 }}>
+                  <div style={subLabelStyle}>What I&apos;d Do Differently</div>
+                  <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.differently}</div>
+                </div>
+              )}
+              {p.outcome && (
+                <div>
+                  <div style={subLabelStyle}>Outcome</div>
+                  <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.outcome}</div>
+                </div>
+              )}
+            </fieldset>
+          )}
+
         </div>
-
-        {hasBuildSummary && (
-          <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
-            <div style={sectionLabelStyle}>Build & Results</div>
-            {p.impact?.length > 0 && (
-              <div style={{ marginBottom: p.architecture?.length > 0 ? 8 : 0 }}>
-                <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>Results</div>
-                {p.impact.map((item, j) => (
-                  <div key={`impact-${j}`} style={{ fontSize: 11, color: "#111", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.55 }}>
-                    <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
-                    {item}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {p.architecture?.length > 0 && (
-              <div>
-                <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>Implementation</div>
-                {p.architecture.map((item, j) => (
-                  <div
-                    key={`arch-${j}`}
-                    style={{
-                      fontSize: 11,
-                      color: "#111",
-                      lineHeight: 1.6,
-                      padding: "2px 0 2px 14px",
-                      position: "relative",
-                      borderBottom: j < p.architecture.length - 1 ? "1px dotted #a8a8a8" : "none",
-                    }}
-                  >
-                    <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>»</span>
-                    {item}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {(p.highlight || p.differently || p.outcome) && (
-          <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #8f8f8f" }}>
-            <div style={sectionLabelStyle}>Reflection</div>
-            {p.highlight && (
-              <div style={{ marginBottom: p.differently || p.outcome ? 8 : 0 }}>
-                <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>Technical Notes</div>
-                <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333", whiteSpace: "pre-line" }}>{p.highlight}</div>
-              </div>
-            )}
-            {p.differently && (
-              <div style={{ marginBottom: p.outcome ? 8 : 0 }}>
-                <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>What I&apos;d Do Differently</div>
-                <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.differently}</div>
-              </div>
-            )}
-            {p.outcome && (
-              <div>
-                <div style={{ ...sectionLabelStyle, marginBottom: 3, fontSize: 9 }}>Outcome</div>
-                <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.outcome}</div>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
