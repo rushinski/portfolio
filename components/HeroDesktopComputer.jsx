@@ -693,7 +693,10 @@ function Window({ win, isActive, onFocus, onClose, onMinimize, onMaximize, onMov
         opacity: isDragging ? 0.75 : 1,
         transition: isDragging ? "none" : "opacity 0.15s",
       }}
-      onPointerDown={(e) => { e.stopPropagation(); onFocus(); }}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        if (!isActive) onFocus();
+      }}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -1203,12 +1206,35 @@ function VideoPreviewCard({ video, onOpen }) {
         border: "2px solid",
         borderColor: "#ffffff #808080 #808080 #ffffff",
         background: "#c0c0c0",
-        padding: 4,
+        padding: 0,
         cursor: "pointer",
         textAlign: "left",
       }}
     >
-      <div style={{ position: "relative", background: "#000", paddingTop: "56.25%", overflow: "hidden" }}>
+      <div
+        style={{
+          background: "linear-gradient(to right, #000080, #1084d0)",
+          color: "#fff",
+          fontSize: 9,
+          fontWeight: 700,
+          padding: "2px 5px",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        Windows Media Player
+      </div>
+      <div
+        style={{
+          position: "relative",
+          background: "#000",
+          paddingTop: "56.25%",
+          overflow: "hidden",
+          margin: 3,
+          border: "2px inset #c0c0c0",
+        }}
+      >
         <video
           src={video.src}
           poster={video.poster || undefined}
@@ -1224,28 +1250,24 @@ function VideoPreviewCard({ video, onOpen }) {
             pointerEvents: "none",
           }}
         />
-        <div
-          style={{
-            position: "absolute",
-            right: 6,
-            bottom: 6,
-            background: "rgba(0, 0, 0, 0.65)",
-            color: "#fff",
-            padding: "2px 5px",
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: 0.4,
-            textTransform: "uppercase",
-          }}
-        >
-          Open in Videos
-        </div>
       </div>
-      <div style={{ marginTop: 5, fontSize: 10, fontWeight: 700, color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      <div style={{ margin: "0 4px 2px", fontSize: 10, fontWeight: 700, color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
         {video.label}
       </div>
-      <div style={{ fontSize: 9, color: "#333", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      <div style={{ margin: "0 4px 4px", fontSize: 9, color: "#333", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
         {video.projectTitle}
+      </div>
+      <div
+        style={{
+          fontSize: 9,
+          color: "#000080",
+          fontWeight: 700,
+          padding: "2px 4px",
+          borderTop: "1px solid #808080",
+          background: "#d4d0c8",
+        }}
+      >
+        Click to open in Videos
       </div>
     </button>
   );
@@ -1478,15 +1500,15 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
   const Section = ({ title, children }) => (
     <fieldset style={{
       border: "1px solid", borderColor: "#808080 #ffffff #ffffff #808080",
-      padding: "4px 8px 8px", marginBottom: 7, background: "#fff",
+      padding: "5px 8px 8px", marginBottom: 7, background: "#f7f7f7",
     }}>
-      <legend style={{ fontSize: 10, fontWeight: 700, padding: "0 3px", background: "#fff" }}>{title}</legend>
+      <legend style={{ fontSize: 10, fontWeight: 700, padding: "0 3px", background: "#d4d0c8", color: "#111" }}>{title}</legend>
       {children}
     </fieldset>
   );
 
   return (
-    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, background: "#fff", padding: "10px 12px" }}>
+    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, background: "#d4d0c8", padding: "8px 9px" }}>
       {onBackToList && (
         <div style={{ marginBottom: 8 }}>
           <button
@@ -1506,7 +1528,7 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
         </div>
       )}
       {/* header badge row */}
-      <div style={{ display: "flex", gap: 5, marginBottom: 10, alignItems: "center", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 5, marginBottom: 9, alignItems: "center", flexWrap: "wrap" }}>
         <span style={{
           padding: "1px 7px", fontSize: 10, fontWeight: 700,
           background: isIP ? "#ffff80" : "#80ff80", border: "1px solid #808080",
@@ -1522,9 +1544,6 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
             <span style={{ width: 9, height: 9, borderRadius: "50%", background: langColor, display: "inline-block" }} />
             {repoLang}
           </span>
-        )}
-        {ghRepo?.stargazers_count != null && (
-          <span style={{ fontSize: 10, color: "#000080", fontWeight: 700 }}>★ {ghRepo.stargazers_count}</span>
         )}
       </div>
 
@@ -1678,29 +1697,33 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
 
 function ProjectsApp({ onOpenVideo }) {
   const [navigation, setNavigation] = useState({
-    history: [{ type: "list" }],
-    idx: 0,
+    current: { type: "list" },
+    backStack: [],
+    forwardStack: [],
   });
   const [selected, setSelected] = useState(null);
   const [repoData, setRepoData] = useState({});
 
-  const currentView = navigation.history[navigation.idx] || { type: "list" };
-  const canGoBack = navigation.idx > 0;
-  const canGoForward = navigation.idx < navigation.history.length - 1;
+  const currentView = navigation.current || { type: "list" };
   const currentProject = currentView.type === "detail" ? PROJECTS[currentView.projectIdx] : null;
 
   const navigate = useCallback((view) => {
     setNavigation((prev) => {
-      const history = [...prev.history.slice(0, prev.idx + 1), view];
-      return { history, idx: history.length - 1 };
+      const isSameView = prev.current?.type === view.type
+        && prev.current?.projectIdx === view.projectIdx;
+      if (isSameView) return prev;
+      return {
+        current: view,
+        backStack: [...prev.backStack, prev.current],
+        forwardStack: [],
+      };
     });
   }, []);
-  const goBack = useCallback(() => {
-    setNavigation((prev) => (prev.idx > 0 ? { ...prev, idx: prev.idx - 1 } : prev));
-  }, []);
-  const goForward = useCallback(() => {
-    setNavigation((prev) => (prev.idx < prev.history.length - 1 ? { ...prev, idx: prev.idx + 1 } : prev));
-  }, []);
+
+  const openProjectDetail = useCallback((projectIdx) => {
+    if (projectIdx == null || projectIdx < 0 || projectIdx >= PROJECTS.length) return;
+    navigate({ type: "detail", projectIdx });
+  }, [navigate]);
 
   useEffect(() => {
     PROJECTS.forEach((p) => {
@@ -1714,78 +1737,11 @@ function ProjectsApp({ onOpenVideo }) {
     });
   }, []);
 
-  useEffect(() => {
-    const onKeyDown = (e) => {
-      if (e.altKey && e.key === "ArrowLeft") {
-        e.preventDefault();
-        goBack();
-      }
-      if (e.altKey && e.key === "ArrowRight") {
-        e.preventDefault();
-        goForward();
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [goBack, goForward]);
-
-  const currentPath = currentView.type === "list" || !currentProject
-    ? "C:\\Portfolio\\Projects"
-    : `C:\\Portfolio\\Projects\\${currentProject.title}`;
-
-  const NavBtn = ({ onClick, disabled, title, children }) => (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      title={title}
-      style={{
-        width: 26, height: 22, padding: 0, fontSize: 11,
-        background: disabled ? "#d4d4d4" : "#c0c0c0",
-        border: "1px solid", borderColor: disabled
-          ? "#c0c0c0 #a0a0a0 #a0a0a0 #c0c0c0"
-          : "#ffffff #808080 #808080 #ffffff",
-        cursor: disabled ? "default" : "pointer",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        color: disabled ? "#a0a0a0" : "#000", fontFamily: "inherit",
-      }}
-    >{children}</button>
-  );
-
   return (
     <div style={{
       height: "100%", display: "flex", flexDirection: "column",
-      background: "#c0c0c0", fontFamily: "inherit", overflow: "hidden",
+      background: "#d4d0c8", fontFamily: "inherit", overflow: "hidden",
     }}>
-      {/* ── Toolbar ── */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: 2, flexShrink: 0,
-        padding: "2px 4px", borderBottom: "1px solid #808080", background: "#c0c0c0",
-      }}>
-        <NavBtn onClick={goBack} disabled={!canGoBack} title="Back (Alt+Left)">◄</NavBtn>
-        <NavBtn onClick={goForward} disabled={!canGoForward} title="Forward (Alt+Right)">►</NavBtn>
-        {currentView.type === "detail" && (
-          <>
-            <div style={{ width: 1, height: 18, background: "#808080", margin: "0 2px", flexShrink: 0 }} />
-            <NavBtn onClick={() => navigate({ type: "list" })} title="Up to Projects">↑</NavBtn>
-          </>
-        )}
-      </div>
-
-      {/* ── Address bar ── */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: 4, flexShrink: 0,
-        padding: "2px 4px", borderBottom: "1px solid #808080",
-      }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "#000", flexShrink: 0 }}>Address</span>
-        <div style={{
-          flex: 1, padding: "1px 5px", fontSize: 10, background: "#fff",
-          border: "1px solid", borderColor: "#808080 #dfdfdf #dfdfdf #808080",
-          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-        }}>
-          {currentPath}
-        </div>
-      </div>
-
       {/* ── Content area ── */}
       {currentView.type === "list" ? (
         <>
@@ -1805,7 +1761,7 @@ function ProjectsApp({ onOpenVideo }) {
 
           {/* Project rows */}
           <div style={{
-            flex: 1, overflowY: "auto", minHeight: 0, background: "#fff",
+            flex: 1, overflowY: "auto", minHeight: 0, background: "#f8f8f8",
             border: "1px solid", borderColor: "#808080 #ffffff #ffffff #808080",
             margin: "0 2px",
           }}>
@@ -1816,7 +1772,7 @@ function ProjectsApp({ onOpenVideo }) {
                 <div
                   key={i}
                   onClick={() => setSelected(isSel ? null : i)}
-                  onDoubleClick={() => navigate({ type: "detail", projectIdx: i })}
+                  onDoubleClick={() => openProjectDetail(i)}
                   style={{
                     display: "grid", gridTemplateColumns: "1fr 82px 110px",
                     background: isSel ? "#000080" : "transparent",
@@ -1870,7 +1826,7 @@ function ProjectsApp({ onOpenVideo }) {
             </div>
             {selected !== null && (
               <button
-                onClick={() => navigate({ type: "detail", projectIdx: selected })}
+                onClick={() => openProjectDetail(selected)}
                 style={{
                   fontSize: 10, padding: "1px 10px", background: "#c0c0c0",
                   fontFamily: "inherit", flexShrink: 0,
@@ -3523,10 +3479,15 @@ export default function HeroDesktopComputerComponent() {
   }, []);
 
   const focusWindow = useCallback((id) => {
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], z: nextZ() },
-    }));
+    setWindows((prev) => {
+      if (!prev[id]) return prev;
+      const topZ = Object.values(prev).reduce((max, win) => Math.max(max, win.z), -Infinity);
+      if (prev[id].z === topZ) return prev;
+      return {
+        ...prev,
+        [id]: { ...prev[id], z: nextZ() },
+      };
+    });
   }, []);
 
   const moveWindow = useCallback((id, x, y) => {
