@@ -1471,22 +1471,25 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
   const hasVideoPreviews = (p.links?.videos?.length || 0) > 0;
   const hasReflection = !!(p.highlight || p.differently || p.outcome);
 
-  // Matches SkillsApp section label style exactly
   const secLabel = {
     fontSize: 10, fontWeight: 700, color: "#000080",
     textTransform: "uppercase", letterSpacing: 1,
     borderBottom: "1px solid #808080", paddingBottom: 3,
     marginBottom: 7, marginTop: 12,
   };
-  // Sub-labels inside a section (no border, smaller)
-  const subLabel = { fontSize: 9, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 3 };
 
-  // Render an architecture item — split "Bold Title: body text" if colon present
-  const archItem = (text, key) => {
+  const bullet = (text, key) => (
+    <div key={key} style={{ fontSize: 11, color: "#222", padding: "1px 0 2px 13px", position: "relative", lineHeight: 1.6 }}>
+      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+      {text}
+    </div>
+  );
+
+  const archBullet = (text, key) => {
     const ci = text.indexOf(": ");
     const hasPrefix = ci > 0 && ci < 55;
     return (
-      <div key={key} style={{ fontSize: 11, color: "#222", padding: "2px 0 3px 13px", position: "relative", lineHeight: 1.6 }}>
+      <div key={key} style={{ fontSize: 11, color: "#222", padding: "1px 0 3px 13px", position: "relative", lineHeight: 1.6 }}>
         <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
         {hasPrefix
           ? <><strong style={{ color: "#111" }}>{text.slice(0, ci)}:</strong>{" "}{text.slice(ci + 2)}</>
@@ -1513,30 +1516,33 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
 
       <div style={{ border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8" }}>
 
-        {/* Header — same pattern as ExperienceApp entries */}
-        <div style={{
-          background: "linear-gradient(to right, #000080, #1084d0)",
-          padding: "5px 10px", display: "flex", alignItems: "flex-start",
-          justifyContent: "space-between", flexWrap: "wrap", gap: 6,
-        }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 800, fontSize: 13, color: "#fff", lineHeight: 1.3 }}>{p.title}</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>{p.date}</div>
+        {/* Header */}
+        <div style={{ background: "linear-gradient(to right, #000080, #1084d0)", padding: "6px 10px" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
+            <div style={{ fontWeight: 800, fontSize: 13, color: "#fff", lineHeight: 1.2, flex: 1, minWidth: 0 }}>{p.title}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+              <span style={{ fontSize: 9, color: "rgba(255,255,255,0.6)" }}>{p.date}</span>
+              <span style={{ padding: "1px 7px", fontSize: 10, fontWeight: 700, background: isIP ? "#ffff80" : "#80ff80", color: "#000", border: "1px solid rgba(0,0,0,0.2)" }}>
+                {isIP ? "In Progress" : "Complete"}
+              </span>
+            </div>
           </div>
-          <span style={{
-            padding: "1px 7px", fontSize: 10, fontWeight: 700,
-            background: isIP ? "#ffff80" : "#80ff80", color: "#000",
-            border: "1px solid rgba(0,0,0,0.2)", flexShrink: 0, alignSelf: "center",
-          }}>
-            {isIP ? "In Progress" : "Complete"}
-          </span>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.75)", lineHeight: 1.4, fontStyle: "italic" }}>{p.desc}</div>
         </div>
 
         {/* Body */}
-        <div style={{ padding: "4px 10px 10px" }}>
+        <div style={{ padding: "4px 10px 12px" }}>
+
+          {/* IMPACT — first thing a recruiter sees */}
+          {p.impact?.length > 0 && (
+            <>
+              <div style={{ ...secLabel, marginTop: 8 }}>Impact</div>
+              {p.impact.map((item, j) => bullet(item, `impact-${j}`))}
+            </>
+          )}
 
           {/* Stack */}
-          <div style={{ ...secLabel, marginTop: 8 }}>Stack</div>
+          <div style={secLabel}>Stack</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
             {p.stack.map((t) => {
               const iconFile = SKILL_ICON_FILES[t];
@@ -1559,39 +1565,18 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
               <div style={secLabel}>Links</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {p.links?.github && (
-                  <button
-                    onClick={() => window.open(p.links.github, "_blank", "noopener,noreferrer")}
-                    style={{
-                      padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
-                      border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                      cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5,
-                    }}
-                  >
+                  <button onClick={() => window.open(p.links.github, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
                     <img src="/skills/github.png" alt="github" width={11} height={11} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
                     {ghRepo?.name || p.links.github.split("/").pop()}
                   </button>
                 )}
                 {p.links?.live && (
-                  <button
-                    onClick={() => window.open(p.links.live, "_blank", "noopener,noreferrer")}
-                    style={{
-                      padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
-                      border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                      cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5,
-                    }}
-                  >
+                  <button onClick={() => window.open(p.links.live, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
                     🌐 Live Site
                   </button>
                 )}
                 {p.links?.landing && (
-                  <button
-                    onClick={() => window.open(p.links.landing, "_blank", "noopener,noreferrer")}
-                    style={{
-                      padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit",
-                      border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                      cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5,
-                    }}
-                  >
+                  <button onClick={() => window.open(p.links.landing, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
                     📄 Landing Page
                   </button>
                 )}
@@ -1607,15 +1592,7 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
                 {p.links.videos.map((video, idx) => {
                   const vd = VIDEO_LIBRARY_BY_ID[video.id] || { ...video, id: video.id || `preview-${idx}`, projectTitle: p.title };
                   return (
-                    <button
-                      key={vd.id}
-                      onClick={() => onOpenVideo?.(vd.id)}
-                      style={{
-                        border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                        background: "#c0c0c0", padding: 0, cursor: "pointer",
-                        textAlign: "left", display: "flex", alignItems: "stretch",
-                      }}
-                    >
+                    <button key={vd.id} onClick={() => onOpenVideo?.(vd.id)} style={{ border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#c0c0c0", padding: 0, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "stretch" }}>
                       <div style={{ width: 96, flexShrink: 0, background: "#000", margin: 3, border: "1px solid #606060", overflow: "hidden" }}>
                         <video src={vd.src} muted preload="metadata" playsInline style={{ width: "100%", height: 54, objectFit: "cover", display: "block", pointerEvents: "none" }} />
                       </div>
@@ -1630,61 +1607,21 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
             </>
           )}
 
-          {/* Overview — the pitch */}
-          <div style={secLabel}>Overview</div>
-          <div style={{ fontSize: 11, lineHeight: 1.65, color: "#222" }}>{p.desc}</div>
-
-          {/* The Challenge */}
-          {p.narrative && (
-            <>
-              <div style={secLabel}>The Challenge</div>
-              <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.narrative}</div>
-            </>
-          )}
-
-          {/* Technical Deep Dive */}
+          {/* How I Built It */}
           {p.architecture?.length > 0 && (
             <>
-              <div style={secLabel}>Technical Deep Dive</div>
-              {p.architecture.map((item, j) => archItem(item, `arch-${j}`))}
+              <div style={secLabel}>How I Built It</div>
+              {p.architecture.map((item, j) => archBullet(item, `arch-${j}`))}
             </>
           )}
 
-          {/* Results / Impact */}
-          {p.impact?.length > 0 && (
-            <>
-              <div style={secLabel}>Results</div>
-              {p.impact.map((item, j) => (
-                <div key={`impact-${j}`} style={{ fontSize: 11, color: "#222", padding: "1px 0 2px 13px", position: "relative", lineHeight: 1.6 }}>
-                  <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
-                  {item}
-                </div>
-              ))}
-            </>
-          )}
-
-          {/* Reflection */}
+          {/* Reflection — condensed to bullets, no sub-headers */}
           {hasReflection && (
             <>
               <div style={secLabel}>Reflection</div>
-              {p.highlight && (
-                <div style={{ marginBottom: p.differently || p.outcome ? 9 : 0 }}>
-                  <div style={subLabel}>Technical Notes</div>
-                  <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.highlight}</div>
-                </div>
-              )}
-              {p.differently && (
-                <div style={{ marginBottom: p.outcome ? 9 : 0 }}>
-                  <div style={subLabel}>What I&apos;d Do Differently</div>
-                  <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.differently}</div>
-                </div>
-              )}
-              {p.outcome && (
-                <div>
-                  <div style={subLabel}>Outcome</div>
-                  <div style={{ fontSize: 11, lineHeight: 1.65, color: "#333" }}>{p.outcome}</div>
-                </div>
-              )}
+              {p.highlight && bullet(p.highlight, "hl")}
+              {p.differently && bullet(`Would do differently: ${p.differently}`, "diff")}
+              {p.outcome && bullet(p.outcome, "out")}
             </>
           )}
 
@@ -1743,101 +1680,63 @@ function ProjectsApp({ onOpenVideo }) {
     }}>
       {/* ── Content area ── */}
       {currentView.type === "list" ? (
-        <>
-          {/* Column headers */}
-          <div style={{
-            display: "grid", gridTemplateColumns: "1fr 82px 110px",
-            background: "#c0c0c0", userSelect: "none", flexShrink: 0,
-          }}>
-            {["Name", "Status", "Date"].map((col) => (
-              <div key={col} style={{
-                padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "default",
-                border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                background: "#c0c0c0",
-              }}>{col}</div>
-            ))}
-          </div>
-
-          {/* Project rows */}
-          <div style={{
-            flex: 1, overflowY: "auto", minHeight: 0, background: "#f8f8f8",
-            border: "1px solid", borderColor: "#808080 #ffffff #ffffff #808080",
-            margin: "0 2px",
-          }}>
-            {PROJECTS.map((p, i) => {
-              const isSel = selected === i;
-              const isIP = p.status === "IN_PROGRESS";
-              return (
-                <div
-                  key={i}
-                  onClick={() => setSelected(isSel ? null : i)}
-                  onDoubleClick={() => openProjectDetail(i)}
-                  style={{
-                    display: "grid", gridTemplateColumns: "1fr 82px 110px",
-                    background: isSel ? "#000080" : "transparent",
-                    color: isSel ? "#fff" : "#000",
-                    cursor: "default", userSelect: "none",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  <div style={{ padding: "4px 8px", display: "flex", alignItems: "center", gap: 6, fontSize: 11, minWidth: 0 }}>
-                    {/* small inline project icon */}
-                    <svg width="16" height="16" viewBox="0 0 32 32" style={{ flexShrink: 0 }}>
-                      <rect x="1" y="10" width="30" height="20" fill="#800080" stroke="#500050" strokeWidth="1"/>
-                      <path d="M1,10 L1,6 L13,6 L16,10 Z" fill="#700070" stroke="#500050" strokeWidth="1"/>
-                      <rect x="2" y="11" width="28" height="18" fill="#c030c0"/>
-                      <line x1="3" y1="12" x2="29" y2="12" stroke="#e080e0" strokeWidth="1.5"/>
-                      <path d="M10,16 L8,20 L10,24" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M22,16 L24,20 L22,24" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                      <line x1="19" y1="15" x2="13" y2="25" stroke="#ffff80" strokeWidth="1.5" strokeLinecap="round"/>
-                    </svg>
-                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</span>
+        <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "10px 12px", background: "#c0c0c0" }}>
+          {PROJECTS.map((proj, i) => {
+            const isIP = proj.status === "IN_PROGRESS";
+            return (
+              <div
+                key={i}
+                onDoubleClick={() => openProjectDetail(i)}
+                style={{
+                  marginBottom: 10, cursor: "default", userSelect: "none",
+                  border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                  background: "#d4d0c8",
+                }}
+              >
+                {/* Card header */}
+                <div style={{
+                  background: "linear-gradient(to right, #000080, #1084d0)",
+                  padding: "5px 10px", display: "flex", alignItems: "center",
+                  justifyContent: "space-between", gap: 8,
+                }}>
+                  <div style={{ fontWeight: 700, fontSize: 12, color: "#fff", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {proj.title}
                   </div>
-                  <div style={{ padding: "4px 8px", fontSize: 10, display: "flex", alignItems: "center" }}>
-                    <span style={{
-                      padding: "0 5px", fontWeight: 700, fontSize: 9,
-                      background: isSel ? "transparent" : (isIP ? "#ffff80" : "#80ff80"),
-                      color: isSel ? "#fff" : "#000",
-                      border: isSel ? "1px solid transparent" : "1px solid #808080",
-                    }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                    <span style={{ fontSize: 9, color: "rgba(255,255,255,0.6)" }}>{proj.date}</span>
+                    <span style={{ padding: "0 6px", fontSize: 9, fontWeight: 700, background: isIP ? "#ffff80" : "#80ff80", color: "#000", border: "1px solid rgba(0,0,0,0.2)" }}>
                       {isIP ? "In Progress" : "Complete"}
                     </span>
                   </div>
-                  <div style={{ padding: "4px 8px", fontSize: 10, display: "flex", alignItems: "center" }}>
-                    {p.date}
+                </div>
+                {/* Card body */}
+                <div style={{ padding: "6px 10px 8px" }}>
+                  <div style={{ fontSize: 11, color: "#444", marginBottom: 6, lineHeight: 1.5, fontStyle: "italic" }}>{proj.desc}</div>
+                  {proj.impact.slice(0, 2).map((item, j) => (
+                    <div key={j} style={{ fontSize: 11, color: "#222", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.5 }}>
+                      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+                      {item}
+                    </div>
+                  ))}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8, gap: 8, flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+                      {proj.stack.slice(0, 5).map((t) => {
+                        const iconFile = SKILL_ICON_FILES[t];
+                        return (
+                          <span key={t} style={{ padding: "0 5px", fontSize: 9, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", display: "inline-flex", alignItems: "center", gap: 2 }}>
+                            {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={9} height={9} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
+                            {t}
+                          </span>
+                        );
+                      })}
+                    </div>
+                    <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>double-click to open →</span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Status bar */}
-          <div style={{
-            display: "flex", alignItems: "center", gap: 3, flexShrink: 0,
-            padding: "2px 4px", borderTop: "1px solid #808080", background: "#c0c0c0",
-          }}>
-            <div style={{
-              flex: 1, padding: "0 4px", fontSize: 10,
-              border: "1px solid", borderColor: "#808080 #dfdfdf #dfdfdf #808080",
-              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-            }}>
-              {selected !== null ? PROJECTS[selected].title : `${PROJECTS.length} object(s) — double-click to open`}
-            </div>
-            {selected !== null && (
-              <button
-                onClick={() => openProjectDetail(selected)}
-                style={{
-                  fontSize: 10, padding: "1px 10px", background: "#c0c0c0",
-                  fontFamily: "inherit", flexShrink: 0,
-                  border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                  cursor: "pointer",
-                }}
-              >
-                Open
-              </button>
-            )}
-          </div>
-        </>
+              </div>
+            );
+          })}
+        </div>
       ) : (
         /* ── Detail page ── */
         currentProject ? (
