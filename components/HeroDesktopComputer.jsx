@@ -44,7 +44,7 @@ const EXPERIENCE = [
       "Engineered an automated sneaker title parsing system with structured attribute extraction, reducing product listing workflow from 24 clicks (Shopify) to 11.",
       "Built a centralized proxy enforcing CSRF protection, Upstash rate limiting, and MFA guardrails — handling 7.5M monthly requests with zero unauthorized access incidents.",
     ],
-    stack: ["Next.js", "Supabase", "Stripe", "Upstash Redis", "GitHub Actions", "AWS SES"],
+    stack: ["TypeScript", "Next.js", "Supabase", "Stripe", "Upstash Redis", "GitHub Actions", "AWS SES"],
   },
   {
     company: "Giant Food Stores",
@@ -786,7 +786,6 @@ function WelcomeApp({ openWindow }) {
     { id: "skills", title: "Skills", description: "for technologies and tools" },
     { id: "experience", title: "Experience", description: "for work history" },
     { id: "projects", title: "Projects", description: "for shipped and in-progress work" },
-    { id: "videos", title: "Videos", description: "for local demos and walkthroughs" },
     { id: "contact", title: "Contact", description: "to reach out" },
   ];
 
@@ -1021,19 +1020,11 @@ function AboutApp({ openWindow }) {
                 <div style={{ fontSize: 11, color: "#555", marginBottom: 2 }}>Top Skills</div>
                 <div style={{ fontSize: 9, color: "#888", marginBottom: 8 }}>my strongest technologies</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                  {TOP_SKILLS.map((s) => {
-                    const file = SKILL_ICON_FILES[s];
-                    return (
-                      <div key={s} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        {file ? (
-                          <img src={`/skills/${file}`} alt={s} width={14} height={14} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
-                        ) : (
-                          <div style={{ width: 14, height: 14, background: "#c0c0c0", display: "grid", placeItems: "center", fontSize: 7, fontWeight: 700, flexShrink: 0 }}>{s.slice(0, 2)}</div>
-                        )}
-                        <span style={{ fontSize: 11, color: "#333", fontWeight: 600 }}>{s}</span>
-                      </div>
-                    );
-                  })}
+                  {TOP_SKILLS.map((s) => (
+                    <div key={s} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 11, color: "#333", fontWeight: 600 }}>{s}</span>
+                    </div>
+                  ))}
                   <button onClick={() => openWindow?.("skills")} style={{
                     background: "transparent", border: "none", padding: 0, fontSize: 10,
                     color: "#000080", fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
@@ -1099,15 +1090,15 @@ function SkillCard({ name }) {
       cursor: "default",
     }}>
       {file ? (
-        <img src={`/skills/${file}`} alt={name} width={28} height={28}
-          style={{ imageRendering: "pixelated", objectFit: "contain", width: 28, height: 28 }}
+        <img src={`/skills/${file}`} alt={name} width={40} height={40}
+          style={{ imageRendering: "pixelated", objectFit: "contain", width: 40, height: 40 }}
         />
       ) : (
         <div style={{
-          width: 28, height: 28, background: "#c0c0c0",
+          width: 40, height: 40, background: "#c0c0c0",
           border: "1px solid", borderColor: "#808080 #ffffff #ffffff #808080",
           display: "grid", placeItems: "center",
-          fontSize: 8, fontWeight: 700, color: "#333",
+          fontSize: 9, fontWeight: 700, color: "#333",
         }}>
           {name.slice(0, 3)}
         </div>
@@ -1189,19 +1180,14 @@ function ExperienceApp() {
             ))}
             {exp.stack.length > 0 && (
               <div style={{ display: "flex", gap: 3, flexWrap: "wrap", marginTop: 7 }}>
-                {exp.stack.map((t) => {
-                  const iconFile = SKILL_ICON_FILES[t];
-                  return (
-                    <span key={t} style={{
-                      padding: "0 5px", fontSize: 9, background: "#c0c0c0",
-                      border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                      display: "inline-flex", alignItems: "center", gap: 2,
-                    }}>
-                      {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={9} height={9} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
-                      {t}
-                    </span>
-                  );
-                })}
+                {exp.stack.map((t) => (
+                  <span key={t} style={{
+                    padding: "0 5px", fontSize: 9, background: "#c0c0c0",
+                    border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                  }}>
+                    {t}
+                  </span>
+                ))}
               </div>
             )}
           </div>
@@ -1579,19 +1565,14 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
           {/* Stack */}
           <div style={secLabel}>Stack</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-            {p.stack.map((t) => {
-              const iconFile = SKILL_ICON_FILES[t];
-              return (
-                <span key={t} style={{
-                  padding: "1px 6px", fontSize: 10, background: "#c0c0c0",
-                  border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                  display: "inline-flex", alignItems: "center", gap: 3,
-                }}>
-                  {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={11} height={11} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
-                  {t}
-                </span>
-              );
-            })}
+            {p.stack.map((t) => (
+              <span key={t} style={{
+                padding: "1px 6px", fontSize: 10, background: "#c0c0c0",
+                border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+              }}>
+                {t}
+              </span>
+            ))}
           </div>
 
           {/* Links */}
@@ -1756,15 +1737,11 @@ function ProjectsApp({ onOpenVideo }) {
                   ))}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8, gap: 8, flexWrap: "wrap" }}>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-                      {proj.stack.slice(0, 5).map((t) => {
-                        const iconFile = SKILL_ICON_FILES[t];
-                        return (
-                          <span key={t} style={{ padding: "0 5px", fontSize: 9, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", display: "inline-flex", alignItems: "center", gap: 2 }}>
-                            {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={9} height={9} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
-                            {t}
-                          </span>
-                        );
-                      })}
+                      {proj.stack.slice(0, 5).map((t) => (
+                        <span key={t} style={{ padding: "0 5px", fontSize: 9, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff" }}>
+                          {t}
+                        </span>
+                      ))}
                     </div>
                     <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>click to open →</span>
                   </div>
@@ -2939,7 +2916,7 @@ export default function HeroDesktopComputerComponent() {
   const [windows, setWindows] = useState({
     welcome:    { id: "welcome",    title: "Welcome",                  x: 250, y: 95,  w: 800, h: 500, isOpen: true,  isMinimized: false, isMaximized: false, z: 11 },
     about:      { id: "about",      title: "About",                    x: 30, y: 20,  w: 1200, h: 600, isOpen: false, isMinimized: false, isMaximized: false, z: 10 },
-    skills:     { id: "skills",     title: "Skills",                   x: 180, y: 50,  w: 900, h: 520, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
+    skills:     { id: "skills",     title: "Skills",                   x: 180, y: 50,  w: 950, h: 550, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
     experience: { id: "experience", title: "Experience",               x: 180, y: 50,  w: 560, h: 480, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
     projects:   { id: "projects",   title: "Projects",                 x: 100, y: 20,  w: 600, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
     videos:     { id: "videos",     title: "Videos",                   x: 140, y: 40,  w: 840, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
