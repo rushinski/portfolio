@@ -207,7 +207,7 @@ export function OSProvider({ children }) {
       title: "System Report",
       message: "JacobOS session diagnostics",
       details: buildSystemReport(Date.now() - sessionStartedAtRef.current),
-      variant: "info",
+      variant: "terminal",
       confirmLabel: "Close",
     });
   }, []);

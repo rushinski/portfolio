@@ -157,6 +157,7 @@ export function getDialogIconStyles(variant = "info") {
     info: { background: "#e9f1ff", border: "#000080", accent: "#1084d0", label: "i" },
     warning: { background: "#fff7d6", border: "#8b6a00", accent: "#d18b00", label: "!" },
     error: { background: "#ffe4e4", border: "#8b1f1f", accent: "#d00000", label: "!" },
+    terminal: { background: "#001400", border: "#0f5f0f", accent: "#2cff2c", label: ">" },
   };
 
   return variantMap[variant] || variantMap.info;

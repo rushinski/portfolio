@@ -125,7 +125,7 @@ export const INITIAL_WINDOWS = {
   terminal: { id: "terminal", title: "Terminal", x: 120, y: 50, w: 500, h: 350, isOpen: false, isMinimized: false, isMaximized: false, z: 4 },
   trash: { id: "trash", title: "Recycle Bin", x: 300, y: 100, w: 320, h: 260, isOpen: false, isMinimized: false, isMaximized: false, z: 3 },
   explorer: { id: "explorer", title: "File Explorer", x: 180, y: 64, w: 660, h: 430, isOpen: false, isMinimized: false, isMaximized: false, z: 2 },
-  settings: { id: "settings", title: "Settings", x: 300, y: 120, w: 380, h: 280, isOpen: false, isMinimized: false, isMaximized: false, z: 1 },
+  settings: { id: "settings", title: "Settings", x: 220, y: 76, w: 600, h: 460, isOpen: false, isMinimized: false, isMaximized: false, z: 1 },
   textdoc: { id: "textdoc", title: "Text Document", x: 240, y: 80, w: 520, h: 360, isOpen: false, isMinimized: false, isMaximized: false, z: 12 },
   resume: { id: "resume", title: "Resume.pdf", x: 80, y: 30, w: 760, h: 600, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
 };

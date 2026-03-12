@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import BootSequence from "./BootSequence";
+import ScreensaverCanvas from "./ScreensaverCanvas";
 import SystemDialog from "./SystemDialog";
 import Taskbar from "./Taskbar";
 import WindowFrame from "./WindowFrame";
@@ -256,6 +257,8 @@ export default function Desktop() {
     desktopColor,
     wallpaperPattern,
     crtEffectEnabled,
+    screensaverType,
+    screensaverTimeout,
   } = useSettings();
   const windowManager = useWindowManager();
   const fileSystem = useFileSystem();
@@ -296,8 +299,10 @@ export default function Desktop() {
 
   const desktopRef = useRef(null);
   const dragStartRef = useRef({});
+  const screensaverTimeoutRef = useRef(null);
   const selectionBoxRef = useRef(null);
   const [booted, setBooted] = useState(false);
+  const [screensaverActive, setScreensaverActive] = useState(false);
   const [selectedIconIds, setSelectedIconIds] = useState([]);
   const [desktopSelectionBox, setDesktopSelectionBox] = useState(null);
   const [marqueePreviewIds, setMarqueePreviewIds] = useState([]);
@@ -323,9 +328,40 @@ export default function Desktop() {
     registerDesktopElement(node);
   }, [registerDesktopElement]);
 
+  const resetScreensaverTimer = useCallback(() => {
+    if (screensaverTimeoutRef.current) {
+      window.clearTimeout(screensaverTimeoutRef.current);
+    }
+
+    setScreensaverActive(false);
+
+    if (!booted || screensaverType === "none" || screensaverTimeout == null) {
+      return;
+    }
+
+    screensaverTimeoutRef.current = window.setTimeout(() => {
+      setScreensaverActive(true);
+    }, screensaverTimeout * 1000);
+  }, [booted, screensaverTimeout, screensaverType]);
+
   useEffect(() => {
     alignIconsToGrid();
   }, [alignIconsToGrid]);
+
+  useEffect(() => {
+    resetScreensaverTimer();
+
+    const wakeEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
+    const handleWake = () => resetScreensaverTimer();
+
+    wakeEvents.forEach((eventName) => window.addEventListener(eventName, handleWake));
+    return () => {
+      wakeEvents.forEach((eventName) => window.removeEventListener(eventName, handleWake));
+      if (screensaverTimeoutRef.current) {
+        window.clearTimeout(screensaverTimeoutRef.current);
+      }
+    };
+  }, [resetScreensaverTimer]);
 
   const getIconsInSelectionBox = useCallback((box) => {
     if (!box || box.w <= 0 || box.h <= 0) return [];
@@ -781,6 +817,17 @@ export default function Desktop() {
 
                 <Taskbar />
               </div>
+
+              {booted && screensaverActive && (
+                <div
+                  style={{ position: "absolute", inset: 0, zIndex: 18000 }}
+                  onMouseMove={resetScreensaverTimer}
+                  onMouseDown={resetScreensaverTimer}
+                  onKeyDown={resetScreensaverTimer}
+                >
+                  <ScreensaverCanvas type={screensaverType} />
+                </div>
+              )}
 
               {!booted && (
                 <BootSequence embedded onComplete={handleBootComplete} />

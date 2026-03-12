@@ -49,6 +49,7 @@ export default function SystemDialog({ dialog, onClose }) {
     cancelLabel = null,
     onConfirm,
   } = dialog;
+  const isTerminal = variant === "terminal";
 
   return (
     <div
@@ -84,12 +85,12 @@ export default function SystemDialog({ dialog, onClose }) {
                   whiteSpace: "pre-wrap",
                   fontFamily: "\"Courier New\", monospace",
                   fontSize: 11,
-                  background: WIN95_COLORS.field,
-                  color: WIN95_COLORS.text,
-                  borderTop: `2px solid ${WIN95_COLORS.borderDark}`,
-                  borderLeft: `2px solid ${WIN95_COLORS.borderDark}`,
-                  borderRight: `2px solid ${WIN95_COLORS.borderLight}`,
-                  borderBottom: `2px solid ${WIN95_COLORS.borderLight}`,
+                  background: isTerminal ? "#000000" : WIN95_COLORS.field,
+                  color: isTerminal ? "#29ff29" : WIN95_COLORS.text,
+                  borderTop: `2px solid ${isTerminal ? "#0d2d0d" : WIN95_COLORS.borderDark}`,
+                  borderLeft: `2px solid ${isTerminal ? "#0d2d0d" : WIN95_COLORS.borderDark}`,
+                  borderRight: `2px solid ${isTerminal ? "#5d8f5d" : WIN95_COLORS.borderLight}`,
+                  borderBottom: `2px solid ${isTerminal ? "#5d8f5d" : WIN95_COLORS.borderLight}`,
                   maxHeight: 220,
                   overflow: "auto",
                 }}
