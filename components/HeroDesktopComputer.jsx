@@ -1109,7 +1109,7 @@ function SkillCard({ name }) {
 
 function SkillsApp() {
   return (
-    <div style={{ padding: "12px 16px", background: "#c0c0c0", minHeight: "100%" }}>
+    <div style={{ padding: "12px 16px", background: "#fff", minHeight: "100%" }}>
       {Object.entries(SKILLS).map(([cat, items]) => (
         <div key={cat} style={{ marginBottom: 14 }}>
           <div style={{
@@ -1138,7 +1138,7 @@ function SkillsApp() {
 
 function ExperienceApp() {
   return (
-    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "10px 12px", background: "#c0c0c0" }}>
+    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "10px 12px", background: "#fff" }}>
       {EXPERIENCE.map((exp, i) => (
         <div key={i} style={{
           marginBottom: 10, userSelect: "none",
@@ -1354,7 +1354,7 @@ function VideosApp({ initialVideoId }) {
 
   if (!VIDEO_LIBRARY.length) {
     return (
-      <div style={{ height: "100%", display: "grid", placeItems: "center", padding: 20, background: "#c0c0c0" }}>
+      <div style={{ height: "100%", display: "grid", placeItems: "center", padding: 20, background: "#fff" }}>
         <div style={{ maxWidth: 420, fontSize: 11, lineHeight: 1.6, color: "#333" }}>
           No local videos configured yet.
           <br />
@@ -1365,7 +1365,7 @@ function VideosApp({ initialVideoId }) {
   }
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#c0c0c0", minHeight: 0 }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#fff", minHeight: 0 }}>
       <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, padding: "7px 10px 5px", borderBottom: "1px solid #808080" }}>
         Videos
       </div>
@@ -1515,7 +1515,7 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
   };
 
   return (
-    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "10px 12px 14px", background: "#c0c0c0" }}>
+    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "10px 12px 14px", background: "#fff" }}>
       {onBackToList && (
         <div style={{ marginBottom: 8 }}>
           <button
@@ -1692,11 +1692,11 @@ function ProjectsApp({ onOpenVideo }) {
   return (
     <div style={{
       height: "100%", display: "flex", flexDirection: "column",
-      background: "#d4d0c8", fontFamily: "inherit", overflow: "hidden",
+      background: "#fff", fontFamily: "inherit", overflow: "hidden",
     }}>
       {/* ── Content area ── */}
       {currentView.type === "list" ? (
-        <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "10px 12px", background: "#c0c0c0" }}>
+        <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "10px 12px", background: "#fff" }}>
           {PROJECTS.map((proj, i) => {
             const isIP = proj.status === "IN_PROGRESS";
             return (
@@ -1823,7 +1823,7 @@ function ContactApp() {
     { label: "Location", value: PERSONAL.location, href: null, icon: null },
   ];
   return (
-    <div style={{ padding: "12px 16px", background: "#c0c0c0", minHeight: "100%" }}>
+    <div style={{ padding: "12px 16px", background: "#fff", minHeight: "100%" }}>
       <div style={{
         fontSize: 10, fontWeight: 700, color: "#000080",
         textTransform: "uppercase", letterSpacing: 1,
@@ -2131,7 +2131,7 @@ function SettingsApp({ iconSizeMode, setIconSizeMode, clockFormat, setClockForma
   const secLabel = { fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, borderBottom: "1px solid #808080", paddingBottom: 3, marginBottom: 8, marginTop: 10 };
 
   return (
-    <div style={{ padding: "12px 14px 0", background: "#c0c0c0", height: "100%", boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "12px 14px 0", background: "#fff", height: "100%", boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
       {/* Tab bar */}
       <div style={{ display: "flex", alignItems: "flex-end", borderBottom: "2px solid #404040", marginBottom: 0 }}>
         {tabBtn("display", "Display")}
@@ -2140,7 +2140,7 @@ function SettingsApp({ iconSizeMode, setIconSizeMode, clockFormat, setClockForma
       </div>
 
       {/* Tab panel */}
-      <div style={{ flex: 1, overflowY: "auto", minHeight: 0, border: "2px solid", borderTop: "none", borderColor: "#404040 #fff #fff #404040", padding: "10px 12px 14px", background: "#c0c0c0" }}>
+      <div style={{ flex: 1, overflowY: "auto", minHeight: 0, border: "2px solid", borderTop: "none", borderColor: "#404040 #fff #fff #404040", padding: "10px 12px 14px", background: "#fff" }}>
 
         {activeTab === "display" && (
           <>
@@ -2327,7 +2327,7 @@ function ExplorerApp({ items, onOpenItem, onAction }) {
   };
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#c0c0c0", fontFamily: "inherit", overflow: "hidden" }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#fff", fontFamily: "inherit", overflow: "hidden" }}>
 
       {/* Toolbar */}
       <div style={{ padding: "4px 6px", borderBottom: "1px solid #808080", display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
@@ -2409,7 +2409,7 @@ function ExplorerApp({ items, onOpenItem, onAction }) {
       </div>
 
       {/* Status bar */}
-      <div style={{ padding: "2px 8px", borderTop: "1px solid #808080", fontSize: 10, color: "#555", flexShrink: 0, background: "#c0c0c0" }}>
+      <div style={{ padding: "2px 8px", borderTop: "1px solid #808080", fontSize: 10, color: "#555", flexShrink: 0, background: "#fff" }}>
         {currentItems.length} object{currentItems.length !== 1 ? "s" : ""}
         {selectedId && (() => { const sel = items.find((i) => i.id === selectedId); return sel ? ` · ${sel.title} selected` : ""; })()}
       </div>
