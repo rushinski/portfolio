@@ -41,6 +41,34 @@ export const Icons = {
       <rect x="8" y="27" width="16" height="2" rx="1" fill="#b0b0b0" stroke="#808080" strokeWidth="0.5" />
     </svg>
   ),
+  trashEmpty: (
+    <svg width="32" height="32" viewBox="0 0 32 32">
+      <path d="M8,9 L7,28 L25,28 L24,9 Z" fill="#d0d0d0" stroke="#808080" strokeWidth="1" />
+      <path d="M8,9 L9,28 L10,28 L11,9 Z" fill="#e8e8e8" />
+      <rect x="6" y="6" width="20" height="4" rx="1" fill="#b0b0b0" stroke="#606060" strokeWidth="1" />
+      <line x1="7" y1="7" x2="25" y2="7" stroke="#d8d8d8" strokeWidth="1" />
+      <rect x="13" y="3" width="6" height="4" rx="1" fill="#a0a0a0" stroke="#606060" strokeWidth="1" />
+      <line x1="14" y1="4" x2="18" y2="4" stroke="#c8c8c8" strokeWidth="1" />
+      <line x1="12" y1="10" x2="11" y2="27" stroke="#b8b8b8" strokeWidth="1.2" />
+      <line x1="16" y1="10" x2="16" y2="27" stroke="#b8b8b8" strokeWidth="1.2" />
+      <line x1="20" y1="10" x2="21" y2="27" stroke="#b8b8b8" strokeWidth="1.2" />
+      <line x1="7" y1="27" x2="25" y2="27" stroke="#808080" strokeWidth="1" />
+    </svg>
+  ),
+  trashFull: (
+    <svg width="32" height="32" viewBox="0 0 32 32">
+      <path d="M8,9 L7,28 L25,28 L24,9 Z" fill="#d0d0d0" stroke="#808080" strokeWidth="1" />
+      <path d="M8,9 L9,28 L10,28 L11,9 Z" fill="#e8e8e8" />
+      <rect x="6" y="6" width="20" height="4" rx="1" fill="#b0b0b0" stroke="#606060" strokeWidth="1" />
+      <line x1="7" y1="7" x2="25" y2="7" stroke="#d8d8d8" strokeWidth="1" />
+      <rect x="13" y="3" width="6" height="4" rx="1" fill="#a0a0a0" stroke="#606060" strokeWidth="1" />
+      <line x1="14" y1="4" x2="18" y2="4" stroke="#c8c8c8" strokeWidth="1" />
+      <path d="M10,13 C12,11 16,11 18,13 C20,15 23,14 23,18 C23,22 20,24 16,24 C12,24 9,21 9,18 C9,16 9,14 10,13 Z" fill="#f5f5f5" stroke="#9a9a9a" strokeWidth="0.7" />
+      <path d="M11.5,18 C12.2,16.5 13.2,15.7 14.8,15.7 C16.1,15.7 17,16.2 17.8,17.2 C18.6,18.1 19.7,18.4 21,18.1" fill="none" stroke="#8a8a8a" strokeWidth="0.8" />
+      <path d="M10.8,20.8 C12.1,19.8 13.2,19.5 14.5,19.9 C15.9,20.3 17.1,20.1 18.2,19.1 C19.1,18.3 20.1,18 21.3,18.4" fill="none" stroke="#8a8a8a" strokeWidth="0.8" />
+      <line x1="7" y1="27" x2="25" y2="27" stroke="#808080" strokeWidth="1" />
+    </svg>
+  ),
   trash: (
     <svg width="32" height="32" viewBox="0 0 32 32">
       <path d="M8,9 L7,28 L25,28 L24,9 Z" fill="#d0d0d0" stroke="#808080" strokeWidth="1" />

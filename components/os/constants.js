@@ -14,7 +14,71 @@ export const ICON_VIEW_MODES = {
 
 export const MENU_TEXT_COLOR = "#162133";
 export const FULLSCREEN_WINDOW_IDS = new Set(["experience", "projects", "videos", "contact", "resume"]);
-export const DEFAULT_PINNED_TASKBAR_IDS = ["about", "skills", "experience", "projects", "videos", "contact"];
+export const DEFAULT_PINNED_TASKBAR_IDS = ["about", "skills", "experience", "projects", "contact"];
+export const DEFAULT_SETTINGS = {
+  clockFormat: "12h",
+  desktopColor: null,
+  iconSizeMode: "medium",
+  wallpaperPattern: "solid",
+  crtEffectEnabled: true,
+  masterSoundEnabled: true,
+  uiSoundsEnabled: true,
+  startupSoundEnabled: true,
+  screensaverType: "none",
+  screensaverTimeout: 120,
+};
+export const DEFAULT_EXPLORER_STATE = {
+  currentFolderId: null,
+  navStack: [],
+  forwardStack: [],
+  viewMode: "grid",
+  sidebarWidth: 180,
+  searchQuery: "",
+  selectedItemId: null,
+};
+export const WALLPAPER_PATTERNS = [
+  { id: "solid", label: "Solid Color" },
+  { id: "scanline", label: "Scanline Overlay" },
+  { id: "dot-grid", label: "Dot Grid" },
+  { id: "retro-stripe", label: "Retro Stripe" },
+];
+export const WALLPAPER_PATTERN_BACKGROUNDS = {
+  solid: "none",
+  scanline: "repeating-linear-gradient(180deg, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0.08) 1px, transparent 1px, transparent 4px)",
+  "dot-grid": "radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px)",
+  "retro-stripe": "repeating-linear-gradient(135deg, rgba(255,255,255,0.15) 0 6px, transparent 6px 14px)",
+};
+export const SCREENSAVER_OPTIONS = [
+  { id: "none", label: "None" },
+  { id: "starfield", label: "Starfield" },
+  { id: "bouncing-logo", label: "Bouncing Logo" },
+  { id: "matrix-rain", label: "Matrix Rain" },
+];
+export const SCREENSAVER_TIMEOUT_OPTIONS = [
+  { value: 60, label: "1 min" },
+  { value: 120, label: "2 min" },
+  { value: 300, label: "5 min" },
+  { value: null, label: "Never" },
+];
+export const SYSTEM_SPECS = [
+  ["Processor", "Jacob's Brain(TM) @ 3.52 GHz"],
+  ["RAM", "16GB Determination"],
+  ["Storage", "500GB of Side Projects"],
+  ["OS", "JacobOS v1.0 (Build 2026)"],
+  ["User", "jacob_rushinski"],
+];
+export const FILE_TYPE_LABELS = {
+  app: "Application",
+  folder: "Folder",
+  text: "Text Document",
+  pdf: "PDF Document",
+};
+export const FILE_SIZE_LABELS = {
+  app: "1.2 MB",
+  folder: "0 bytes",
+  text: "4 KB",
+  pdf: "2.4 MB",
+};
 
 export const DESKTOP_COLORS = [
   { label: "Default", value: null, preview: "linear-gradient(180deg, #0b4aa6, #0a3f90)" },
@@ -85,12 +149,15 @@ const SYSTEM_DESKTOP_ICON_DEFS = [
   { id: "terminal", title: "Terminal", glyph: Icons.terminal, windowId: "terminal", itemType: "app", system: true, parentId: null },
   { id: "explorer", title: "File Explorer", glyph: Icons.folder, windowId: "explorer", itemType: "app", system: true, parentId: null },
   { id: "settings", title: "Settings", glyph: Icons.settings, windowId: "settings", itemType: "app", system: true, parentId: null },
-  { id: "trash", title: "Recycle Bin", glyph: Icons.trash, windowId: "trash", itemType: "app", system: true, parentId: null },
+  { id: "trash", title: "Recycle Bin", glyph: Icons.trashEmpty, windowId: "trash", itemType: "app", system: true, parentId: null },
   { id: "resume", title: "Resume.pdf", glyph: Icons.resume, windowId: "resume", itemType: "app", system: true, parentId: null },
 ];
 
-export const buildSystemDesktopIcons = (renamedSystemIcons = {}) =>
+export const buildSystemDesktopIcons = (renamedSystemIcons = {}, options = {}) =>
   SYSTEM_DESKTOP_ICON_DEFS.map((item) => ({
     ...item,
+    glyph: item.id === "trash" ? (options.recycleBinHasItems ? Icons.trashFull : Icons.trashEmpty) : item.glyph,
     title: renamedSystemIcons[item.id] || item.title,
+    sizeLabel: FILE_SIZE_LABELS[item.itemType] || "0 bytes",
+    typeLabel: FILE_TYPE_LABELS[item.itemType] || "Item",
   }));

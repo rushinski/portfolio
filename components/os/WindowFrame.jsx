@@ -3,6 +3,13 @@
 import { useRef, useState } from "react";
 
 import { clamp, snap } from "./constants";
+import {
+  WIN95_COLORS,
+  getWin95ButtonStyle,
+  getWin95FieldStyle,
+  getWin95TitleBarStyle,
+  getWin95WindowStyle,
+} from "./ui/retro";
 
 function TitleBar({
   title,
@@ -14,9 +21,6 @@ function TitleBar({
   onPointerDown,
   onTitleDoubleClick,
 }) {
-  const background = isActive
-    ? "linear-gradient(180deg, #1a56c9 0%, #0b3b8f 100%)"
-    : "linear-gradient(180deg, #808080 0%, #606060 100%)";
   const controls = [
     { id: "min", glyph: "-", action: onMinimize },
     { id: "max", glyph: isMaximized ? "\u2750" : "\u25A1", action: onMaximize },
@@ -31,15 +35,7 @@ function TitleBar({
         onTitleDoubleClick?.();
       }}
       style={{
-        background,
-        color: "#fff",
-        fontWeight: 700,
-        fontSize: "12px",
-        letterSpacing: "0.3px",
-        padding: "5px 5px 5px 8px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
+        ...getWin95TitleBarStyle(isActive),
         cursor: "default",
         userSelect: "none",
       }}
@@ -57,23 +53,15 @@ function TitleBar({
               button.action();
             }}
             style={{
+              ...getWin95ButtonStyle({ padding: 0 }),
               width: 28,
               height: 22,
-              background: "#c0c0c0",
-              border: "none",
-              borderTop: "1px solid #fff",
-              borderLeft: "1px solid #fff",
-              borderRight: "1px solid #404040",
-              borderBottom: "1px solid #404040",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#111",
+              color: WIN95_COLORS.text,
               fontSize: button.id === "min" ? "16px" : "14px",
               lineHeight: 1,
-              cursor: "pointer",
-              fontFamily: "inherit",
-              padding: 0,
             }}
           >
             <span style={{ transform: button.id === "min" ? "translateY(-2px)" : "none" }}>{button.glyph}</span>
@@ -207,12 +195,7 @@ export default function WindowFrame({
     >
       <div
         style={{
-          background: "#c0c0c0",
-          borderTop: "2px solid #fff",
-          borderLeft: "2px solid #fff",
-          borderRight: "2px solid #404040",
-          borderBottom: "2px solid #404040",
-          boxShadow: isActive ? "2px 4px 16px rgba(0,0,0,0.5)" : "1px 2px 8px rgba(0,0,0,0.3)",
+          ...getWin95WindowStyle(isActive),
           display: "flex",
           flexDirection: "column",
           height: "100%",
@@ -231,12 +214,10 @@ export default function WindowFrame({
         />
         <div
           style={{
-            background: "#fff",
-            border: "2px inset #c0c0c0",
+            ...getWin95FieldStyle(),
             margin: "3px",
             flex: 1,
             overflow: "auto",
-            color: "#111",
             fontSize: "13px",
             lineHeight: 1.55,
             minHeight: 0,

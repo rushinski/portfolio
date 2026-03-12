@@ -1,61 +1,22 @@
 "use client";
 
-import { useState } from "react";
-
 import { useFileSystem } from "../hooks/useFileSystem";
+import { useWindowManager } from "../hooks/useWindowManager";
 
 export default function FileExplorerApp() {
-  const { desktopItems, openItem } = useFileSystem();
-  const [navStack, setNavStack] = useState([]);
-  const [forwardStack, setForwardStack] = useState([]);
-  const [currentFolderId, setCurrentFolderId] = useState(null);
-  const [selectedId, setSelectedId] = useState(null);
+  const { desktopItems, getFolderPathSegments, getItemById, getItemsInFolder, openItem } = useFileSystem();
+  const {
+    explorerState,
+    explorerNavigateTo,
+    explorerGoBack,
+    explorerGoForward,
+    explorerGoUp,
+    setExplorerSelectedItemId,
+  } = useWindowManager();
 
   const folders = desktopItems.filter((item) => item.itemType === "folder");
-  const currentItems = currentFolderId === null
-    ? desktopItems.filter((item) => (item.parentId ?? null) === null)
-    : desktopItems.filter((item) => item.parentId === currentFolderId);
-  const currentFolderTitle = currentFolderId === null
-    ? "Desktop"
-    : (desktopItems.find((item) => item.id === currentFolderId)?.title || "Folder");
-
-  const navigateTo = (folderId) => {
-    setNavStack((prev) => [...prev, currentFolderId]);
-    setForwardStack([]);
-    setCurrentFolderId(folderId);
-    setSelectedId(null);
-  };
-
-  const goBack = () => {
-    if (navStack.length === 0) return;
-    const previousFolder = navStack[navStack.length - 1];
-    setForwardStack((prev) => [...prev, currentFolderId]);
-    setNavStack((prev) => prev.slice(0, -1));
-    setCurrentFolderId(previousFolder);
-    setSelectedId(null);
-  };
-
-  const goForward = () => {
-    if (forwardStack.length === 0) return;
-    const nextFolder = forwardStack[forwardStack.length - 1];
-    setNavStack((prev) => [...prev, currentFolderId]);
-    setForwardStack((prev) => prev.slice(0, -1));
-    setCurrentFolderId(nextFolder);
-    setSelectedId(null);
-  };
-
-  const goUp = () => {
-    if (currentFolderId === null) return;
-    navigateTo(null);
-  };
-
-  const handleItemDoubleClick = (item) => {
-    if (item.itemType === "folder") {
-      navigateTo(item.id);
-      return;
-    }
-    openItem(item);
-  };
+  const currentItems = getItemsInFolder(explorerState.currentFolderId);
+  const pathSegments = getFolderPathSegments(explorerState.currentFolderId);
 
   const navButton = (label, disabled, onClick) => (
     <button
@@ -80,33 +41,35 @@ export default function FileExplorerApp() {
   );
 
   const itemIcon = (item) => {
-    if (item.itemType === "folder") return "📁";
-    if (item.itemType === "text") return "📄";
-    return "🖥";
+    if (item.itemType === "folder") return "F";
+    if (item.itemType === "text") return "TXT";
+    return "APP";
   };
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#fff", fontFamily: "inherit", overflow: "hidden" }}>
       <div style={{ padding: "4px 6px", borderBottom: "1px solid #808080", display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-        {navButton("◄", navStack.length === 0, goBack)}
-        {navButton("►", forwardStack.length === 0, goForward)}
-        {navButton("▲", currentFolderId === null, goUp)}
+        {navButton("<", explorerState.navStack.length === 0, explorerGoBack)}
+        {navButton(">", explorerState.forwardStack.length === 0, explorerGoForward)}
+        {navButton("^", explorerState.currentFolderId === null, explorerGoUp)}
         <div style={{ flex: 1, marginLeft: 4, padding: "1px 6px", border: "2px inset #c0c0c0", background: "#fff", fontSize: 11, color: "#111", lineHeight: "18px", height: 20, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          <span style={{ color: "#808080" }}>Desktop</span>
-          {currentFolderId !== null && (
-            <span> › <span style={{ color: "#111" }}>{currentFolderTitle}</span></span>
-          )}
+          {pathSegments.map((segment, index) => (
+            <span key={`${segment.id ?? "desktop"}-${index}`}>
+              {index > 0 ? " > " : ""}
+              <span style={{ color: index === pathSegments.length - 1 ? "#111" : "#808080" }}>{segment.title}</span>
+            </span>
+          ))}
         </div>
       </div>
 
       <div style={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0 }}>
         <div style={{ width: 130, flexShrink: 0, borderRight: "1px solid #808080", overflowY: "auto", background: "#d4d0c8", padding: "4px 0" }}>
-          <div onClick={() => navigateTo(null)} style={{ padding: "2px 8px", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 5, background: currentFolderId === null ? "#000080" : "transparent", color: currentFolderId === null ? "#fff" : "#111" }}>
-            <span>🖥</span> Desktop
+          <div onClick={() => explorerNavigateTo(null)} style={{ padding: "2px 8px", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 5, background: explorerState.currentFolderId === null ? "#000080" : "transparent", color: explorerState.currentFolderId === null ? "#fff" : "#111" }}>
+            <span>PC</span> Desktop
           </div>
           {folders.map((folder) => (
-            <div key={folder.id} onClick={() => navigateTo(folder.id)} style={{ padding: "2px 8px 2px 20px", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, background: currentFolderId === folder.id ? "#000080" : "transparent", color: currentFolderId === folder.id ? "#fff" : "#111" }}>
-              <span>📁</span>
+            <div key={folder.id} onClick={() => explorerNavigateTo(folder.id)} style={{ padding: "2px 8px 2px 20px", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, background: explorerState.currentFolderId === folder.id ? "#000080" : "transparent", color: explorerState.currentFolderId === folder.id ? "#fff" : "#111" }}>
+              <span>F</span>
               <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{folder.title}</span>
             </div>
           ))}
@@ -119,24 +82,30 @@ export default function FileExplorerApp() {
             currentItems.map((item) => (
               <div
                 key={item.id}
-                onClick={() => setSelectedId(item.id)}
-                onDoubleClick={() => handleItemDoubleClick(item)}
+                onClick={() => setExplorerSelectedItemId(item.id)}
+                onDoubleClick={() => {
+                  if (item.itemType === "folder") {
+                    explorerNavigateTo(item.id);
+                    return;
+                  }
+                  openItem(item);
+                }}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
                   padding: "2px 8px",
-                  background: selectedId === item.id ? "#000080" : "transparent",
-                  color: selectedId === item.id ? "#fff" : "#111",
+                  background: explorerState.selectedItemId === item.id ? "#000080" : "transparent",
+                  color: explorerState.selectedItemId === item.id ? "#fff" : "#111",
                   fontSize: 11,
                   cursor: "default",
                   userSelect: "none",
                 }}
               >
-                <span style={{ fontSize: 13, flexShrink: 0 }}>{itemIcon(item)}</span>
+                <span style={{ fontSize: 10, flexShrink: 0, minWidth: 20 }}>{itemIcon(item)}</span>
                 <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.title}</span>
-                <span style={{ fontSize: 9, color: selectedId === item.id ? "rgba(255,255,255,0.7)" : "#808080", flexShrink: 0 }}>
-                  {item.itemType === "folder" ? "Folder" : item.itemType === "text" ? "Text Document" : "Application"}
+                <span style={{ fontSize: 9, color: explorerState.selectedItemId === item.id ? "rgba(255,255,255,0.7)" : "#808080", flexShrink: 0 }}>
+                  {item.typeLabel || (item.itemType === "folder" ? "Folder" : item.itemType === "text" ? "Text Document" : "Application")}
                 </span>
               </div>
             ))
@@ -146,9 +115,9 @@ export default function FileExplorerApp() {
 
       <div style={{ padding: "2px 8px", borderTop: "1px solid #808080", fontSize: 10, color: "#555", flexShrink: 0, background: "#fff" }}>
         {currentItems.length} object{currentItems.length !== 1 ? "s" : ""}
-        {selectedId && (() => {
-          const selected = desktopItems.find((item) => item.id === selectedId);
-          return selected ? ` · ${selected.title} selected` : "";
+        {explorerState.selectedItemId && (() => {
+          const selected = getItemById(explorerState.selectedItemId);
+          return selected ? ` | ${selected.title} selected` : "";
         })()}
       </div>
     </div>
