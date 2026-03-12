@@ -33,15 +33,16 @@ const EXPERIENCE = [
   {
     company: "Realdealkickzsc",
     role: "Contract Full-Stack Software Engineer",
-    period: "Nov 2025 - Present",
+    period: "Nov 2025 - Feb 2026",
     type: "Contract / Remote",
-    desc: "Built a production e-commerce platform from scratch to replace Shopify.",
+    desc: "Sole engineer — built a production e-commerce platform from scratch, replacing Shopify with a custom full-stack system and owning the entire infrastructure.",
     bullets: [
-      "Reduced infrastructure costs by 58% replacing Shopify with custom Next.js + Supabase + Upstash platform.",
-      "Designed 60+ API routes with transactional order processing - 100% order success rate, zero duplicate charges.",
-      "Maintained 100% uptime during deployments with GitHub Actions CI/CD and post-deploy health checks.",
-      "Built centralized proxy pipeline with CSRF protection, rate limiting, and MFA-based admin guardrails.",
-      "Designed automated product title parser reducing publishing workflow steps by 33%.",
+      "Replaced Shopify with a custom Next.js/Supabase system, reducing monthly costs from $132 to $50.",
+      "Engineered transactional order workflows and Stripe/Shippo webhook pipelines supporting 31 monthly orders ($8k GMV) with 100% success and zero duplicate charges.",
+      "Optimized storefront via SSR improvements, query tuning, and layout refactoring — increasing projected annual sessions from 204k to 236k.",
+      "Maintained 100% deployment uptime with GitHub Actions CI/CD: migration validation, type-check enforcement, build verification, and post-deploy health monitoring.",
+      "Engineered an automated sneaker title parsing system with structured attribute extraction, reducing product listing workflow from 24 clicks (Shopify) to 11.",
+      "Built a centralized proxy enforcing CSRF protection, Upstash rate limiting, and MFA guardrails — handling 7.5M monthly requests with zero unauthorized access incidents.",
     ],
     stack: ["Next.js", "Supabase", "Stripe", "Upstash Redis", "GitHub Actions", "AWS SES"],
   },
@@ -50,10 +51,10 @@ const EXPERIENCE = [
     role: "Giant Direct Facilitator & Seafood Associate",
     period: "May 2022 - Present",
     type: "Part-time",
-    desc: "Led high-volume fulfillment operations and trained new associates during peak demand.",
+    desc: "High-volume grocery fulfillment and seafood department operations in a fast-paced retail environment.",
     bullets: [
-      "Processed 400+ unit orders during peak periods while onboarding new associates.",
-      "Maintained accuracy and efficiency standards across high-volume fulfillment cycles.",
+      "Led Giant Direct fulfillment processing 400+ unit orders during peak demand while training and onboarding new associates.",
+      "Delivered consistent customer service with zero formal complaints and hundreds of positive commendations across in-store and online order interactions.",
     ],
     stack: [],
   },
@@ -563,6 +564,7 @@ function TitleBar({ title, isActive, isMaximized, onClose, onMinimize, onMaximiz
         {controls.map((btn) => (
           <button
             key={btn.id}
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); btn.action(); }}
             style={{
               width: 28,
@@ -1136,26 +1138,31 @@ function SkillsApp() {
 
 function ExperienceApp() {
   return (
-    <div style={{ padding: "12px 16px", background: "#c0c0c0", minHeight: "100%" }}>
+    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "10px 12px", background: "#c0c0c0" }}>
       {EXPERIENCE.map((exp, i) => (
         <div key={i} style={{
-          marginBottom: 10,
+          marginBottom: 10, userSelect: "none",
           border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
           background: "#d4d0c8",
         }}>
-          {/* entry header bar */}
+          {/* Header */}
           <div style={{
-            background: "linear-gradient(to right, #000080, #1084d0)",
-            padding: "3px 8px", display: "flex", alignItems: "center",
-            justifyContent: "space-between", flexWrap: "wrap", gap: 4,
+            background: "#d4d0c8", borderBottom: "1px solid #808080",
+            padding: "5px 10px", display: "flex", alignItems: "flex-start",
+            justifyContent: "space-between", gap: 8,
           }}>
-            <div style={{ fontWeight: 700, fontSize: 11, color: "#fff" }}>{exp.company}</div>
-            <div style={{ fontSize: 10, color: "#cce" }}>{exp.period}</div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontWeight: 700, fontSize: 12, color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{exp.company}</div>
+              <div style={{ fontSize: 10, color: "#555", fontStyle: "italic", marginTop: 1 }}>{exp.role}</div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+              <span style={{ fontSize: 9, color: "#555" }}>{exp.period}</span>
+              <span style={{ padding: "0 5px", fontSize: 9, fontWeight: 700, background: "#c0c0c0", color: "#111", border: "1px solid #808080" }}>{exp.type}</span>
+            </div>
           </div>
-          {/* entry body */}
-          <div style={{ padding: "6px 10px" }}>
-            <div style={{ fontSize: 11, color: "#000080", fontWeight: 700, marginBottom: 3 }}>{exp.role}</div>
-            <div style={{ fontSize: 11, color: "#333", marginBottom: 6, lineHeight: 1.55 }}>{exp.desc}</div>
+          {/* Body */}
+          <div style={{ padding: "6px 10px 8px" }}>
+            <div style={{ fontSize: 11, color: "#444", marginBottom: 6, lineHeight: 1.5, fontStyle: "italic" }}>{exp.desc}</div>
             {exp.bullets.map((b, j) => (
               <div key={j} style={{ fontSize: 11, color: "#222", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.5 }}>
                 <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
@@ -1163,13 +1170,20 @@ function ExperienceApp() {
               </div>
             ))}
             {exp.stack.length > 0 && (
-              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 7 }}>
-                {exp.stack.map((t) => (
-                  <span key={t} style={{
-                    padding: "1px 6px", fontSize: 10, background: "#c0c0c0",
-                    border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
-                  }}>{t}</span>
-                ))}
+              <div style={{ display: "flex", gap: 3, flexWrap: "wrap", marginTop: 7 }}>
+                {exp.stack.map((t) => {
+                  const iconFile = SKILL_ICON_FILES[t];
+                  return (
+                    <span key={t} style={{
+                      padding: "0 5px", fontSize: 9, background: "#c0c0c0",
+                      border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
+                      display: "inline-flex", alignItems: "center", gap: 2,
+                    }}>
+                      {iconFile && <img src={`/skills/${iconFile}`} alt={t} width={9} height={9} style={{ imageRendering: "pixelated", objectFit: "contain" }} />}
+                      {t}
+                    </span>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -1688,7 +1702,7 @@ function ProjectsApp({ onOpenVideo }) {
             return (
               <div
                 key={i}
-                onDoubleClick={() => openProjectDetail(i)}
+                onClick={() => openProjectDetail(i)}
                 style={{
                   marginBottom: 10, cursor: "pointer", userSelect: "none",
                   border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
@@ -1733,7 +1747,7 @@ function ProjectsApp({ onOpenVideo }) {
                         );
                       })}
                     </div>
-                    <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>double-click to open</span>
+                    <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>click to open →</span>
                   </div>
                 </div>
               </div>
