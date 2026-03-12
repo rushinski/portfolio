@@ -6,7 +6,7 @@ import BootSequence from "./BootSequence";
 import SystemDialog from "./SystemDialog";
 import Taskbar from "./Taskbar";
 import WindowFrame from "./WindowFrame";
-import { ICON_VIEW_MODES, MENU_TEXT_COLOR, WALLPAPER_PATTERN_BACKGROUNDS, canPinItemToTaskbar, clamp } from "./constants";
+import { DRAG_ITEM_MIME, ICON_VIEW_MODES, MENU_TEXT_COLOR, WALLPAPER_PATTERN_BACKGROUNDS, canPinItemToTaskbar, clamp } from "./constants";
 import { PERSONAL } from "./data";
 import { useDialogs } from "./hooks/useDialogs";
 import { useFileSystem } from "./hooks/useFileSystem";
@@ -287,6 +287,7 @@ export default function Desktop() {
     pasteDesktopItem,
     commitRenameItem,
     deleteDesktopItem,
+    moveItemToParent,
     moveItemToRecycleBin,
     openItem,
     setIconPositions,
@@ -305,6 +306,7 @@ export default function Desktop() {
   const [desktopViewMenuOpen, setDesktopViewMenuOpen] = useState(false);
   const [iconMenu, setIconMenu] = useState(null);
   const [renamingItem, setRenamingItem] = useState(null);
+  const [desktopDropActive, setDesktopDropActive] = useState(false);
 
   const rootDesktopItems = useMemo(
     () => desktopItems.filter((item) => (item.parentId ?? null) === null),
@@ -521,6 +523,25 @@ export default function Desktop() {
     });
   }, [desktopItems, findFreeGridPosition, iconPositions.trash, iconSizeMode, moveItemToRecycleBin, normalizeIconPosition, setIconPositions]);
 
+  const handleDesktopExternalDrop = useCallback((event) => {
+    const draggedId = event.dataTransfer?.getData(DRAG_ITEM_MIME) || event.dataTransfer?.getData("text/plain");
+    setDesktopDropActive(false);
+    if (!draggedId) {
+      return;
+    }
+
+    rememberDesktopCursor(event.clientX, event.clientY);
+    const moved = moveItemToParent(draggedId, null, {
+      clientX: event.clientX,
+      clientY: event.clientY,
+    });
+    if (moved) {
+      setSelectedIconIds([draggedId]);
+      setIconMenu(null);
+      setDesktopMenu(null);
+    }
+  }, [moveItemToParent, rememberDesktopCursor]);
+
   const nudgeSelectedIcon = useCallback((dxCells, dyCells) => {
     const id = selectedIconIds[0];
     if (!id) return;
@@ -648,7 +669,27 @@ export default function Desktop() {
 
               <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, opacity: booted ? 1 : 0.96, pointerEvents: booted ? "auto" : "none", transition: "opacity 240ms linear" }}>
                 <TopMenuBar />
-                <div ref={setDesktopNode} style={{ flex: 1, position: "relative", overflow: "hidden" }} onPointerDown={handleDesktopPointerDown} onPointerMove={(event) => rememberDesktopCursor(event.clientX, event.clientY)} onContextMenu={(event) => { if (event.target !== event.currentTarget) return; event.preventDefault(); event.stopPropagation(); openDesktopMenuAt(event.clientX, event.clientY); }}>
+                <div
+                  ref={setDesktopNode}
+                  style={{ flex: 1, position: "relative", overflow: "hidden", outline: desktopDropActive ? "1px dotted rgba(255,255,255,0.85)" : "none", outlineOffset: -2 }}
+                  onPointerDown={handleDesktopPointerDown}
+                  onPointerMove={(event) => rememberDesktopCursor(event.clientX, event.clientY)}
+                  onDragOver={(event) => {
+                    const dragTypes = Array.from(event.dataTransfer?.types || []);
+                    const draggedId = dragTypes.includes(DRAG_ITEM_MIME) || dragTypes.includes("text/plain");
+                    if (!draggedId) {
+                      return;
+                    }
+                    event.preventDefault();
+                    setDesktopDropActive(true);
+                  }}
+                  onDragLeave={() => setDesktopDropActive(false)}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    handleDesktopExternalDrop(event);
+                  }}
+                  onContextMenu={(event) => { if (event.target !== event.currentTarget) return; event.preventDefault(); event.stopPropagation(); openDesktopMenuAt(event.clientX, event.clientY); }}
+                >
                   {rootDesktopItems.map((icon) => (
                     <DesktopIcon key={icon.id} icon={icon} position={iconPositions[icon.id]} selected={selectedIconIds.includes(icon.id)} hovered={hoveredIcon === icon.id || marqueePreviewIds.includes(icon.id)} iconSizeMode={iconSizeMode} onDoubleClick={() => openItem(icon)} onDragStart={handleIconDragStart} onDragMove={handleIconDragMove} onDrop={handleIconDrop} onSingleClick={(id, _x, _y, opts) => selectDesktopIcon(id, opts)} onContextMenu={openIconMenuAt} onHoverChange={setHoveredIcon} isCutPending={clipboardState?.mode === "cut" && clipboardState.id === icon.id} isRenaming={renamingItem?.id === icon.id} renameValue={renamingItem?.id === icon.id ? renamingItem.value : icon.title} onRenameChange={(value) => setRenamingItem((prev) => (prev?.id === icon.id ? { ...prev, value } : prev))} onRenameCommit={commitRenameDesktopItem} onRenameCancel={cancelRenameDesktopItem} />
                   ))}

@@ -5,6 +5,7 @@ import { cloneElement, useEffect, useMemo, useRef, useState } from "react";
 import { useDialogs } from "../hooks/useDialogs";
 import { useFileSystem } from "../hooks/useFileSystem";
 import { useWindowManager } from "../hooks/useWindowManager";
+import { DRAG_ITEM_MIME } from "../constants";
 import {
   ETCHED_SEPARATOR_STYLE,
   INSET_BORDER,
@@ -225,12 +226,16 @@ function TreeRow({
   depth,
   label,
   selected,
+  dropActive = false,
   icon,
   hasChildren,
   isCollapsed,
   onToggle,
   onClick,
   onContextMenu,
+  onDragOver,
+  onDragLeave,
+  onDrop,
 }) {
   const rowColor = selected ? "#ffffff" : WIN95_COLORS.text;
   const connectorLeft = 10 + depth * TREE_INDENT;
@@ -239,14 +244,17 @@ function TreeRow({
     <div
       onClick={onClick}
       onContextMenu={onContextMenu}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
       style={{
         position: "relative",
         height: TREE_ROW_HEIGHT,
         display: "flex",
         alignItems: "center",
         paddingLeft: 6 + depth * TREE_INDENT,
-        background: selected ? WIN95_COLORS.selection : "transparent",
-        color: rowColor,
+        background: dropActive ? "#5b8fd8" : selected ? WIN95_COLORS.selection : "transparent",
+        color: dropActive ? "#ffffff" : rowColor,
         fontSize: 12,
         whiteSpace: "nowrap",
         cursor: "default",
@@ -296,11 +304,15 @@ function FolderTreeNode({
   folder,
   depth,
   currentFolderId,
+  dropTargetId,
   childrenByParent,
   collapsedNodeIds,
   toggleNode,
   onSelect,
   onContextMenu,
+  onDragOverFolder,
+  onDropToFolder,
+  onClearDropState,
 }) {
   const childFolders = childrenByParent.get(folder.id) || [];
   const isCollapsed = collapsedNodeIds.has(folder.id);
@@ -311,12 +323,16 @@ function FolderTreeNode({
         depth={depth}
         label={folder.title}
         selected={currentFolderId === folder.id}
+        dropActive={dropTargetId === folder.id}
         icon={<ExplorerItemGlyph item={folder} size={16} />}
         hasChildren={childFolders.length > 0}
         isCollapsed={isCollapsed}
         onToggle={() => toggleNode(folder.id)}
         onClick={() => onSelect(folder.id)}
         onContextMenu={(event) => onContextMenu(event, folder)}
+        onDragOver={(event) => onDragOverFolder(event, folder.id)}
+        onDragLeave={onClearDropState}
+        onDrop={(event) => onDropToFolder(event, folder.id)}
       />
       {!isCollapsed && childFolders.map((childFolder) => (
         <FolderTreeNode
@@ -324,11 +340,15 @@ function FolderTreeNode({
           folder={childFolder}
           depth={depth + 1}
           currentFolderId={currentFolderId}
+          dropTargetId={dropTargetId}
           childrenByParent={childrenByParent}
           collapsedNodeIds={collapsedNodeIds}
           toggleNode={toggleNode}
           onSelect={onSelect}
           onContextMenu={onContextMenu}
+          onDragOverFolder={onDragOverFolder}
+          onDropToFolder={onDropToFolder}
+          onClearDropState={onClearDropState}
         />
       ))}
     </>
@@ -481,6 +501,7 @@ export default function FileExplorerApp() {
     canCreateInFolder,
     canDeleteItem,
     canRenameItem,
+    moveItemToParent,
     moveItemToRecycleBin,
     openItem,
     pasteItem,
@@ -509,6 +530,8 @@ export default function FileExplorerApp() {
   const [renamingItemId, setRenamingItemId] = useState(null);
   const [renameValue, setRenameValue] = useState("");
   const [propertiesItemId, setPropertiesItemId] = useState(null);
+  const [dropTargetId, setDropTargetId] = useState(null);
+  const [contentDropActive, setContentDropActive] = useState(false);
 
   const currentFolder = explorerState.currentFolderId ? getItemById(explorerState.currentFolderId) : null;
   const pathSegments = getFolderPathSegments(explorerState.currentFolderId);
@@ -602,6 +625,14 @@ export default function FileExplorerApp() {
     setContextMenu(null);
   };
 
+  const startRenameById = (id, title) => {
+    if (!id) return;
+    setExplorerSelectedItemId(id);
+    setRenamingItemId(id);
+    setRenameValue(title);
+    setContextMenu(null);
+  };
+
   const commitRename = () => {
     if (!renamingItemId) return;
     commitRenameItem(renamingItemId, renameValue);
@@ -615,19 +646,15 @@ export default function FileExplorerApp() {
 
   const handleCreateFolder = () => {
     const createdId = createFolder({ parentId: explorerState.currentFolderId });
-    const item = createdId ? getItemById(createdId) : null;
     if (createdId) {
-      setExplorerSelectedItemId(createdId);
-      if (item) startRename(item);
+      startRenameById(createdId, "New Folder");
     }
   };
 
   const handleCreateTextDocument = () => {
     const createdId = createTextDocument({ parentId: explorerState.currentFolderId });
-    const item = createdId ? getItemById(createdId) : null;
     if (createdId) {
-      setExplorerSelectedItemId(createdId);
-      if (item) startRename(item);
+      startRenameById(createdId, "New Text Document.txt");
     }
   };
 
@@ -688,6 +715,75 @@ export default function FileExplorerApp() {
     }
 
     setContextMenu(null);
+  };
+
+  const getDraggedItemId = (event) => (
+    event.dataTransfer?.getData(DRAG_ITEM_MIME) || event.dataTransfer?.getData("text/plain") || ""
+  );
+
+  const handleExplorerDragStart = (event, item) => {
+    if (!canDeleteItem(item)) {
+      event.preventDefault();
+      return;
+    }
+
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData(DRAG_ITEM_MIME, item.id);
+    event.dataTransfer.setData("text/plain", item.id);
+    setExplorerSelectedItemId(item.id);
+  };
+
+  const clearDropState = () => {
+    setDropTargetId(null);
+    setContentDropActive(false);
+  };
+
+  const handleDropToFolder = (event, targetParentId) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const draggedId = getDraggedItemId(event);
+    clearDropState();
+
+    if (!draggedId || draggedId === targetParentId) {
+      return;
+    }
+
+    if (!canCreateInFolder(targetParentId)) {
+      return;
+    }
+
+    const moved = moveItemToParent(draggedId, targetParentId, {
+      clientX: event.clientX,
+      clientY: event.clientY,
+    });
+
+    if (moved) {
+      setExplorerSelectedItemId(draggedId);
+    }
+  };
+
+  const handleDragOverFolder = (event, targetParentId) => {
+    const draggedId = getDraggedItemId(event);
+    if (!draggedId || draggedId === targetParentId || !canCreateInFolder(targetParentId)) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    setDropTargetId(targetParentId ?? "__desktop__");
+    setContentDropActive(false);
+  };
+
+  const handleContentDragOver = (event) => {
+    const draggedId = getDraggedItemId(event);
+    if (!draggedId || !canCreateInFolder(explorerState.currentFolderId)) {
+      return;
+    }
+
+    event.preventDefault();
+    setContentDropActive(true);
+    setDropTargetId(null);
   };
 
   useEffect(() => {
@@ -892,11 +988,15 @@ export default function FileExplorerApp() {
                 depth={0}
                 label="Desktop"
                 selected={explorerState.currentFolderId === null}
+                dropActive={dropTargetId === "__desktop__"}
                 icon={<DesktopTreeGlyph />}
                 hasChildren={(treeChildrenByParent.get(null) || []).length > 0}
                 isCollapsed={false}
                 onClick={() => explorerNavigateTo(null)}
                 onContextMenu={(event) => openContextMenu(event, "background")}
+                onDragOver={(event) => handleDragOverFolder(event, null)}
+                onDragLeave={clearDropState}
+                onDrop={(event) => handleDropToFolder(event, null)}
               />
               {(treeChildrenByParent.get(null) || []).map((folder) => (
                 <FolderTreeNode
@@ -904,11 +1004,15 @@ export default function FileExplorerApp() {
                   folder={folder}
                   depth={1}
                   currentFolderId={explorerState.currentFolderId}
+                  dropTargetId={dropTargetId}
                   childrenByParent={treeChildrenByParent}
                   collapsedNodeIds={collapsedNodeIds}
                   toggleNode={toggleTreeNode}
                   onSelect={explorerNavigateTo}
                   onContextMenu={(event, item) => openContextMenu(event, "item", item)}
+                  onDragOverFolder={handleDragOverFolder}
+                  onDropToFolder={handleDropToFolder}
+                  onClearDropState={clearDropState}
                 />
               ))}
             </div>
@@ -936,7 +1040,10 @@ export default function FileExplorerApp() {
                   setContextMenu(null);
                 }}
                 onContextMenu={(event) => openContextMenu(event, "background")}
-                style={{ flex: 1, minHeight: 0, overflow: "auto", background: "#ffffff", padding: explorerState.viewMode === "grid" ? "10px" : 0 }}
+                onDragOver={handleContentDragOver}
+                onDragLeave={clearDropState}
+                onDrop={(event) => handleDropToFolder(event, explorerState.currentFolderId)}
+                style={{ flex: 1, minHeight: 0, overflow: "auto", background: contentDropActive ? "#eef4ff" : "#ffffff", padding: explorerState.viewMode === "grid" ? "10px" : 0 }}
               >
                 {visibleItems.length === 0 ? (
                   <div style={{ padding: "18px 16px", color: WIN95_COLORS.textMuted, fontSize: 12 }}>
@@ -947,21 +1054,29 @@ export default function FileExplorerApp() {
                     {visibleItems.map((item) => {
                       const selected = explorerState.selectedItemId === item.id;
                       const renaming = renamingItemId === item.id;
+                      const canDragItem = canDeleteItem(item);
+                      const isFolderDropTarget = isContainerItem(item) && canCreateInFolder(item.id);
 
                       return (
                         <button
                           key={item.id}
                           type="button"
+                          draggable={canDragItem}
                           onClick={(event) => {
                             event.stopPropagation();
                             setExplorerSelectedItemId(item.id);
                           }}
+                          onDragStart={(event) => handleExplorerDragStart(event, item)}
+                          onDragEnd={clearDropState}
+                          onDragOver={isFolderDropTarget ? (event) => handleDragOverFolder(event, item.id) : undefined}
+                          onDragLeave={isFolderDropTarget ? clearDropState : undefined}
+                          onDrop={isFolderDropTarget ? (event) => handleDropToFolder(event, item.id) : undefined}
                           onDoubleClick={(event) => {
                             event.stopPropagation();
                             if (!renaming) openItem(item);
                           }}
                           onContextMenu={(event) => openContextMenu(event, "item", item)}
-                          style={{ border: "none", background: selected ? WIN95_COLORS.selection : "transparent", color: selected ? "#ffffff" : WIN95_COLORS.text, padding: "6px 4px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 86, fontFamily: "inherit", fontSize: 11, textAlign: "center", cursor: "default" }}
+                          style={{ border: "none", outline: dropTargetId === item.id ? "1px dotted #000080" : "none", background: dropTargetId === item.id ? "#dce9ff" : selected ? WIN95_COLORS.selection : "transparent", color: selected ? "#ffffff" : WIN95_COLORS.text, padding: "6px 4px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minHeight: 86, fontFamily: "inherit", fontSize: 11, textAlign: "center", cursor: canDragItem ? "grab" : "default" }}
                         >
                           <ExplorerItemGlyph item={item} size={32} />
                           {renaming ? (
@@ -994,20 +1109,28 @@ export default function FileExplorerApp() {
                   visibleItems.map((item) => {
                     const selected = explorerState.selectedItemId === item.id;
                     const renaming = renamingItemId === item.id;
+                    const canDragItem = canDeleteItem(item);
+                    const isFolderDropTarget = isContainerItem(item) && canCreateInFolder(item.id);
 
                     return (
                       <div
                         key={item.id}
+                        draggable={canDragItem}
                         onClick={(event) => {
                           event.stopPropagation();
                           setExplorerSelectedItemId(item.id);
                         }}
+                        onDragStart={(event) => handleExplorerDragStart(event, item)}
+                        onDragEnd={clearDropState}
+                        onDragOver={isFolderDropTarget ? (event) => handleDragOverFolder(event, item.id) : undefined}
+                        onDragLeave={isFolderDropTarget ? clearDropState : undefined}
+                        onDrop={isFolderDropTarget ? (event) => handleDropToFolder(event, item.id) : undefined}
                         onDoubleClick={(event) => {
                           event.stopPropagation();
                           if (!renaming) openItem(item);
                         }}
                         onContextMenu={(event) => openContextMenu(event, "item", item)}
-                        style={{ display: "grid", gridTemplateColumns: "minmax(220px, 1fr) 120px 86px 90px", alignItems: "center", minHeight: 20, padding: "0 8px", background: selected ? WIN95_COLORS.selection : "transparent", color: selected ? "#ffffff" : WIN95_COLORS.text, fontSize: 11, cursor: "default", userSelect: "none" }}
+                        style={{ display: "grid", gridTemplateColumns: "minmax(220px, 1fr) 120px 86px 90px", alignItems: "center", minHeight: 20, padding: "0 8px", outline: dropTargetId === item.id ? "1px dotted #000080" : "none", background: dropTargetId === item.id ? "#dce9ff" : selected ? WIN95_COLORS.selection : "transparent", color: selected ? "#ffffff" : WIN95_COLORS.text, fontSize: 11, cursor: canDragItem ? "grab" : "default", userSelect: "none" }}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
                           <ExplorerItemGlyph item={item} size={16} />

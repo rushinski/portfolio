@@ -13,6 +13,7 @@ export const ICON_VIEW_MODES = {
 };
 
 export const MENU_TEXT_COLOR = "#162133";
+export const DRAG_ITEM_MIME = "application/x-jacobos-item-id";
 export const FULLSCREEN_WINDOW_IDS = new Set(["experience", "projects", "videos", "contact", "resume"]);
 export const DEFAULT_PINNED_TASKBAR_IDS = ["about", "skills", "experience", "projects", "contact"];
 export const DEFAULT_SETTINGS = {
