@@ -455,7 +455,7 @@ const ICON_VIEW_MODES = {
   large: { tileW: 94, tileH: 112, glyphScale: 1.2, labelSize: 12, cellX: 108, cellY: 126, maxLabel: 100 },
 };
 const MENU_TEXT_COLOR = "#162133";
-const FULLSCREEN_WINDOW_IDS = new Set(["skills", "experience", "projects", "videos", "contact", "resume"]);
+const FULLSCREEN_WINDOW_IDS = new Set(["experience", "projects", "videos", "contact", "resume"]);
 const DEFAULT_PINNED_TASKBAR_IDS = ["about", "skills", "experience", "projects", "videos", "contact"];
 const canPinItemToTaskbar = (item) => item?.itemType === "app" && !!item.windowId;
 const snapIconToGrid = (x, y, mode = "medium", marginX = 12, marginY = 8) => {
@@ -2939,7 +2939,7 @@ export default function HeroDesktopComputerComponent() {
   const [windows, setWindows] = useState({
     welcome:    { id: "welcome",    title: "Welcome",                  x: 250, y: 95,  w: 800, h: 500, isOpen: true,  isMinimized: false, isMaximized: false, z: 11 },
     about:      { id: "about",      title: "About",                    x: 30, y: 20,  w: 1200, h: 600, isOpen: false, isMinimized: false, isMaximized: false, z: 10 },
-    skills:     { id: "skills",     title: "Skills",                   x: 200, y: 60,  w: 480, h: 400, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
+    skills:     { id: "skills",     title: "Skills",                   x: 180, y: 50,  w: 900, h: 520, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
     experience: { id: "experience", title: "Experience",               x: 180, y: 50,  w: 560, h: 480, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
     projects:   { id: "projects",   title: "Projects",                 x: 100, y: 20,  w: 600, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
     videos:     { id: "videos",     title: "Videos",                   x: 140, y: 40,  w: 840, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
