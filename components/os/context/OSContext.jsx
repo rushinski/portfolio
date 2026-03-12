@@ -10,9 +10,11 @@ import {
   FILE_TYPE_LABELS,
   FULLSCREEN_WINDOW_IDS,
   ICON_VIEW_MODES,
+  INITIAL_CUSTOM_ITEMS,
   INITIAL_ICON_POSITIONS,
   INITIAL_WINDOWS,
   SYSTEM_SPECS,
+  buildExplorerSystemItems,
   buildSystemDesktopIcons,
   canPinItemToTaskbar,
   clamp,
@@ -83,7 +85,7 @@ export function OSProvider({ children }) {
   const [systemDialog, setSystemDialog] = useState(null);
   const [clipboardState, setClipboardState] = useState(null);
   const [renamedSystemIcons, setRenamedSystemIcons] = useState({});
-  const [customItems, setCustomItems] = useState([]);
+  const [customItems, setCustomItems] = useState(() => INITIAL_CUSTOM_ITEMS.map((item) => enrichItem(item)));
   const [recycleBinItems, setRecycleBinItems] = useState([]);
   const [activeTextDocId, setActiveTextDocId] = useState(null);
   const [selectedVideoId, setSelectedVideoId] = useState(VIDEO_LIBRARY[0]?.id || null);
@@ -151,15 +153,23 @@ export function OSProvider({ children }) {
     () => buildSystemDesktopIcons(renamedSystemIcons, { recycleBinHasItems: recycleBinItems.length > 0 }),
     [renamedSystemIcons, recycleBinItems.length],
   );
+  const explorerSystemItems = useMemo(
+    () => buildExplorerSystemItems(),
+    [],
+  );
 
   const desktopItems = useMemo(
     () => [...systemDesktopIcons, ...customItems],
     [systemDesktopIcons, customItems],
   );
+  const allFileSystemItems = useMemo(
+    () => [...explorerSystemItems, ...desktopItems],
+    [desktopItems, explorerSystemItems],
+  );
 
   const itemsById = useMemo(
-    () => new Map(desktopItems.map((item) => [item.id, item])),
-    [desktopItems],
+    () => new Map(allFileSystemItems.map((item) => [item.id, item])),
+    [allFileSystemItems],
   );
 
   const activeTextDoc = useMemo(
@@ -371,12 +381,12 @@ export function OSProvider({ children }) {
   }, [allSettings.iconSizeMode]);
 
   const getItemsInFolder = useCallback((folderId = null) => (
-    desktopItems.filter((item) => (item.parentId ?? null) === (folderId ?? null))
-  ), [desktopItems]);
+    allFileSystemItems.filter((item) => (item.parentId ?? null) === (folderId ?? null))
+  ), [allFileSystemItems]);
 
   const getRootDesktopItems = useCallback(
-    () => getItemsInFolder(null),
-    [getItemsInFolder],
+    () => desktopItems.filter((item) => (item.parentId ?? null) === null),
+    [desktopItems],
   );
 
   const getNextDesktopSlot = useCallback(() => {
@@ -440,6 +450,30 @@ export function OSProvider({ children }) {
   }, [allSettings.iconSizeMode, getRootDesktopItems, normalizeIconPosition]);
 
   const getItemById = useCallback((id) => itemsById.get(id) || null, [itemsById]);
+
+  const isContainerItem = useCallback((itemOrId) => {
+    const item = typeof itemOrId === "string" ? itemsById.get(itemOrId) : itemOrId;
+    return !!item && (item.isContainer || item.itemType === "folder");
+  }, [itemsById]);
+
+  const canCreateInFolder = useCallback((folderId = null) => {
+    if (folderId === null) {
+      return true;
+    }
+
+    const folder = itemsById.get(folderId);
+    return !!folder && isContainerItem(folder) && !folder.readOnly;
+  }, [isContainerItem, itemsById]);
+
+  const canRenameItem = useCallback((itemOrId) => {
+    const item = typeof itemOrId === "string" ? itemsById.get(itemOrId) : itemOrId;
+    return !!item && !item.explorerOnly;
+  }, [itemsById]);
+
+  const canDeleteItem = useCallback((itemOrId) => {
+    const item = typeof itemOrId === "string" ? itemsById.get(itemOrId) : itemOrId;
+    return !!item && !item.system;
+  }, [itemsById]);
 
   const getFolderPathSegments = useCallback((folderId = null) => {
     const segments = [{ id: null, title: "Desktop" }];
@@ -722,7 +756,7 @@ export function OSProvider({ children }) {
       return;
     }
 
-    if (item.itemType === "folder") {
+    if (isContainerItem(item)) {
       openFolderInExplorer(item.id);
       return;
     }
@@ -730,10 +764,18 @@ export function OSProvider({ children }) {
     if (item.windowId) {
       openWindow(item.windowId);
     }
-  }, [nextZ, openFolderInExplorer, openWindow, playUiSound]);
+  }, [isContainerItem, nextZ, openFolderInExplorer, openWindow, playUiSound]);
 
   const createItem = useCallback((itemType, request = {}) => {
     const { clientX, clientY, parentId = null, title } = request;
+    if (!canCreateInFolder(parentId)) {
+      showAlertDialog("You cannot create items in this location.", {
+        title: "File Explorer",
+        variant: "warning",
+      });
+      return null;
+    }
+
     const id = createItemId(itemType);
     const createdAt = Date.now();
     const basePosition = parentId === null
@@ -781,7 +823,7 @@ export function OSProvider({ children }) {
 
     playUiSound("click");
     return id;
-  }, [findFreeGridPosition, getNextDesktopSlot, normalizeIconPosition, playUiSound, toDesktopPoint]);
+  }, [canCreateInFolder, findFreeGridPosition, getNextDesktopSlot, normalizeIconPosition, playUiSound, showAlertDialog, toDesktopPoint]);
 
   const createFolder = useCallback((firstArg, clientY) => {
     const request = normalizeRequest(firstArg, clientY);
@@ -817,6 +859,10 @@ export function OSProvider({ children }) {
   const moveItemToParent = useCallback((id, targetParentId = null, options = {}) => {
     const item = itemsById.get(id);
     if (!item || item.system) {
+      return false;
+    }
+
+    if (!canCreateInFolder(targetParentId)) {
       return false;
     }
 
@@ -857,7 +903,7 @@ export function OSProvider({ children }) {
     });
 
     return true;
-  }, [findFreeGridPosition, getNextDesktopSlot, itemsById, resolvePasteBasePosition]);
+  }, [canCreateInFolder, findFreeGridPosition, getNextDesktopSlot, itemsById, resolvePasteBasePosition]);
 
   const pasteItem = useCallback((firstArg, clientY) => {
     if (!clipboardState) {
@@ -868,6 +914,18 @@ export function OSProvider({ children }) {
     const { targetParentId = null, clientX, clientY: pointerY } = request;
     const source = itemsById.get(clipboardState.id);
     if (!source) {
+      return null;
+    }
+
+    if (source.system) {
+      return null;
+    }
+
+    if (!canCreateInFolder(targetParentId)) {
+      showAlertDialog("You cannot paste items into this location.", {
+        title: "File Explorer",
+        variant: "warning",
+      });
       return null;
     }
 
@@ -908,7 +966,7 @@ export function OSProvider({ children }) {
 
     playUiSound("click");
     return cloneId;
-  }, [clipboardState, findFreeGridPosition, itemsById, moveItemToParent, playUiSound, resolvePasteBasePosition]);
+  }, [canCreateInFolder, clipboardState, findFreeGridPosition, itemsById, moveItemToParent, playUiSound, resolvePasteBasePosition, showAlertDialog]);
 
   const pasteDesktopItem = useCallback((firstArg, clientY) => {
     const request = normalizeRequest(firstArg, clientY);
@@ -927,6 +985,9 @@ export function OSProvider({ children }) {
     }
 
     if (item.system) {
+      if (item.explorerOnly) {
+        return;
+      }
       setRenamedSystemIcons((prev) => ({ ...prev, [id]: safeTitle }));
       return;
     }
@@ -1350,6 +1411,8 @@ export function OSProvider({ children }) {
     },
     fileSystem: {
       desktopItems,
+      explorerSystemItems,
+      allFileSystemItems,
       systemDesktopIcons,
       customItems,
       recycleBinItems,
@@ -1370,6 +1433,10 @@ export function OSProvider({ children }) {
       getItemLocationLabel,
       getItemPathLabel,
       getItemProperties,
+      isContainerItem,
+      canCreateInFolder,
+      canRenameItem,
+      canDeleteItem,
       createFolder,
       createTextDocument,
       pasteItem,
@@ -1440,6 +1507,8 @@ export function OSProvider({ children }) {
     pinTaskbarItem,
     unpinTaskbarItem,
     desktopItems,
+    explorerSystemItems,
+    allFileSystemItems,
     systemDesktopIcons,
     customItems,
     recycleBinItems,
@@ -1460,6 +1529,10 @@ export function OSProvider({ children }) {
     getItemLocationLabel,
     getItemPathLabel,
     getItemProperties,
+    isContainerItem,
+    canCreateInFolder,
+    canRenameItem,
+    canDeleteItem,
     createFolder,
     createTextDocument,
     pasteItem,

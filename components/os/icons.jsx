@@ -1,6 +1,20 @@
 "use client";
 
 export const Icons = {
+  computer: (
+    <svg width="32" height="32" viewBox="0 0 32 32">
+      <rect x="4" y="3" width="24" height="17" fill="#c8c8c8" stroke="#404040" strokeWidth="1" />
+      <line x1="5" y1="4" x2="27" y2="4" stroke="#ffffff" strokeWidth="1" />
+      <line x1="5" y1="4" x2="5" y2="19" stroke="#ffffff" strokeWidth="1" />
+      <rect x="6" y="5" width="20" height="12" fill="#000080" stroke="#6aa0ff" strokeWidth="0.8" />
+      <rect x="13" y="20" width="6" height="3" fill="#a0a0a0" stroke="#606060" strokeWidth="0.8" />
+      <rect x="10" y="23" width="12" height="2" fill="#9a9a9a" stroke="#606060" strokeWidth="0.8" />
+      <rect x="7" y="25" width="18" height="4" fill="#d5d5d5" stroke="#606060" strokeWidth="1" />
+      <line x1="8" y1="26" x2="24" y2="26" stroke="#ffffff" strokeWidth="0.8" />
+      <circle cx="10" cy="27.5" r="0.7" fill="#008000" />
+      <circle cx="13" cy="27.5" r="0.7" fill="#a00000" />
+    </svg>
+  ),
   folder: (
     <svg width="32" height="32" viewBox="0 0 32 32">
       <rect x="1" y="9" width="30" height="20" fill="#c8a000" stroke="#806000" strokeWidth="1" />
@@ -23,6 +37,19 @@ export const Icons = {
       <line x1="8" y1="16" x2="19" y2="16" stroke="#c0c0c0" strokeWidth="1" />
       <line x1="8" y1="20" x2="20" y2="20" stroke="#c0c0c0" strokeWidth="1" />
       <line x1="8" y1="24" x2="15" y2="24" stroke="#c0c0c0" strokeWidth="1" />
+    </svg>
+  ),
+  drive: (
+    <svg width="32" height="32" viewBox="0 0 32 32">
+      <rect x="4" y="10" width="24" height="12" fill="#cfcfcf" stroke="#404040" strokeWidth="1" />
+      <line x1="5" y1="11" x2="27" y2="11" stroke="#ffffff" strokeWidth="1" />
+      <line x1="5" y1="11" x2="5" y2="21" stroke="#ffffff" strokeWidth="1" />
+      <rect x="6" y="13" width="20" height="6" fill="#9a9a9a" stroke="#6a6a6a" strokeWidth="0.6" />
+      <rect x="7" y="6" width="18" height="5" fill="#e2e2e2" stroke="#606060" strokeWidth="0.8" />
+      <line x1="8" y1="7" x2="24" y2="7" stroke="#ffffff" strokeWidth="0.8" />
+      <circle cx="22.5" cy="16" r="1.2" fill="#00a000" />
+      <circle cx="25.5" cy="16" r="1.2" fill="#a00000" />
+      <rect x="10" y="24" width="12" height="2" fill="#808080" />
     </svg>
   ),
   terminal: (
