@@ -402,6 +402,24 @@ const Icons = {
       <rect x="21.5" y="21.5" width="3" height="3" rx="0.5" transform="rotate(45 23 23)" fill="#808080"/>
     </svg>
   ),
+  resume: (
+    <svg width="32" height="32" viewBox="0 0 32 32">
+      {/* page body */}
+      <rect x="4" y="1" width="20" height="26" fill="#ffffff" stroke="#808080" strokeWidth="0.5"/>
+      {/* folded corner */}
+      <polygon points="24,1 30,7 24,7" fill="#d8d8d8" stroke="#808080" strokeWidth="0.5"/>
+      {/* outer border with corner cut */}
+      <path d="M4,1 L24,1 L30,7 L30,27 L4,27 Z" fill="none" stroke="#404080" strokeWidth="1"/>
+      {/* red PDF badge */}
+      <rect x="3" y="20" width="16" height="8" rx="1" fill="#cc0000"/>
+      <text x="5" y="27" fontSize="5.5" fontWeight="bold" fill="#ffffff" fontFamily="Arial,sans-serif">PDF</text>
+      {/* text lines */}
+      <line x1="7" y1="6" x2="21" y2="6" stroke="#606060" strokeWidth="1.2"/>
+      <line x1="7" y1="9" x2="21" y2="9" stroke="#909090" strokeWidth="0.8"/>
+      <line x1="7" y1="12" x2="21" y2="12" stroke="#909090" strokeWidth="0.8"/>
+      <line x1="7" y1="15" x2="17" y2="15" stroke="#909090" strokeWidth="0.8"/>
+    </svg>
+  ),
   location: (
     <svg width="32" height="32" viewBox="0 0 32 32">
       {/* teal background with bevel */}
@@ -437,7 +455,7 @@ const ICON_VIEW_MODES = {
   large: { tileW: 94, tileH: 112, glyphScale: 1.2, labelSize: 12, cellX: 108, cellY: 126, maxLabel: 100 },
 };
 const MENU_TEXT_COLOR = "#162133";
-const FULLSCREEN_WINDOW_IDS = new Set(["skills", "experience", "projects", "videos", "contact"]);
+const FULLSCREEN_WINDOW_IDS = new Set(["skills", "experience", "projects", "videos", "contact", "resume"]);
 const DEFAULT_PINNED_TASKBAR_IDS = ["about", "skills", "experience", "projects", "videos", "contact"];
 const canPinItemToTaskbar = (item) => item?.itemType === "app" && !!item.windowId;
 const snapIconToGrid = (x, y, mode = "medium", marginX = 12, marginY = 8) => {
@@ -869,7 +887,7 @@ function AboutApp({ openWindow }) {
 
           {/* Action buttons */}
           <div style={{ display: "flex", gap: 6 }}>
-            <button onClick={() => window.open(PERSONAL.resumeUrl, "_blank")} style={{
+            <button onClick={() => openWindow?.("resume")} style={{
               background: "#000080", color: "#fff", border: "none",
               borderTop: "2px solid #3366cc", borderLeft: "2px solid #3366cc",
               borderRight: "2px solid #000040", borderBottom: "2px solid #000040",
@@ -1283,10 +1301,11 @@ function VideosApp({ initialVideoId }) {
 
   useEffect(() => {
     const nextId = normalizeVideoId(initialVideoId);
-    if (nextId && nextId !== currentVideoId) {
+    if (nextId) {
       setCurrentVideoId(nextId);
     }
-  }, [initialVideoId, normalizeVideoId, currentVideoId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialVideoId]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -1397,8 +1416,8 @@ function VideosApp({ initialVideoId }) {
         </div>
 
         <div style={{ border: "2px inset #c0c0c0", background: "#d4d0c8", minHeight: 0, display: "flex", flexDirection: "column" }}>
-          <div style={{ background: "linear-gradient(to right, #000080, #1084d0)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 6px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            Windows Media Player - {currentVideo?.label || "No Video Selected"}
+          <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", color: "#111", fontSize: 10, fontWeight: 700, padding: "3px 6px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {currentVideo?.label || "No Video Selected"}
           </div>
 
           <div style={{ flex: 1, background: "#000", margin: 3, position: "relative", minHeight: 0 }}>
@@ -2089,6 +2108,16 @@ const DESKTOP_COLORS = [
   { label: "Black",       value: "#000000",  preview: "#000000" },
 ];
 
+function ResumeApp() {
+  return (
+    <iframe
+      src="/Jacob_Rushinski_Resume.pdf#zoom=100"
+      style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+      title="Resume"
+    />
+  );
+}
+
 function SettingsApp({ iconSizeMode, setIconSizeMode, clockFormat, setClockFormat, desktopColor, setDesktopColor }) {
   const [activeTab, setActiveTab] = useState("display");
 
@@ -2675,7 +2704,7 @@ function TopMenuBar({
     Desk: [
       { label: "About JacobOS...", action: () => openWindow("welcome") },
       { label: "---------------", action: null },
-      { label: "View Resume", action: () => window.open("/Jacob_Rushinski_Resume.pdf", "_blank") },
+      { label: "View Resume", action: () => openWindow("resume") },
     ],
     File: [
       { label: "Open About", action: () => openWindow("about") },
@@ -2881,6 +2910,7 @@ export default function HeroDesktopComputerComponent() {
     explorer: { x: 112, y: 8 },
     settings: { x: 112, y: 104 },
     location: { x: 112, y: 200 },
+    resume:   { x: 112, y: 392 },
   });
 
   const systemDesktopIcons = [
@@ -2896,6 +2926,7 @@ export default function HeroDesktopComputerComponent() {
     { id: "explorer", title: "File Explorer", glyph: Icons.folder, windowId: "explorer", itemType: "app", system: true },
     { id: "settings", title: "Settings", glyph: Icons.settings, windowId: "settings", itemType: "app", system: true },
     { id: "trash", title: "Recycle Bin", glyph: Icons.trash, windowId: "trash", itemType: "app", system: true },
+    { id: "resume", title: "Resume.pdf", glyph: Icons.resume, windowId: "resume", itemType: "app", system: true },
   ].map((item) => ({
     ...item,
     title: renamedSystemIcons[item.id] || item.title,
@@ -2919,6 +2950,7 @@ export default function HeroDesktopComputerComponent() {
     explorer:   { id: "explorer",   title: "File Explorer",            x: 260, y: 90,  w: 460, h: 360, isOpen: false, isMinimized: false, isMaximized: false, z: 2 },
     settings:   { id: "settings",   title: "Settings",                 x: 300, y: 120, w: 380, h: 280, isOpen: false, isMinimized: false, isMaximized: false, z: 1 },
     textdoc:    { id: "textdoc",    title: "Text Document",            x: 240, y: 80,  w: 520, h: 360, isOpen: false, isMinimized: false, isMaximized: false, z: 12 },
+    resume:     { id: "resume",     title: "Resume.pdf",               x: 80,  y: 30,  w: 760, h: 600, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
   });
 
   const nextZ = () => ++topZRef.current;
@@ -3834,6 +3866,7 @@ export default function HeroDesktopComputerComponent() {
     ),
     settings: <SettingsApp iconSizeMode={iconSizeMode} setIconSizeMode={setIconSizeMode} clockFormat={clockFormat} setClockFormat={setClockFormat} desktopColor={desktopColor} setDesktopColor={setDesktopColor} />,
     textdoc: <TextDocumentApp item={activeTextDoc} onChangeContent={updateTextContent} />,
+    resume: <ResumeApp />,
   };
 
   const monthStart = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth(), 1);
