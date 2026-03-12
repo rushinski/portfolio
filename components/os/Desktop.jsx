@@ -1,0 +1,772 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import BootSequence from "./BootSequence";
+import Taskbar from "./Taskbar";
+import WindowFrame from "./WindowFrame";
+import { ICON_VIEW_MODES, MENU_TEXT_COLOR, canPinItemToTaskbar, clamp } from "./constants";
+import { PERSONAL } from "./data";
+import { useOSContext } from "./context/OSContext";
+import { useFileSystem } from "./hooks/useFileSystem";
+import { useSettings } from "./hooks/useSettings";
+import { useWindowManager } from "./hooks/useWindowManager";
+import AboutApp from "./apps/About";
+import ContactApp from "./apps/Contact";
+import ExperienceApp from "./apps/Experience";
+import FileExplorerApp from "./apps/FileExplorer";
+import LocationApp from "./apps/Location";
+import ProjectsApp from "./apps/Projects";
+import RecycleBinApp from "./apps/RecycleBin";
+import ResumeApp from "./apps/Resume";
+import SettingsApp from "./apps/Settings";
+import SkillsApp from "./apps/Skills";
+import TerminalApp from "./apps/Terminal";
+import TextDocumentApp from "./apps/TextDocument";
+import VideosApp from "./apps/Videos";
+import WelcomeApp from "./apps/Welcome";
+
+function SystemAlertModal({ message, onClose }) {
+  if (!message) return null;
+  return (
+    <div style={{ position: "fixed", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,0.4)", zIndex: 99999 }}>
+      <div style={{ background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", padding: 0, width: 340, boxShadow: "3px 6px 20px rgba(0,0,0,0.5)" }}>
+        <div style={{ background: "linear-gradient(180deg, #1a56c9, #0b3b8f)", color: "#fff", fontWeight: 700, fontSize: 12, padding: "5px 8px" }}>
+          System Error
+        </div>
+        <div style={{ padding: "20px 16px", display: "flex", alignItems: "flex-start", gap: 12 }}>
+          <span style={{ fontSize: 24, color: "#8b1f1f" }}>!</span>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: "#111" }}>Access Denied</div>
+            <div style={{ fontSize: 12, color: "#444" }}>{message}</div>
+          </div>
+        </div>
+        <div style={{ padding: "8px 16px 12px", textAlign: "right" }}>
+          <button onClick={onClose} style={{ background: "#c0c0c0", border: "none", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", padding: "4px 24px", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DesktopIcon({
+  icon,
+  position,
+  onDoubleClick,
+  onDragStart,
+  onDragMove,
+  onDrop,
+  selected,
+  hovered,
+  onSingleClick,
+  onContextMenu,
+  onHoverChange,
+  iconSizeMode = "medium",
+  isCutPending = false,
+  isRenaming = false,
+  renameValue = "",
+  onRenameChange,
+  onRenameCommit,
+  onRenameCancel,
+}) {
+  const ref = useRef(null);
+  const renameInputRef = useRef(null);
+  const offsetRef = useRef({ x: 0, y: 0 });
+  const movedRef = useRef(false);
+  const lastPosRef = useRef(position);
+  const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
+  const labelMaxWidth = Math.max(28, Math.min(view.maxLabel, view.tileW - 6));
+
+  useEffect(() => {
+    lastPosRef.current = position;
+  }, [position]);
+
+  useEffect(() => {
+    if (!isRenaming) return;
+    renameInputRef.current?.focus();
+    renameInputRef.current?.select();
+  }, [isRenaming]);
+
+  const handlePointerDown = (event) => {
+    if (isRenaming) return;
+    if (event.button !== 0) {
+      event.stopPropagation();
+      return;
+    }
+
+    event.stopPropagation();
+    movedRef.current = false;
+    onDragStart?.(icon.id, position);
+
+    const rect = ref.current?.parentElement?.getBoundingClientRect();
+    if (!rect) return;
+
+    offsetRef.current = {
+      x: event.clientX - position.x - rect.left,
+      y: event.clientY - position.y - rect.top,
+    };
+
+    const handleMove = (pointerEvent) => {
+      const parent = ref.current?.parentElement?.getBoundingClientRect();
+      if (!parent) return;
+      let nextX = pointerEvent.clientX - parent.left - offsetRef.current.x;
+      let nextY = pointerEvent.clientY - parent.top - offsetRef.current.y;
+      nextX = clamp(nextX, 0, parent.width - view.tileW);
+      nextY = clamp(nextY, 0, parent.height - view.tileH);
+      movedRef.current = true;
+      lastPosRef.current = { x: nextX, y: nextY };
+      onDragMove?.(icon.id, nextX, nextY);
+    };
+
+    const handleUp = (pointerEvent) => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+
+      if (movedRef.current) {
+        onDrop?.(icon.id, lastPosRef.current.x, lastPosRef.current.y, pointerEvent.clientX, pointerEvent.clientY);
+      } else {
+        onSingleClick?.(icon.id, pointerEvent.clientX, pointerEvent.clientY, { ctrlKey: pointerEvent.ctrlKey || pointerEvent.metaKey, shiftKey: pointerEvent.shiftKey });
+      }
+    };
+
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp);
+  };
+
+  return (
+    <div
+      ref={ref}
+      style={{ position: "absolute", left: position.x, top: position.y, width: view.tileW, minHeight: view.tileH, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, cursor: "pointer", userSelect: "none", touchAction: "none", padding: "2px 2px 1px", outline: (hovered || selected) ? "1px dotted rgba(255,255,255,0.8)" : "1px solid transparent", outlineOffset: -1, opacity: isCutPending ? 0.5 : 1, filter: isCutPending ? "grayscale(0.45) blur(0.6px) brightness(0.85)" : "none", transition: "opacity 120ms linear, filter 120ms linear" }}
+      onPointerDown={handlePointerDown}
+      onDoubleClick={(event) => {
+        if (isRenaming) return;
+        event.stopPropagation();
+        onDoubleClick?.();
+      }}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onContextMenu?.(icon.id, event.clientX, event.clientY);
+      }}
+      onMouseEnter={() => onHoverChange?.(icon.id)}
+      onMouseLeave={() => onHoverChange?.(null)}
+    >
+      {(selected || hovered) && (
+        <div style={{ position: "absolute", left: 4, top: 4, width: 12, height: 12, border: "none", borderTop: "1px solid #ffffff", borderLeft: "1px solid #ffffff", borderRight: "1px solid #3a3a3a", borderBottom: "1px solid #3a3a3a", background: selected ? "#c0c0c0" : "#e7e7e7", color: "#000080", fontSize: 9, lineHeight: "11px", textAlign: "center", fontWeight: 700 }}>
+          {selected ? "\u2713" : ""}
+        </div>
+      )}
+      <div style={{ padding: 4, border: "1px solid transparent", background: "transparent" }}>
+        <div style={{ transform: `scale(${view.glyphScale})`, transformOrigin: "center" }}>{icon.glyph}</div>
+      </div>
+      {isRenaming ? (
+        <input
+          ref={renameInputRef}
+          value={renameValue}
+          onChange={(event) => onRenameChange?.(event.target.value)}
+          onClick={(event) => event.stopPropagation()}
+          onPointerDown={(event) => event.stopPropagation()}
+          onBlur={() => onRenameCommit?.()}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              onRenameCommit?.();
+            } else if (event.key === "Escape") {
+              event.preventDefault();
+              onRenameCancel?.();
+            }
+          }}
+          style={{ display: "inline-block", width: "auto", maxWidth: labelMaxWidth, boxSizing: "border-box", background: "rgba(0,0,0,0.45)", color: "#fff", border: "none", outline: "none", fontSize: view.labelSize, fontFamily: "inherit", padding: "1px 5px", textAlign: "center", lineHeight: 1.3 }}
+        />
+      ) : (
+        <div style={{ background: "rgba(0,0,0,0.45)", color: "#fff", fontSize: view.labelSize, padding: "1px 5px", display: "inline-block", width: "auto", maxWidth: labelMaxWidth, boxSizing: "border-box", textAlign: "center", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3 }}>
+          {icon.title}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TopMenuBar() {
+  const { openWindow, closeAllWindows, tileWindows, cascadeWindows } = useWindowManager();
+  const { iconSizeMode, setIconSizeMode } = useSettings();
+  const { createFolder, createTextDocument } = useFileSystem();
+  const [openMenu, setOpenMenu] = useState(null);
+
+  useEffect(() => {
+    const handler = () => setOpenMenu(null);
+    window.addEventListener("click", handler);
+    return () => window.removeEventListener("click", handler);
+  }, []);
+
+  const menus = {
+    Desk: [
+      { label: "About JacobOS...", action: () => openWindow("welcome") },
+      { label: "---------------", action: null },
+      { label: "View Resume", action: () => openWindow("resume") },
+    ],
+    File: [
+      { label: "Open About", action: () => openWindow("about") },
+      { label: "Open Skills", action: () => openWindow("skills") },
+      { label: "Open Experience", action: () => openWindow("experience") },
+      { label: "Open Projects", action: () => openWindow("projects") },
+      { label: "Open Videos", action: () => openWindow("videos") },
+      { label: "Open Contact", action: () => openWindow("contact") },
+      { label: "Open Jacobs Time", action: () => openWindow("location") },
+      { label: "Open Terminal", action: () => openWindow("terminal") },
+      { label: "Open File Explorer", action: () => openWindow("explorer") },
+      { label: "Open Settings", action: () => openWindow("settings") },
+      { label: "---------------", action: null },
+      { label: "New Folder", action: createFolder },
+      { label: "New Text Document", action: createTextDocument },
+    ],
+    View: [
+      { label: (iconSizeMode === "large" ? "* " : "") + "Large icons", action: () => setIconSizeMode("large") },
+      { label: (iconSizeMode === "medium" ? "* " : "") + "Medium icons", action: () => setIconSizeMode("medium") },
+      { label: (iconSizeMode === "small" ? "* " : "") + "Small icons", action: () => setIconSizeMode("small") },
+      { label: "---------------", action: null },
+      { label: "Cascade Windows", action: cascadeWindows },
+      { label: "Tile Windows", action: tileWindows },
+      { label: "---------------", action: null },
+      { label: "Close All", action: closeAllWindows },
+    ],
+    Options: [
+      { label: "GitHub Profile", action: () => window.open(PERSONAL.github, "_blank") },
+      { label: "LinkedIn Profile", action: () => window.open(PERSONAL.linkedin, "_blank") },
+      { label: "Send Email", action: () => window.open(`mailto:${PERSONAL.email}`) },
+      { label: "Open Settings", action: () => openWindow("settings") },
+    ],
+  };
+
+  return (
+    <div style={{ background: "#c0c0c0", fontSize: 12, padding: "3px 10px", display: "flex", gap: 0, borderBottom: "1px solid #808080", color: "#111", position: "relative", zIndex: 8000, flexShrink: 0 }}>
+      {Object.entries(menus).map(([name, items]) => (
+        <div key={name} style={{ position: "relative" }}>
+          <button onClick={(event) => { event.stopPropagation(); setOpenMenu(openMenu === name ? null : name); }} style={{ background: openMenu === name ? "#000080" : "transparent", color: openMenu === name ? "#fff" : "#111", border: "none", padding: "2px 10px", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: name === "Desk" ? 700 : 400 }}>
+            {name}
+          </button>
+          {openMenu === name && (
+            <div onClick={(event) => event.stopPropagation()} style={{ position: "absolute", left: 0, top: "100%", minWidth: 210, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "3px 3px 8px rgba(0,0,0,0.4)", zIndex: 9000, padding: "2px 0" }}>
+              {items.map((item, index) => item.action === null ? (
+                <div key={`${name}-divider-${index}`} style={{ height: 1, background: "#808080", margin: "3px 8px" }} />
+              ) : (
+                <button
+                  key={`${name}-${item.label}`}
+                  onClick={() => { item.action(); setOpenMenu(null); }}
+                  style={{ display: "block", width: "100%", padding: "4px 20px", border: "none", background: "transparent", cursor: "pointer", fontSize: 12, fontFamily: "inherit", textAlign: "left", color: "#111" }}
+                  onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }}
+                  onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = "#111"; }}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+      <span style={{ marginLeft: "auto", opacity: 0.7, fontStyle: "italic", padding: "2px 0" }}>JacobOS</span>
+    </div>
+  );
+}
+
+export default function Desktop() {
+  const { systemAlert, setSystemAlert } = useOSContext();
+  const { iconSizeMode, setIconSizeMode, desktopColor } = useSettings();
+  const windowManager = useWindowManager();
+  const fileSystem = useFileSystem();
+
+  const {
+    openWindows,
+    activeWindowId,
+    focusWindow,
+    closeWindow,
+    minimizeWindow,
+    maximizeWindow,
+    moveWindow,
+    resizeWindow,
+    pinTaskbarItem,
+    unpinTaskbarItem,
+  } = windowManager;
+  const {
+    desktopItems,
+    iconPositions,
+    clipboardState,
+    setClipboardState,
+    registerDesktopElement,
+    rememberDesktopCursor,
+    toDesktopPoint,
+    normalizeIconPosition,
+    findFreeGridPosition,
+    createFolder,
+    createTextDocument,
+    pasteDesktopItem,
+    commitRenameItem,
+    deleteDesktopItem,
+    moveItemToRecycleBin,
+    openItem,
+    setIconPositions,
+    alignIconsToGrid,
+  } = fileSystem;
+
+  const desktopRef = useRef(null);
+  const dragStartRef = useRef({});
+  const selectionBoxRef = useRef(null);
+  const [booted, setBooted] = useState(false);
+  const [selectedIconIds, setSelectedIconIds] = useState([]);
+  const [desktopSelectionBox, setDesktopSelectionBox] = useState(null);
+  const [marqueePreviewIds, setMarqueePreviewIds] = useState([]);
+  const [hoveredIcon, setHoveredIcon] = useState(null);
+  const [desktopMenu, setDesktopMenu] = useState(null);
+  const [desktopViewMenuOpen, setDesktopViewMenuOpen] = useState(false);
+  const [iconMenu, setIconMenu] = useState(null);
+  const [renamingItem, setRenamingItem] = useState(null);
+
+  const rootDesktopItems = useMemo(
+    () => desktopItems.filter((item) => (item.parentId ?? null) === null),
+    [desktopItems],
+  );
+
+  const setDesktopNode = useCallback((node) => {
+    desktopRef.current = node;
+    registerDesktopElement(node);
+  }, [registerDesktopElement]);
+
+  useEffect(() => {
+    alignIconsToGrid();
+  }, [alignIconsToGrid]);
+
+  const getIconsInSelectionBox = useCallback((box) => {
+    if (!box || box.w <= 0 || box.h <= 0) return [];
+    const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
+
+    return rootDesktopItems
+      .filter((item) => {
+        const pos = iconPositions[item.id];
+        if (!pos) return false;
+        return pos.x < box.x + box.w && pos.x + view.tileW > box.x && pos.y < box.y + box.h && pos.y + view.tileH > box.y;
+      })
+      .sort((a, b) => {
+        const posA = iconPositions[a.id] || { x: 0, y: 0 };
+        const posB = iconPositions[b.id] || { x: 0, y: 0 };
+        if (posA.x === posB.x) return posA.y - posB.y;
+        return posA.x - posB.x;
+      })
+      .map((item) => item.id);
+  }, [iconPositions, iconSizeMode, rootDesktopItems]);
+
+  const handleDesktopPointerDown = useCallback((event) => {
+    if (event.button !== 0 || event.target !== event.currentTarget) return;
+    const rect = desktopRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    rememberDesktopCursor(event.clientX, event.clientY);
+    const startX = clamp(event.clientX - rect.left, 0, rect.width);
+    const startY = clamp(event.clientY - rect.top, 0, rect.height);
+    const initialBox = { x: startX, y: startY, w: 0, h: 0 };
+
+    setSelectedIconIds([]);
+    setIconMenu(null);
+    setDesktopMenu(null);
+    setDesktopViewMenuOpen(false);
+    setMarqueePreviewIds([]);
+    setDesktopSelectionBox(initialBox);
+    selectionBoxRef.current = initialBox;
+
+    const handleMove = (pointerEvent) => {
+      rememberDesktopCursor(pointerEvent.clientX, pointerEvent.clientY);
+      const currentX = clamp(pointerEvent.clientX - rect.left, 0, rect.width);
+      const currentY = clamp(pointerEvent.clientY - rect.top, 0, rect.height);
+      const box = {
+        x: Math.min(startX, currentX),
+        y: Math.min(startY, currentY),
+        w: Math.abs(currentX - startX),
+        h: Math.abs(currentY - startY),
+      };
+      selectionBoxRef.current = box;
+      setDesktopSelectionBox(box);
+      if (box.w > 3 || box.h > 3) {
+        setMarqueePreviewIds(getIconsInSelectionBox(box));
+      } else {
+        setMarqueePreviewIds([]);
+      }
+    };
+
+    const handleUp = () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+      const box = selectionBoxRef.current;
+      if (box && (box.w > 4 || box.h > 4)) {
+        const hits = getIconsInSelectionBox(box);
+        if (hits.length > 0) setSelectedIconIds(hits);
+      }
+      selectionBoxRef.current = null;
+      setDesktopSelectionBox(null);
+      setMarqueePreviewIds([]);
+    };
+
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp);
+  }, [getIconsInSelectionBox, rememberDesktopCursor]);
+
+  const selectDesktopIcon = useCallback((id, opts = {}) => {
+    if (opts.ctrlKey) {
+      setSelectedIconIds((prev) => (prev.includes(id) ? prev.filter((entry) => entry !== id) : [...prev, id]));
+    } else {
+      setSelectedIconIds([id]);
+    }
+    setIconMenu(null);
+    setDesktopMenu(null);
+    setDesktopViewMenuOpen(false);
+  }, []);
+
+  const openIconMenuAt = useCallback((id, clientX, clientY) => {
+    rememberDesktopCursor(clientX, clientY);
+    const rect = desktopRef.current?.getBoundingClientRect();
+    const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
+    const iconPos = iconPositions[id];
+    const menuW = 188;
+    const menuH = 196;
+
+    setSelectedIconIds([id]);
+    setDesktopMenu(null);
+    setDesktopViewMenuOpen(false);
+
+    if (rect && iconPos) {
+      let menuX = iconPos.x + view.tileW + 6;
+      if (menuX + menuW > rect.width - 4) menuX = Math.max(4, iconPos.x - menuW - 6);
+      let menuY = clamp(iconPos.y + 4, 4, Math.max(4, rect.height - menuH - 4));
+      if (menuX <= iconPos.x + view.tileW && menuX + menuW >= iconPos.x) {
+        menuX = clamp(iconPos.x + view.tileW + 6, 4, Math.max(4, rect.width - menuW - 4));
+        if (menuX <= iconPos.x + view.tileW && menuX + menuW >= iconPos.x) {
+          menuX = clamp(iconPos.x - menuW - 6, 4, Math.max(4, rect.width - menuW - 4));
+        }
+      }
+      setIconMenu({ id, x: menuX, y: menuY });
+      return;
+    }
+
+    const point = toDesktopPoint(clientX, clientY);
+    setIconMenu({ id, x: point.x, y: point.y });
+  }, [rememberDesktopCursor, iconPositions, iconSizeMode, toDesktopPoint]);
+
+  const openDesktopMenuAt = useCallback((clientX, clientY) => {
+    rememberDesktopCursor(clientX, clientY);
+    const point = toDesktopPoint(clientX, clientY);
+    setDesktopMenu({ x: point.x, y: point.y });
+    setDesktopViewMenuOpen(false);
+    setIconMenu(null);
+  }, [rememberDesktopCursor, toDesktopPoint]);
+
+  const commitRenameDesktopItem = useCallback(() => {
+    if (!renamingItem) return;
+    commitRenameItem(renamingItem.id, renamingItem.value);
+    setRenamingItem(null);
+  }, [commitRenameItem, renamingItem]);
+
+  const cancelRenameDesktopItem = useCallback(() => {
+    setRenamingItem(null);
+  }, []);
+
+  const handleIconAction = useCallback((action, id) => {
+    const item = desktopItems.find((entry) => entry.id === id);
+    if (!item) return;
+
+    setSelectedIconIds([id]);
+
+    if (action === "open") openItem(item);
+    if (action === "cut") setClipboardState({ mode: "cut", id });
+    if (action === "copy") setClipboardState({ mode: "copy", id });
+    if (action === "paste") {
+      const pastedId = pasteDesktopItem();
+      if (pastedId) setSelectedIconIds([pastedId]);
+    }
+    if (action === "rename") setRenamingItem({ id, value: item.title });
+    if (action === "delete") {
+      const deleted = deleteDesktopItem(id);
+      if (deleted) setSelectedIconIds((prev) => prev.filter((entry) => entry !== id));
+    }
+    if (action === "pinTaskbar") pinTaskbarItem(id);
+    if (action === "unpinTaskbar") unpinTaskbarItem(id);
+
+    setIconMenu(null);
+  }, [deleteDesktopItem, desktopItems, openItem, pasteDesktopItem, pinTaskbarItem, setClipboardState, unpinTaskbarItem]);
+
+  const handleIconDragStart = useCallback((id, position) => {
+    dragStartRef.current[id] = position;
+    setSelectedIconIds([id]);
+    setIconMenu(null);
+    setDesktopMenu(null);
+  }, []);
+
+  const handleIconDragMove = useCallback((id, x, y) => {
+    setIconPositions((prev) => ({ ...prev, [id]: { x, y } }));
+  }, [setIconPositions]);
+
+  const handleIconDrop = useCallback((id, x, y) => {
+    const item = desktopItems.find((entry) => entry.id === id);
+    if (!item) return;
+
+    const snapped = normalizeIconPosition(x, y);
+    const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
+    const trashPos = iconPositions.trash;
+    const overTrash = id !== "trash" && trashPos
+      && snapped.x + view.tileW / 2 >= trashPos.x
+      && snapped.x + view.tileW / 2 <= trashPos.x + view.tileW
+      && snapped.y + view.tileH / 2 >= trashPos.y
+      && snapped.y + view.tileH / 2 <= trashPos.y + view.tileH;
+
+    if (overTrash) {
+      const deleted = moveItemToRecycleBin(id, dragStartRef.current[id] || snapped);
+      if (!deleted) {
+        setIconPositions((prev) => ({ ...prev, [id]: dragStartRef.current[id] || snapped }));
+      } else {
+        setSelectedIconIds((prev) => prev.filter((entry) => entry !== id));
+      }
+      return;
+    }
+
+    setIconPositions((prev) => {
+      const freePos = findFreeGridPosition(snapped.x, snapped.y, id, prev);
+      return { ...prev, [id]: freePos };
+    });
+  }, [desktopItems, findFreeGridPosition, iconPositions.trash, iconSizeMode, moveItemToRecycleBin, normalizeIconPosition, setIconPositions]);
+
+  const nudgeSelectedIcon = useCallback((dxCells, dyCells) => {
+    const id = selectedIconIds[0];
+    if (!id) return;
+    const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
+    setIconPositions((prev) => {
+      const current = prev[id];
+      if (!current) return prev;
+      const targetX = current.x + dxCells * view.cellX;
+      const targetY = current.y + dyCells * view.cellY;
+      const freePos = findFreeGridPosition(targetX, targetY, id, prev);
+      return { ...prev, [id]: freePos };
+    });
+  }, [findFreeGridPosition, iconSizeMode, selectedIconIds, setIconPositions]);
+
+  const iconMenuItem = iconMenu ? desktopItems.find((item) => item.id === iconMenu.id) : null;
+  const iconMenuIsPinnable = canPinItemToTaskbar(iconMenuItem);
+  const actualIconMenuPinned = !!iconMenuItem && windowManager.pinnedTaskbarAppIds.includes(iconMenuItem.id);
+
+  const windowContent = {
+    welcome: <WelcomeApp />,
+    about: <AboutApp />,
+    skills: <SkillsApp />,
+    experience: <ExperienceApp />,
+    projects: <ProjectsApp />,
+    videos: <VideosApp />,
+    contact: <ContactApp />,
+    location: <LocationApp />,
+    terminal: <TerminalApp />,
+    trash: <RecycleBinApp />,
+    explorer: <FileExplorerApp />,
+    settings: <SettingsApp />,
+    textdoc: <TextDocumentApp />,
+    resume: <ResumeApp />,
+  };
+
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      const target = event.target;
+      const isTyping = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target?.isContentEditable;
+      if (isTyping) return;
+
+      const ctrl = event.ctrlKey || event.metaKey;
+
+      if (event.key === "Escape") {
+        setIconMenu(null);
+        setDesktopMenu(null);
+        setDesktopViewMenuOpen(false);
+        cancelRenameDesktopItem();
+        return;
+      }
+
+      if (ctrl && event.shiftKey && (event.key === "N" || event.key === "n")) {
+        event.preventDefault();
+        const createdId = createFolder();
+        if (createdId) setSelectedIconIds([createdId]);
+        return;
+      }
+
+      if (ctrl && (event.key === "v" || event.key === "V")) {
+        event.preventDefault();
+        if (!clipboardState) return;
+        const pastedId = pasteDesktopItem();
+        if (pastedId) setSelectedIconIds([pastedId]);
+        return;
+      }
+
+      const activeId = selectedIconIds[0];
+      if (!activeId) return;
+
+      if (ctrl && (event.key === "c" || event.key === "C")) {
+        event.preventDefault();
+        setClipboardState({ mode: "copy", id: activeId });
+        return;
+      }
+
+      if (ctrl && (event.key === "x" || event.key === "X")) {
+        event.preventDefault();
+        setClipboardState({ mode: "cut", id: activeId });
+        return;
+      }
+
+      if (event.key === "Delete") {
+        event.preventDefault();
+        const deleted = deleteDesktopItem(activeId);
+        if (deleted) setSelectedIconIds((prev) => prev.filter((entry) => entry !== activeId));
+        return;
+      }
+
+      if (event.key === "F2") {
+        event.preventDefault();
+        const item = desktopItems.find((entry) => entry.id === activeId);
+        if (item) setRenamingItem({ id: activeId, value: item.title });
+        return;
+      }
+
+      if (event.shiftKey && event.key === "ArrowLeft") { event.preventDefault(); nudgeSelectedIcon(-1, 0); }
+      if (event.shiftKey && event.key === "ArrowRight") { event.preventDefault(); nudgeSelectedIcon(1, 0); }
+      if (event.shiftKey && event.key === "ArrowUp") { event.preventDefault(); nudgeSelectedIcon(0, -1); }
+      if (event.shiftKey && event.key === "ArrowDown") { event.preventDefault(); nudgeSelectedIcon(0, 1); }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [cancelRenameDesktopItem, clipboardState, createFolder, deleteDesktopItem, desktopItems, nudgeSelectedIcon, pasteDesktopItem, selectedIconIds, setClipboardState]);
+
+  return (
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 13px; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+        @keyframes fadeIn { from{opacity:0;transform:scale(0.97)} to{opacity:1;transform:scale(1)} }
+        ::-webkit-scrollbar { width: 14px; height: 14px; background: #d7d7d7; }
+        ::-webkit-scrollbar-track { background: #d7d7d7; border-left: 2px solid #f3f3f3; border-right: 2px solid #b8b8b8; }
+        ::-webkit-scrollbar-thumb { background: #5f5f5f; border-top: 1px solid #9a9a9a; border-left: 1px solid #9a9a9a; border-right: 1px solid #2a2a2a; border-bottom: 1px solid #2a2a2a; min-height: 24px; cursor: pointer; }
+        ::-webkit-scrollbar-thumb:hover { background: #727272; border-top: 1px solid #a4a4a4; border-left: 1px solid #a4a4a4; border-right: 1px solid #4a4a4a; border-bottom: 1px solid #4a4a4a; cursor: pointer; }
+        ::selection { background: #000080; color: #fff; }
+      `}</style>
+
+      <div style={{ width: "100vw", height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#2a2a2a", padding: "12px" }}>
+        <div style={{ width: "100%", flex: 1, minHeight: 0, maxWidth: 1400, maxHeight: 900, background: "linear-gradient(180deg, #d6c9a7 0%, #c9bb98 100%)", borderRadius: "24px", padding: "18px", boxShadow: "0 20px 80px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -3px 0 rgba(0,0,0,0.15)", border: "1px solid rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", animation: "fadeIn 0.6s ease-out" }}>
+          <div style={{ flex: 1, background: "#222", borderRadius: "16px", padding: "10px", boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 4px 12px rgba(0,0,0,0.5)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ flex: 1, borderRadius: "10px", overflow: "hidden", position: "relative", background: desktopColor ? desktopColor : "radial-gradient(circle at 30% 25%, rgba(255,255,255,0.06), transparent 40%), radial-gradient(circle at 70% 60%, rgba(0,0,0,0.15), transparent 55%), linear-gradient(180deg, #0b4aa6, #0a3f90)", boxShadow: "inset 0 0 30px rgba(0,0,0,0.6)", display: "flex", flexDirection: "column" }}>
+              <div style={{ position: "absolute", inset: 0, background: "repeating-linear-gradient(to bottom, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 4px)", pointerEvents: "none", zIndex: 50 }} />
+              <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.3) 100%)", pointerEvents: "none", zIndex: 51 }} />
+
+              {booted ? (
+                <>
+                  <TopMenuBar />
+                  <div ref={setDesktopNode} style={{ flex: 1, position: "relative", overflow: "hidden" }} onPointerDown={handleDesktopPointerDown} onPointerMove={(event) => rememberDesktopCursor(event.clientX, event.clientY)} onContextMenu={(event) => { if (event.target !== event.currentTarget) return; event.preventDefault(); event.stopPropagation(); openDesktopMenuAt(event.clientX, event.clientY); }}>
+                    {rootDesktopItems.map((icon) => (
+                      <DesktopIcon key={icon.id} icon={icon} position={iconPositions[icon.id]} selected={selectedIconIds.includes(icon.id)} hovered={hoveredIcon === icon.id || marqueePreviewIds.includes(icon.id)} iconSizeMode={iconSizeMode} onDoubleClick={() => openItem(icon)} onDragStart={handleIconDragStart} onDragMove={handleIconDragMove} onDrop={handleIconDrop} onSingleClick={(id, _x, _y, opts) => selectDesktopIcon(id, opts)} onContextMenu={openIconMenuAt} onHoverChange={setHoveredIcon} isCutPending={clipboardState?.mode === "cut" && clipboardState.id === icon.id} isRenaming={renamingItem?.id === icon.id} renameValue={renamingItem?.id === icon.id ? renamingItem.value : icon.title} onRenameChange={(value) => setRenamingItem((prev) => (prev?.id === icon.id ? { ...prev, value } : prev))} onRenameCommit={commitRenameDesktopItem} onRenameCancel={cancelRenameDesktopItem} />
+                    ))}
+
+                    {desktopSelectionBox && (desktopSelectionBox.w > 0 || desktopSelectionBox.h > 0) && (
+                      <div style={{ position: "absolute", left: desktopSelectionBox.x, top: desktopSelectionBox.y, width: desktopSelectionBox.w, height: desktopSelectionBox.h, background: "rgba(154,198,255,0.35)", border: "1px solid #5b8fd8", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.35)", pointerEvents: "none", zIndex: 150 }} />
+                    )}
+
+                    {desktopMenu && (
+                      <div onClick={(event) => event.stopPropagation()} style={{ position: "absolute", left: desktopMenu.x, top: desktopMenu.y, minWidth: 190, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "3px 3px 10px rgba(0,0,0,0.4)", zIndex: 9100, padding: "2px 0" }}>
+                        <div onMouseEnter={() => setDesktopViewMenuOpen(true)} onMouseLeave={() => setDesktopViewMenuOpen(false)} style={{ position: "relative" }}>
+                          <button
+                            style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }}
+                            onClick={() => setDesktopViewMenuOpen((prev) => !prev)}
+                            onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }}
+                            onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}
+                          >
+                            View  &gt;
+                          </button>
+                          {desktopViewMenuOpen && (
+                            <div onMouseEnter={() => setDesktopViewMenuOpen(true)} onMouseLeave={() => setDesktopViewMenuOpen(false)} style={{ position: "absolute", left: "100%", top: 0, minWidth: 180, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "3px 3px 10px rgba(0,0,0,0.4)" }}>
+                              {[
+                                { key: "large", label: "Large icons" },
+                                { key: "medium", label: "Medium icons" },
+                                { key: "small", label: "Small icons" },
+                              ].map((opt) => (
+                                <button
+                                  key={opt.key}
+                                  onClick={() => {
+                                    setIconSizeMode(opt.key);
+                                    setDesktopMenu(null);
+                                    setDesktopViewMenuOpen(false);
+                                  }}
+                                  style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }}
+                                  onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }}
+                                  onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}
+                                >
+                                  {(iconSizeMode === opt.key ? "* " : "") + opt.label}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <button onClick={() => { alignIconsToGrid(); setDesktopMenu(null); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
+                          Sort by Grid
+                        </button>
+                        <button onClick={() => { alignIconsToGrid(); setDesktopMenu(null); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
+                          Refresh
+                        </button>
+                        <div style={{ height: 1, background: "#808080", margin: "3px 8px" }} />
+                        <button onClick={() => { const createdId = createFolder(); if (createdId) setSelectedIconIds([createdId]); setDesktopMenu(null); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
+                          New Folder
+                        </button>
+                        <button onClick={() => { const createdId = createTextDocument(); if (createdId) setSelectedIconIds([createdId]); setDesktopMenu(null); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
+                          New Text Document
+                        </button>
+                        {clipboardState && (
+                          <button onClick={() => { const pastedId = pasteDesktopItem(); if (pastedId) setSelectedIconIds([pastedId]); setDesktopMenu(null); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
+                            Paste
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {iconMenu && (
+                      <div onClick={(event) => event.stopPropagation()} style={{ position: "absolute", left: iconMenu.x, top: iconMenu.y, minWidth: 180, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "3px 3px 10px rgba(0,0,0,0.4)", zIndex: 9200, padding: "2px 0" }}>
+                        {[
+                          { key: "open", label: "Open" },
+                          { key: "cut", label: "Cut" },
+                          { key: "copy", label: "Copy" },
+                          ...(clipboardState ? [{ key: "paste", label: "Paste" }] : []),
+                          ...(iconMenuIsPinnable ? [{ key: actualIconMenuPinned ? "unpinTaskbar" : "pinTaskbar", label: actualIconMenuPinned ? "Unpin from Taskbar" : "Pin to Taskbar" }] : []),
+                          { key: "rename", label: "Rename" },
+                          { key: "delete", label: "Delete" },
+                        ].map((opt) => (
+                          <button key={opt.key} onClick={() => handleIconAction(opt.key, iconMenu.id)} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {openWindows.filter((win) => !win.isMinimized).sort((a, b) => a.z - b.z).map((win) => (
+                      <WindowFrame key={win.id} win={win} isActive={win.id === activeWindowId} onFocus={() => focusWindow(win.id)} onClose={() => closeWindow(win.id)} onMinimize={() => minimizeWindow(win.id)} onMaximize={() => maximizeWindow(win.id)} onMove={(x, y) => moveWindow(win.id, x, y)} onResize={(x, y, width, height) => resizeWindow(win.id, x, y, width, height)}>
+                        {windowContent[win.id]}
+                      </WindowFrame>
+                    ))}
+                  </div>
+
+                  <Taskbar />
+                </>
+              ) : (
+                <BootSequence embedded onComplete={() => setBooted(true)} />
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ marginTop: 8, height: 6, borderRadius: 10, background: "linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.15))", marginLeft: "30%", marginRight: "30%" }} />
+      </div>
+
+      <SystemAlertModal message={systemAlert} onClose={() => setSystemAlert("")} />
+    </>
+  );
+}

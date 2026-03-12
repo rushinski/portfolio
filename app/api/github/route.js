@@ -5,7 +5,7 @@ const GH_GRAPHQL = "https://api.github.com/graphql";
 const USERNAME = process.env.NEXT_PUBLIC_GITHUB_USERNAME || "rushinski";
 const TOKEN = process.env.GITHUB_TOKEN;
 
-const commonHeaders: HeadersInit = {
+const commonHeaders = {
   Accept: "application/vnd.github+json",
   "X-GitHub-Api-Version": "2022-11-28",
   ...(TOKEN ? { Authorization: `Bearer ${TOKEN}` } : {}),
@@ -62,26 +62,32 @@ export async function GET() {
       eventsRes.json(),
     ]);
 
-    if (graphqlData.errors) throw new Error(graphqlData.errors[0]?.message || "GraphQL error");
+    if (graphqlData.errors) {
+      throw new Error(graphqlData.errors[0]?.message || "GraphQL error");
+    }
 
     const userData = graphqlData?.data?.user;
+    const reposList = Array.isArray(repos) ? repos : [];
+    const eventsList = Array.isArray(events) ? events : [];
 
-    // Language stats from non-fork repos
-    const langMap: Record<string, number> = {};
-    for (const repo of repos) {
+    const langMap = {};
+    for (const repo of reposList) {
       if (repo.language && !repo.fork) {
         langMap[repo.language] = (langMap[repo.language] || 0) + 1;
       }
     }
+
     const topLanguages = Object.entries(langMap)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 6)
       .map(([lang, count]) => ({ lang, count }));
 
-    // Pinned repos fetched by name
     const pinnedRepos = PINNED_REPOS.map((name) => {
-      const repo = repos.find((r: { name: string }) => r.name === name);
-      if (!repo) return null;
+      const repo = reposList.find((candidate) => candidate.name === name);
+      if (!repo) {
+        return null;
+      }
+
       return {
         name: repo.name,
         description: repo.description,
@@ -91,21 +97,24 @@ export async function GET() {
       };
     }).filter(Boolean);
 
-    // Recent commits from push events
-    const recentCommits: { message: string; repo: string; date: string }[] = [];
-    if (Array.isArray(events)) {
-      for (const event of events) {
-        if (event.type === "PushEvent" && event.payload?.commits) {
-          for (const commit of event.payload.commits.slice(0, 2)) {
-            recentCommits.push({
-              message: commit.message.split("\n")[0].slice(0, 55),
-              repo: (event.repo?.name ?? "").replace(`${USERNAME}/`, ""),
-              date: (event.created_at ?? "").slice(0, 10),
-            });
-            if (recentCommits.length >= 7) break;
+    const recentCommits = [];
+    for (const event of eventsList) {
+      if (event.type === "PushEvent" && event.payload?.commits) {
+        for (const commit of event.payload.commits.slice(0, 2)) {
+          recentCommits.push({
+            message: commit.message.split("\n")[0].slice(0, 55),
+            repo: (event.repo?.name ?? "").replace(`${USERNAME}/`, ""),
+            date: (event.created_at ?? "").slice(0, 10),
+          });
+
+          if (recentCommits.length >= 7) {
+            break;
           }
         }
-        if (recentCommits.length >= 7) break;
+      }
+
+      if (recentCommits.length >= 7) {
+        break;
       }
     }
 

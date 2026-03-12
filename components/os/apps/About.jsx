@@ -1,0 +1,278 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+import { PERSONAL } from "../data";
+import { useWindowManager } from "../hooks/useWindowManager";
+
+const LANG_COLORS = {
+  JavaScript: "#f1e05a",
+  TypeScript: "#3178c6",
+  Python: "#3572A5",
+  Go: "#00ADD8",
+  Java: "#b07219",
+  PHP: "#4F5D95",
+  "C++": "#f34b7d",
+  HTML: "#e34c26",
+  CSS: "#563d7c",
+  Shell: "#89e051",
+  Dockerfile: "#384d54",
+  "Node.js": "#68a063",
+};
+
+function DonutChart({ langs, size = 84 }) {
+  if (!langs?.length) return null;
+  const totalCount = langs.reduce((sum, language) => sum + language.count, 0);
+  if (totalCount === 0) return null;
+
+  const cx = size / 2;
+  const cy = size / 2;
+  const radius = size / 2 - 2;
+  const innerRadius = radius * 0.52;
+  let angle = -Math.PI / 2;
+
+  const paths = langs.map((language) => {
+    const sweep = Math.min((language.count / totalCount) * 2 * Math.PI, 2 * Math.PI * 0.9999);
+    const start = angle;
+    const end = angle + sweep;
+    angle += (language.count / totalCount) * 2 * Math.PI;
+
+    const large = sweep > Math.PI ? 1 : 0;
+    const format = (value) => value.toFixed(2);
+    return {
+      d: `M ${format(cx + radius * Math.cos(start))} ${format(cy + radius * Math.sin(start))} A ${radius} ${radius} 0 ${large} 1 ${format(cx + radius * Math.cos(end))} ${format(cy + radius * Math.sin(end))} L ${format(cx + innerRadius * Math.cos(end))} ${format(cy + innerRadius * Math.sin(end))} A ${innerRadius} ${innerRadius} 0 ${large} 0 ${format(cx + innerRadius * Math.cos(start))} ${format(cy + innerRadius * Math.sin(start))} Z`,
+      color: LANG_COLORS[language.lang] || "#999",
+    };
+  });
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: "block", flexShrink: 0 }}>
+      {paths.map((path, index) => (
+        <path key={`${path.color}-${index}`} d={path.d} fill={path.color} stroke="#f0f4f8" strokeWidth={1} />
+      ))}
+    </svg>
+  );
+}
+
+export default function AboutApp() {
+  const { openWindow } = useWindowManager();
+  const [ghData, setGhData] = useState(null);
+  const [ghHovered, setGhHovered] = useState(null);
+  const topSkills = ["JavaScript", "Python", "PostgreSQL", "Next.js"];
+
+  useEffect(() => {
+    fetch("/api/github")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (data && !data.error) {
+          setGhData(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const socials = [
+    { label: "Email", value: "jacobrushinski@gmail.com", href: "mailto:jacobrushinski@gmail.com", icon: "email.png" },
+    { label: "Phone", value: "(717) 216-9005", href: "tel:+17172169005", icon: "phone.png" },
+    { label: "LinkedIn", value: "linkedin.com/in/jacobrushinski", href: "https://linkedin.com/in/jacobrushinski", icon: "linkedin.png" },
+    { label: "GitHub", value: "github.com/rushinski", href: "https://github.com/rushinski", icon: "github.png" },
+  ];
+
+  return (
+    <div style={{ padding: "16px 24px" }}>
+      <div style={{ display: "flex", gap: 24, marginBottom: 16, alignItems: "flex-start" }}>
+        <div style={{ flex: "0 0 270px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+            <div style={{ width: 56, height: 56, background: "linear-gradient(135deg, #000080, #0000c0)", display: "grid", placeItems: "center", color: "#fff", fontSize: 22, fontWeight: 800, flexShrink: 0, border: "2px solid #808080" }}>
+              JR
+            </div>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: "#111" }}>{PERSONAL.name}</div>
+              <div style={{ fontSize: 12, color: "#000080", fontWeight: 600 }}>{PERSONAL.title}</div>
+              <div style={{ fontSize: 11, color: "#777" }}>{PERSONAL.location}</div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 10, paddingBottom: 10, borderBottom: "1px solid #c0c0c0" }}>
+            {socials.map((social) => (
+              <a
+                key={social.label}
+                href={social.href}
+                target={social.href.startsWith("mailto") || social.href.startsWith("tel") ? undefined : "_blank"}
+                rel="noopener noreferrer"
+                style={{ display: "flex", alignItems: "center", gap: 6, textDecoration: "none", color: "#000080", fontSize: 11 }}
+              >
+                <img src={`/socials/${social.icon}`} alt={social.label} width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
+                {social.value}
+              </a>
+            ))}
+          </div>
+
+          <div style={{ display: "flex", gap: 6 }}>
+            <button
+              onClick={() => openWindow("resume")}
+              style={{
+                background: "#000080",
+                color: "#fff",
+                border: "none",
+                borderTop: "2px solid #3366cc",
+                borderLeft: "2px solid #3366cc",
+                borderRight: "2px solid #000040",
+                borderBottom: "2px solid #000040",
+                padding: "5px 14px",
+                fontSize: 11,
+                fontWeight: 700,
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              View Resume
+            </button>
+            <button
+              onClick={() => openWindow("contact")}
+              style={{
+                background: "#c0c0c0",
+                color: "#111",
+                border: "none",
+                borderTop: "2px solid #fff",
+                borderLeft: "2px solid #fff",
+                borderRight: "2px solid #404040",
+                borderBottom: "2px solid #404040",
+                padding: "5px 14px",
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              Contact Me
+            </button>
+          </div>
+        </div>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>About Me</div>
+          <div style={{ fontSize: 12, color: "#333", lineHeight: 1.75 }}>
+            Hi, I'm Jacob Rushinski!<br /><br />I'm currently attending Thaddeus Stevens College of Technology, graduating with an Associate's in Computer Software Engineering Technology in May 2026. I'm looking for Backend, Full-Stack, or related roles near Philadelphia, PA (≤50mi) or nationwide remote.<br /><br />Right now I'm rebuilding a{" "}
+            <button onClick={() => openWindow("projects")} style={{ background: "none", border: "none", padding: 0, color: "#000080", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 12, textDecoration: "underline" }}>
+              multi-tenant sneaker marketplace
+            </button>
+            {" "}from the ground up. I enjoy working on production-grade systems and the level of detail required to build software that is reliable and maintainable. I take pride in writing clean code and designing systems that perform well under real-world usage. If you'd like to connect or learn more about my work, feel free to reach out.
+          </div>
+        </div>
+      </div>
+
+      {ghData && (() => {
+        const cell = 10;
+        const gap = 2;
+        const step = 12;
+        const chartColors = ["#c0c0c0", "#cce8cc", "#7dbf7d", "#3a8a3a", "#1a5c1a"];
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const calendar = ghData.contributionCalendar || {};
+        const allWeeks = calendar.weeks || [];
+        const total = calendar.totalContributions || 0;
+        const langs = ghData.topLanguages || [];
+        const totalLangCount = langs.reduce((sum, language) => sum + language.count, 0);
+        const getLevel = (count) => (count === 0 ? 0 : count <= 2 ? 1 : count <= 5 ? 2 : count <= 9 ? 3 : 4);
+
+        const monthMarkers = [];
+        allWeeks.forEach((week, weekIndex) => {
+          if (!week.contributionDays?.length) return;
+          const day = new Date(`${week.contributionDays[0].date}T12:00:00`);
+          const month = day.getMonth();
+          const previousMonth = weekIndex > 0 && allWeeks[weekIndex - 1].contributionDays?.length
+            ? new Date(`${allWeeks[weekIndex - 1].contributionDays[0].date}T12:00:00`).getMonth()
+            : -1;
+          if (month !== previousMonth) monthMarkers.push({ weekIndex, label: months[month] });
+        });
+
+        return (
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, borderBottom: "2px solid #000080", paddingBottom: 4, marginBottom: 10 }}>
+              Coding Stats
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <div style={{ display: "flex", gap: 12, alignItems: "stretch", width: "max-content" }}>
+                <div style={{ flexShrink: 0, background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px", display: "flex", flexDirection: "column" }}>
+                  <div style={{ fontSize: 11, color: "#555", marginBottom: 8 }}>{total.toLocaleString()} contributions in the last year</div>
+                  <div style={{ position: "relative", marginLeft: 24, height: 14, marginBottom: 3 }}>
+                    {monthMarkers.map(({ weekIndex, label }) => (
+                      <span key={`${label}-${weekIndex}`} style={{ position: "absolute", left: weekIndex * step, fontSize: 9, color: "#000080", opacity: 0.8 }}>{label}</span>
+                    ))}
+                  </div>
+                  <div style={{ display: "flex" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap, width: 20, marginRight: 4, flexShrink: 0 }}>
+                      {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
+                        <div key={`${day}-${index}`} style={{ height: cell, fontSize: 9, color: index % 2 === 1 ? "#000080" : "transparent", lineHeight: `${cell}px`, textAlign: "right", opacity: 0.7 }}>{day}</div>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", gap }}>
+                      {allWeeks.map((week, weekIndex) => (
+                        <div key={`week-${weekIndex}`} style={{ display: "flex", flexDirection: "column", gap, flexShrink: 0 }}>
+                          {week.contributionDays.map((day, dayIndex) => (
+                            <div
+                              key={`${day.date}-${dayIndex}`}
+                              onMouseEnter={() => setGhHovered(day)}
+                              onMouseLeave={() => setGhHovered(null)}
+                              style={{ width: cell, height: cell, background: chartColors[getLevel(day.contributionCount)], border: "1px solid rgba(0,0,0,0.08)", cursor: "default", flexShrink: 0 }}
+                            />
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                    <div style={{ fontSize: 10, color: "#555", minHeight: 13 }}>
+                      {ghHovered ? `${ghHovered.date} — ${ghHovered.contributionCount} contribution${ghHovered.contributionCount !== 1 ? "s" : ""}` : "\u00A0"}
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, color: "#777", flexShrink: 0 }}>
+                      <span>Less</span>
+                      {chartColors.map((color, index) => (
+                        <div key={`${color}-${index}`} style={{ width: 9, height: 9, background: color, border: "1px solid rgba(0,0,0,0.12)" }} />
+                      ))}
+                      <span>More</span>
+                    </div>
+                  </div>
+                </div>
+
+                {langs.length > 0 && (
+                  <div style={{ flexShrink: 0, background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px" }}>
+                    <div style={{ fontSize: 11, color: "#555", marginBottom: 2 }}>Repo Languages</div>
+                    <div style={{ fontSize: 9, color: "#888", marginBottom: 8 }}>by number of repos</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <DonutChart langs={langs} size={80} />
+                      <div>
+                        {langs.slice(0, 6).map((language) => (
+                          <div key={language.lang} style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 5 }}>
+                            <div style={{ width: 8, height: 8, background: LANG_COLORS[language.lang] || "#999", flexShrink: 0, border: "1px solid rgba(0,0,0,0.15)" }} />
+                            <div style={{ fontSize: 10, color: "#333", whiteSpace: "nowrap" }}>{language.lang}</div>
+                            <div style={{ fontSize: 10, color: "#777", flexShrink: 0, marginLeft: 4 }}>{Math.round((language.count / totalLangCount) * 100)}%</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ flexShrink: 0, background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px" }}>
+                  <div style={{ fontSize: 11, color: "#555", marginBottom: 2 }}>Top Skills</div>
+                  <div style={{ fontSize: 9, color: "#888", marginBottom: 8 }}>my strongest technologies</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    {topSkills.map((skill) => (
+                      <div key={skill} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontSize: 11, color: "#333", fontWeight: 600 }}>{skill}</span>
+                      </div>
+                    ))}
+                    <button onClick={() => openWindow("skills")} style={{ background: "transparent", border: "none", padding: 0, fontSize: 10, color: "#000080", fontWeight: 600, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline", textAlign: "left", marginTop: 2 }}>
+                      All skills
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
