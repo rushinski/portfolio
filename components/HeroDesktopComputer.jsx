@@ -1519,17 +1519,17 @@ function ProjectDetailView({ project: p, repoData, onOpenVideo, onBackToList }) 
       <div style={{ border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8" }}>
 
         {/* Header */}
-        <div style={{ background: "linear-gradient(to right, #000080, #1084d0)", padding: "6px 10px" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
-            <div style={{ fontWeight: 800, fontSize: 13, color: "#fff", lineHeight: 1.2, flex: 1, minWidth: 0 }}>{p.title}</div>
+        <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "7px 10px" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 3 }}>
+            <div style={{ fontWeight: 800, fontSize: 13, color: "#111", lineHeight: 1.2, flex: 1, minWidth: 0 }}>{p.title}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-              <span style={{ fontSize: 9, color: "rgba(255,255,255,0.6)" }}>{p.date}</span>
-              <span style={{ padding: "1px 7px", fontSize: 10, fontWeight: 700, background: isIP ? "#ffff80" : "#80ff80", color: "#000", border: "1px solid rgba(0,0,0,0.2)" }}>
+              <span style={{ fontSize: 9, color: "#555" }}>{p.date}</span>
+              <span style={{ padding: "1px 6px", fontSize: 9, fontWeight: 700, background: isIP ? "#ffff00" : "#00cc44", color: "#000", border: "1px solid #808080" }}>
                 {isIP ? "In Progress" : "Complete"}
               </span>
             </div>
           </div>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.75)", lineHeight: 1.4, fontStyle: "italic" }}>{p.desc}</div>
+          <div style={{ fontSize: 10, color: "#555", lineHeight: 1.4, fontStyle: "italic" }}>{p.desc}</div>
         </div>
 
         {/* Body */}
@@ -1690,23 +1690,24 @@ function ProjectsApp({ onOpenVideo }) {
                 key={i}
                 onDoubleClick={() => openProjectDetail(i)}
                 style={{
-                  marginBottom: 10, cursor: "default", userSelect: "none",
+                  marginBottom: 10, cursor: "pointer", userSelect: "none",
                   border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff",
                   background: "#d4d0c8",
                 }}
               >
                 {/* Card header */}
                 <div style={{
-                  background: "linear-gradient(to right, #000080, #1084d0)",
+                  background: "#d4d0c8",
+                  borderBottom: "1px solid #808080",
                   padding: "5px 10px", display: "flex", alignItems: "center",
                   justifyContent: "space-between", gap: 8,
                 }}>
-                  <div style={{ fontWeight: 700, fontSize: 12, color: "#fff", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <div style={{ fontWeight: 700, fontSize: 12, color: "#111", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {proj.title}
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                    <span style={{ fontSize: 9, color: "rgba(255,255,255,0.6)" }}>{proj.date}</span>
-                    <span style={{ padding: "0 6px", fontSize: 9, fontWeight: 700, background: isIP ? "#ffff80" : "#80ff80", color: "#000", border: "1px solid rgba(0,0,0,0.2)" }}>
+                    <span style={{ fontSize: 9, color: "#555" }}>{proj.date}</span>
+                    <span style={{ padding: "0 5px", fontSize: 9, fontWeight: 700, background: isIP ? "#ffff00" : "#00cc44", color: "#000", border: "1px solid #808080" }}>
                       {isIP ? "In Progress" : "Complete"}
                     </span>
                   </div>
@@ -2063,36 +2064,158 @@ function TrashApp({ items, onRestoreItem, onDeleteItem, onEmpty }) {
     </div>
   );
 }
-function SettingsApp({ iconSizeMode, setIconSizeMode }) {
+const DESKTOP_COLORS = [
+  { label: "Default",     value: null,      preview: "linear-gradient(180deg, #0b4aa6, #0a3f90)" },
+  { label: "Teal",        value: "#008080",  preview: "#008080" },
+  { label: "Navy",        value: "#000080",  preview: "#000080" },
+  { label: "Forest",      value: "#1a5c1a",  preview: "#1a5c1a" },
+  { label: "Maroon",      value: "#800000",  preview: "#800000" },
+  { label: "Purple",      value: "#4b0082",  preview: "#4b0082" },
+  { label: "Dark Gray",   value: "#404040",  preview: "#404040" },
+  { label: "Black",       value: "#000000",  preview: "#000000" },
+];
+
+function SettingsApp({ iconSizeMode, setIconSizeMode, clockFormat, setClockFormat, desktopColor, setDesktopColor }) {
+  const [activeTab, setActiveTab] = useState("display");
+
+  const tabBtn = (id, label) => {
+    const isActive = activeTab === id;
+    return (
+      <button
+        key={id}
+        onClick={() => setActiveTab(id)}
+        style={{
+          fontFamily: "inherit", fontSize: 11, cursor: "pointer",
+          padding: "3px 10px 4px",
+          background: isActive ? "#c0c0c0" : "#b0b0b0",
+          borderTop: "2px solid #fff",
+          borderLeft: "2px solid #fff",
+          borderRight: "2px solid #404040",
+          borderBottom: isActive ? "2px solid #c0c0c0" : "2px solid #404040",
+          marginRight: 2,
+          position: "relative",
+          zIndex: isActive ? 2 : 1,
+          fontWeight: isActive ? 700 : 400,
+          color: "#111",
+        }}
+      >{label}</button>
+    );
+  };
+
+  const win95Btn = (label, active, onClick) => (
+    <button onClick={onClick} style={{
+      fontFamily: "inherit", fontSize: 11, cursor: "pointer", padding: "3px 12px",
+      background: "#c0c0c0",
+      borderTop: active ? "1px solid #404040" : "2px solid #fff",
+      borderLeft: active ? "1px solid #404040" : "2px solid #fff",
+      borderRight: active ? "1px solid #fff" : "2px solid #404040",
+      borderBottom: active ? "1px solid #fff" : "2px solid #404040",
+      fontWeight: active ? 700 : 400, color: "#111",
+    }}>{label}</button>
+  );
+
+  const secLabel = { fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, borderBottom: "1px solid #808080", paddingBottom: 3, marginBottom: 8, marginTop: 10 };
+
   return (
-    <div style={{ padding: "16px 20px" }}>
-      <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12, color: "#111" }}>Settings</div>
-      <div style={{ fontSize: 12, color: "#444", marginBottom: 10 }}>Desktop icon size</div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-        {["small", "medium", "large"].map((size) => (
-          <button
-            key={size}
-            onClick={() => setIconSizeMode(size)}
-            style={{
-              border: "none",
-              borderTop: iconSizeMode === size ? "1px solid #404040" : "2px solid #fff",
-              borderLeft: iconSizeMode === size ? "1px solid #404040" : "2px solid #fff",
-              borderRight: iconSizeMode === size ? "1px solid #fff" : "2px solid #404040",
-              borderBottom: iconSizeMode === size ? "1px solid #fff" : "2px solid #404040",
-              background: "#c0c0c0",
-              padding: "5px 10px",
-              fontSize: 11,
-              textTransform: "capitalize",
-              cursor: "pointer",
-              fontFamily: "inherit",
-            }}
-          >
-            {size}
-          </button>
-        ))}
+    <div style={{ padding: "12px 14px 0", background: "#c0c0c0", height: "100%", boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
+      {/* Tab bar */}
+      <div style={{ display: "flex", alignItems: "flex-end", borderBottom: "2px solid #404040", marginBottom: 0 }}>
+        {tabBtn("display", "Display")}
+        {tabBtn("clock", "Clock")}
+        {tabBtn("about", "About")}
       </div>
-      <div style={{ fontSize: 11, color: "#666" }}>
-        Current mode: <strong style={{ color: "#111", textTransform: "capitalize" }}>{iconSizeMode}</strong>
+
+      {/* Tab panel */}
+      <div style={{ flex: 1, overflowY: "auto", minHeight: 0, border: "2px solid", borderTop: "none", borderColor: "#404040 #fff #fff #404040", padding: "10px 12px 14px", background: "#c0c0c0" }}>
+
+        {activeTab === "display" && (
+          <>
+            <div style={secLabel}>Desktop Icon Size</div>
+            <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
+              {["small", "medium", "large"].map((size) =>
+                win95Btn(size.charAt(0).toUpperCase() + size.slice(1), iconSizeMode === size, () => setIconSizeMode(size))
+              )}
+            </div>
+
+            <div style={secLabel}>Desktop Background</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {DESKTOP_COLORS.map(({ label, value, preview }) => {
+                const isSelected = desktopColor === value;
+                return (
+                  <div
+                    key={label}
+                    onClick={() => setDesktopColor(value)}
+                    title={label}
+                    style={{
+                      cursor: "pointer",
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+                    }}
+                  >
+                    <div style={{
+                      width: 28, height: 20,
+                      background: preview,
+                      border: isSelected ? "2px solid #000080" : "1px solid #808080",
+                      outline: isSelected ? "1px solid #fff" : "none",
+                      outlineOffset: -3,
+                    }} />
+                    <span style={{ fontSize: 9, color: "#333", whiteSpace: "nowrap" }}>{label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {activeTab === "clock" && (
+          <>
+            <div style={secLabel}>Time Format</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[["12h", "12-hour (AM/PM)"], ["24h", "24-hour"]].map(([val, lbl]) => (
+                <label key={val} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 11, color: "#111" }}>
+                  <div
+                    onClick={() => setClockFormat(val)}
+                    style={{
+                      width: 13, height: 13, borderRadius: "50%",
+                      border: "2px solid #808080",
+                      borderTop: "2px solid #404040", borderLeft: "2px solid #404040",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      background: "#fff", cursor: "pointer", flexShrink: 0,
+                    }}
+                  >
+                    {clockFormat === val && <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#000080" }} />}
+                  </div>
+                  <span onClick={() => setClockFormat(val)}>{lbl}</span>
+                </label>
+              ))}
+            </div>
+            <div style={{ marginTop: 14, padding: "6px 10px", border: "2px inset #c0c0c0", background: "#fff", fontSize: 11, color: "#111" }}>
+              Preview: <strong>{new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: clockFormat === "12h" })}</strong>
+            </div>
+          </>
+        )}
+
+        {activeTab === "about" && (
+          <>
+            <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginTop: 4 }}>
+              <div style={{ fontSize: 36, lineHeight: 1, flexShrink: 0 }}>🖥</div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "#111", marginBottom: 2 }}>JacobOS 98</div>
+                <div style={{ fontSize: 10, color: "#555", marginBottom: 8 }}>Build 2026.03 · Portfolio Edition</div>
+                <div style={{ fontSize: 11, color: "#222", lineHeight: 1.7 }}>
+                  <div>Frontend: <strong>Next.js 15 · React 18</strong></div>
+                  <div>Backend: <strong>Go 1.23 · PostgreSQL</strong></div>
+                  <div>Infra: <strong>Digital Ocean · Upstash Redis</strong></div>
+                  <div>Processor: <strong>Human Brain @ variable GHz</strong></div>
+                </div>
+              </div>
+            </div>
+            <div style={{ marginTop: 12, padding: "6px 10px", border: "2px inset #c0c0c0", background: "#fff", fontSize: 10, color: "#555", lineHeight: 1.6 }}>
+              This product is licensed to: <strong>Jacob Rushinski</strong><br />
+              Full-stack engineer · Est. 2024<br />
+              &copy; 2026 JacobOS Corp. All rights reserved.
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -2115,48 +2238,166 @@ function LocationApp() {
     </div>
   );
 }
-function ExplorerApp({ items, selectedId, onOpenItem, onAction, onMoveItem }) {
+function ExplorerApp({ items, onOpenItem, onAction }) {
+  const [navStack, setNavStack] = useState([]);
+  const [fwdStack, setFwdStack] = useState([]);
+  const [currentFolderId, setCurrentFolderId] = useState(null); // null = Desktop root
+  const [selectedId, setSelectedId] = useState(null);
+
+  const folders = items.filter((i) => i.itemType === "folder");
+
+  const currentItems = currentFolderId === null
+    ? items
+    : items.filter((i) => i.parentId === currentFolderId);
+
+  const currentFolderTitle = currentFolderId === null
+    ? "Desktop"
+    : (items.find((i) => i.id === currentFolderId)?.title || "Folder");
+
+  const navigateTo = (folderId) => {
+    setNavStack((prev) => [...prev, currentFolderId]);
+    setFwdStack([]);
+    setCurrentFolderId(folderId);
+    setSelectedId(null);
+  };
+
+  const goBack = () => {
+    if (navStack.length === 0) return;
+    const prev = navStack[navStack.length - 1];
+    setFwdStack((f) => [...f, currentFolderId]);
+    setNavStack((n) => n.slice(0, -1));
+    setCurrentFolderId(prev);
+    setSelectedId(null);
+  };
+
+  const goForward = () => {
+    if (fwdStack.length === 0) return;
+    const next = fwdStack[fwdStack.length - 1];
+    setNavStack((n) => [...n, currentFolderId]);
+    setFwdStack((f) => f.slice(0, -1));
+    setCurrentFolderId(next);
+    setSelectedId(null);
+  };
+
+  const goUp = () => {
+    if (currentFolderId === null) return;
+    navigateTo(null);
+  };
+
+  const handleItemDoubleClick = (item) => {
+    if (item.itemType === "folder") {
+      navigateTo(item.id);
+    } else {
+      onOpenItem?.(item);
+    }
+  };
+
+  const navBtn = (label, disabled, onClick) => (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        fontFamily: "inherit", fontSize: 11, cursor: disabled ? "default" : "pointer",
+        padding: "1px 7px", background: "#c0c0c0",
+        borderTop: "2px solid #fff", borderLeft: "2px solid #fff",
+        borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
+        color: disabled ? "#808080" : "#111", minWidth: 24,
+      }}
+    >{label}</button>
+  );
+
+  const itemIcon = (item) => {
+    if (item.itemType === "folder") return "📁";
+    if (item.itemType === "text") return "📄";
+    return "🖥";
+  };
+
   return (
-    <div style={{ padding: "16px 20px" }}>
-      <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 12, color: "#111" }}>File Explorer</div>
-      <div style={{ fontSize: 11, color: "#666", marginBottom: 12 }}>Desktop root (all apps and files)</div>
-      <div style={{ border: "2px inset #c0c0c0", background: "#fff", minHeight: 220, padding: 8 }}>
-        {items.length === 0 ? (
-          <div style={{ fontSize: 12, color: "#666" }}>No items.</div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {items.map((item) => (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#c0c0c0", fontFamily: "inherit", overflow: "hidden" }}>
+
+      {/* Toolbar */}
+      <div style={{ padding: "4px 6px", borderBottom: "1px solid #808080", display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+        {navBtn("◄", navStack.length === 0, goBack)}
+        {navBtn("►", fwdStack.length === 0, goForward)}
+        {navBtn("▲", currentFolderId === null, goUp)}
+        {/* Address bar */}
+        <div style={{
+          flex: 1, marginLeft: 4, padding: "1px 6px",
+          border: "2px inset #c0c0c0", background: "#fff",
+          fontSize: 11, color: "#111", lineHeight: "18px", height: 20,
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+        }}>
+          <span style={{ color: "#808080" }}>Desktop</span>
+          {currentFolderId !== null && (
+            <span> › <span style={{ color: "#111" }}>{currentFolderTitle}</span></span>
+          )}
+        </div>
+      </div>
+
+      {/* Main area */}
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0 }}>
+
+        {/* Left pane — folder tree */}
+        <div style={{ width: 130, flexShrink: 0, borderRight: "1px solid #808080", overflowY: "auto", background: "#d4d0c8", padding: "4px 0" }}>
+          <div
+            onClick={() => navigateTo(null)}
+            style={{
+              padding: "2px 8px", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 5,
+              background: currentFolderId === null ? "#000080" : "transparent",
+              color: currentFolderId === null ? "#fff" : "#111",
+            }}
+          >
+            <span>🖥</span> Desktop
+          </div>
+          {folders.map((folder) => (
+            <div
+              key={folder.id}
+              onClick={() => navigateTo(folder.id)}
+              style={{
+                padding: "2px 8px 2px 20px", fontSize: 11, cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
+                background: currentFolderId === folder.id ? "#000080" : "transparent",
+                color: currentFolderId === folder.id ? "#fff" : "#111",
+              }}
+            >
+              <span>📁</span>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{folder.title}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Right pane — file list */}
+        <div style={{ flex: 1, overflowY: "auto", background: "#fff", minWidth: 0 }}>
+          {currentItems.length === 0 ? (
+            <div style={{ padding: "16px", fontSize: 11, color: "#808080" }}>This folder is empty.</div>
+          ) : (
+            currentItems.map((item) => (
               <div
                 key={item.id}
+                onClick={() => setSelectedId(item.id)}
+                onDoubleClick={() => handleItemDoubleClick(item)}
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "18px 1fr auto",
-                  alignItems: "center",
-                  gap: 8,
-                  fontSize: 12,
-                  color: "#333",
-                  padding: "3px 4px",
-                  background: selectedId === item.id ? "#e9eef9" : "transparent",
-                  border: selectedId === item.id ? "1px solid #9fb5db" : "1px solid transparent",
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "2px 8px",
+                  background: selectedId === item.id ? "#000080" : "transparent",
+                  color: selectedId === item.id ? "#fff" : "#111",
+                  fontSize: 11, cursor: "default", userSelect: "none",
                 }}
               >
-                <span>{item.itemType === "folder" ? "[]" : item.itemType === "text" ? "TXT" : "APP"}</span>
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.title}</span>
-                <div style={{ display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                  <button onClick={() => onOpenItem?.(item)} style={{ fontSize: 10, padding: "1px 5px" }}>Open</button>
-                  <button onClick={() => onAction?.("rename", item.id)} style={{ fontSize: 10, padding: "1px 5px" }}>Rename</button>
-                  <button onClick={() => onAction?.("cut", item.id)} style={{ fontSize: 10, padding: "1px 5px" }}>Cut</button>
-                  <button onClick={() => onAction?.("copy", item.id)} style={{ fontSize: 10, padding: "1px 5px" }}>Copy</button>
-                  <button onClick={() => onAction?.("delete", item.id)} style={{ fontSize: 10, padding: "1px 5px" }}>Delete</button>
-                  <button onClick={() => onMoveItem?.(item.id, -1, 0)} style={{ fontSize: 10, padding: "1px 5px" }}>{"<"}</button>
-                  <button onClick={() => onMoveItem?.(item.id, 1, 0)} style={{ fontSize: 10, padding: "1px 5px" }}>{">"}</button>
-                  <button onClick={() => onMoveItem?.(item.id, 0, -1)} style={{ fontSize: 10, padding: "1px 5px" }}>^</button>
-                  <button onClick={() => onMoveItem?.(item.id, 0, 1)} style={{ fontSize: 10, padding: "1px 5px" }}>v</button>
-                </div>
+                <span style={{ fontSize: 13, flexShrink: 0 }}>{itemIcon(item)}</span>
+                <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.title}</span>
+                <span style={{ fontSize: 9, color: selectedId === item.id ? "rgba(255,255,255,0.7)" : "#808080", flexShrink: 0 }}>
+                  {item.itemType === "folder" ? "Folder" : item.itemType === "text" ? "Text Document" : "Application"}
+                </span>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Status bar */}
+      <div style={{ padding: "2px 8px", borderTop: "1px solid #808080", fontSize: 10, color: "#555", flexShrink: 0, background: "#c0c0c0" }}>
+        {currentItems.length} object{currentItems.length !== 1 ? "s" : ""}
+        {selectedId && (() => { const sel = items.find((i) => i.id === selectedId); return sel ? ` · ${sel.title} selected` : ""; })()}
       </div>
     </div>
   );
@@ -2561,7 +2802,7 @@ function TopMenuBar({
 export default function HeroDesktopComputerComponent() {
   const [booted, setBooted] = useState(false);
   const [clock, setClock] = useState("");
-  const [selectedIcon, setSelectedIcon] = useState(null);
+  const [selectedIconIds, setSelectedIconIds] = useState([]);
   const topZRef = useRef(100);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [calendarViewDate, setCalendarViewDate] = useState(() => {
@@ -2576,18 +2817,21 @@ export default function HeroDesktopComputerComponent() {
     setBooted(true);
   }, []);
 
+  const [clockFormat, setClockFormat] = useState("12h");
+  const [desktopColor, setDesktopColor] = useState(null);
+
   // Clock
   useEffect(() => {
     const tick = () => {
       const now = new Date();
       const date = now.toLocaleDateString([], { month: "2-digit", day: "2-digit", year: "2-digit" });
-      const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: clockFormat === "12h" });
       setClock(`${date} ${time}`);
     };
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [clockFormat]);
 
   //  Icons state 
   const desktopRef = useRef(null);
@@ -2818,7 +3062,7 @@ export default function HeroDesktopComputerComponent() {
       const position = findFreeGridPosition(basePosition.x, basePosition.y, id, prev);
       return { ...prev, [id]: position };
     });
-    setSelectedIcon(id);
+    setSelectedIconIds([id]);
     setIconMenu(null);
     setDesktopMenu(null);
   }, [findFreeGridPosition, getNextDesktopSlot, normalizeIconPosition, toDesktopPoint]);
@@ -2860,7 +3104,7 @@ export default function HeroDesktopComputerComponent() {
         const position = findFreeGridPosition(basePosition.x, basePosition.y, source.id, prev);
         return { ...prev, [source.id]: position };
       });
-      setSelectedIcon(source.id);
+      setSelectedIconIds([source.id]);
       setClipboardState(null);
       return;
     }
@@ -2878,7 +3122,7 @@ export default function HeroDesktopComputerComponent() {
       const position = findFreeGridPosition(basePosition.x, basePosition.y, cloneId, prev);
       return { ...prev, [cloneId]: position };
     });
-    setSelectedIcon(cloneId);
+    setSelectedIconIds([cloneId]);
   }, [clipboardState, desktopItems, findFreeGridPosition, resolvePasteBasePosition]);
 
   const renameDesktopItem = useCallback((id) => {
@@ -2945,13 +3189,13 @@ export default function HeroDesktopComputerComponent() {
       setActiveTextDocId(null);
       setWindows((prev) => ({ ...prev, textdoc: { ...prev.textdoc, isOpen: false } }));
     }
-    if (selectedIcon === id) {
-      setSelectedIcon(null);
+    if (selectedIconIds.includes(id)) {
+      setSelectedIconIds((prev) => prev.filter((x) => x !== id));
     }
     if (clipboardState?.id === id) {
       setClipboardState(null);
     }
-  }, [desktopItems, showProtectedDeleteAlert, iconPositions, getNextDesktopSlot, activeTextDocId, selectedIcon, clipboardState]);
+  }, [desktopItems, showProtectedDeleteAlert, iconPositions, getNextDesktopSlot, activeTextDocId, selectedIconIds, clipboardState]);
 
   const deleteDesktopItem = useCallback((id) => {
     moveItemToRecycleBin(id);
@@ -2972,7 +3216,7 @@ export default function HeroDesktopComputerComponent() {
       const restoredPos = findFreeGridPosition(anchor.x, anchor.y, id, prev);
       return { ...prev, [id]: restoredPos };
     });
-    setSelectedIcon(id);
+    setSelectedIconIds([id]);
   }, [recycleBinItems, findFreeGridPosition, getNextDesktopSlot]);
 
   const permanentlyDeleteRecycleBinItem = useCallback((id) => {
@@ -3097,7 +3341,7 @@ export default function HeroDesktopComputerComponent() {
     const startY = clamp(e.clientY - rect.top, 0, rect.height);
     const initialBox = { x: startX, y: startY, w: 0, h: 0 };
 
-    setSelectedIcon(null);
+    setSelectedIconIds([]);
     setStartOpen(false);
     setCalendarOpen(false);
     setIconMenu(null);
@@ -3134,7 +3378,7 @@ export default function HeroDesktopComputerComponent() {
       if (box && (box.w > 4 || box.h > 4)) {
         const hits = getIconsInSelectionBox(box);
         if (hits.length > 0) {
-          setSelectedIcon(hits[0]);
+          setSelectedIconIds(hits);
         }
       }
       selectionBoxRef.current = null;
@@ -3146,8 +3390,14 @@ export default function HeroDesktopComputerComponent() {
     window.addEventListener("pointerup", handleUp);
   }, [getIconsInSelectionBox, rememberDesktopCursor]);
 
-  const selectDesktopIcon = useCallback((id) => {
-    setSelectedIcon(id);
+  const selectDesktopIcon = useCallback((id, opts = {}) => {
+    if (opts.ctrlKey) {
+      setSelectedIconIds((prev) =>
+        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      );
+    } else {
+      setSelectedIconIds([id]);
+    }
     setCalendarOpen(false);
     setIconMenu(null);
     setDesktopMenu(null);
@@ -3163,7 +3413,7 @@ export default function HeroDesktopComputerComponent() {
     const menuW = 188;
     const menuH = 196;
 
-    setSelectedIcon(id);
+    setSelectedIconIds([id]);
     setDesktopMenu(null);
     setDesktopViewMenuOpen(false);
     setCalendarOpen(false);
@@ -3202,7 +3452,7 @@ export default function HeroDesktopComputerComponent() {
   const handleIconAction = useCallback((action, id) => {
     const item = desktopItems.find((entry) => entry.id === id);
     if (!item) return;
-    setSelectedIcon(id);
+    setSelectedIconIds([id]);
 
     if (action === "open") openDesktopItem(item);
     if (action === "cut") setClipboardState({ mode: "cut", id });
@@ -3219,7 +3469,7 @@ export default function HeroDesktopComputerComponent() {
 
   const handleIconDragStart = useCallback((id, position) => {
     dragStartRef.current[id] = position;
-    setSelectedIcon(id);
+    setSelectedIconIds([id]);
     setIconMenu(null);
     setDesktopMenu(null);
     setTaskbarMenu(null);
@@ -3259,17 +3509,18 @@ export default function HeroDesktopComputerComponent() {
   }, [desktopItems, iconSizeMode, iconPositions.trash, normalizeIconPosition, showProtectedDeleteAlert, moveItemToRecycleBin, findFreeGridPosition]);
 
   const nudgeSelectedIcon = useCallback((dxCells, dyCells) => {
-    if (!selectedIcon) return;
+    const id = selectedIconIds[0];
+    if (!id) return;
     const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
     setIconPositions((prev) => {
-      const current = prev[selectedIcon];
+      const current = prev[id];
       if (!current) return prev;
       const targetX = current.x + dxCells * view.cellX;
       const targetY = current.y + dyCells * view.cellY;
-      const freePos = findFreeGridPosition(targetX, targetY, selectedIcon, prev);
-      return { ...prev, [selectedIcon]: freePos };
+      const freePos = findFreeGridPosition(targetX, targetY, id, prev);
+      return { ...prev, [id]: freePos };
     });
-  }, [selectedIcon, iconSizeMode, findFreeGridPosition]);
+  }, [selectedIconIds, iconSizeMode, findFreeGridPosition]);
 
   const moveDesktopItemByGrid = useCallback((id, dxCells, dyCells) => {
     const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
@@ -3281,7 +3532,7 @@ export default function HeroDesktopComputerComponent() {
       const freePos = findFreeGridPosition(targetX, targetY, id, prev);
       return { ...prev, [id]: freePos };
     });
-    setSelectedIcon(id);
+    setSelectedIconIds([id]);
   }, [iconSizeMode, findFreeGridPosition]);
 
   useEffect(() => {
@@ -3315,29 +3566,30 @@ export default function HeroDesktopComputerComponent() {
         return;
       }
 
-      if (!selectedIcon) return;
+      const activeId = selectedIconIds[0];
+      if (!activeId) return;
 
       if (ctrl && (e.key === "c" || e.key === "C")) {
         e.preventDefault();
-        setClipboardState({ mode: "copy", id: selectedIcon });
+        setClipboardState({ mode: "copy", id: activeId });
         return;
       }
 
       if (ctrl && (e.key === "x" || e.key === "X")) {
         e.preventDefault();
-        setClipboardState({ mode: "cut", id: selectedIcon });
+        setClipboardState({ mode: "cut", id: activeId });
         return;
       }
 
       if (e.key === "Delete") {
         e.preventDefault();
-        deleteDesktopItem(selectedIcon);
+        deleteDesktopItem(activeId);
         return;
       }
 
       if (e.key === "F2") {
         e.preventDefault();
-        renameDesktopItem(selectedIcon);
+        renameDesktopItem(activeId);
         return;
       }
 
@@ -3349,7 +3601,7 @@ export default function HeroDesktopComputerComponent() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [cancelRenameDesktopItem, clipboardState, createFolder, deleteDesktopItem, nudgeSelectedIcon, pasteDesktopItem, renameDesktopItem, selectedIcon]);
+  }, [cancelRenameDesktopItem, clipboardState, createFolder, deleteDesktopItem, nudgeSelectedIcon, pasteDesktopItem, renameDesktopItem, selectedIconIds]);
 
   useEffect(() => {
     const closeTaskbarContext = () => setTaskbarMenu(null);
@@ -3562,13 +3814,11 @@ export default function HeroDesktopComputerComponent() {
     explorer: (
       <ExplorerApp
         items={desktopItems}
-        selectedId={selectedIcon}
         onOpenItem={openDesktopItem}
         onAction={handleIconAction}
-        onMoveItem={moveDesktopItemByGrid}
       />
     ),
-    settings: <SettingsApp iconSizeMode={iconSizeMode} setIconSizeMode={setIconSizeMode} />,
+    settings: <SettingsApp iconSizeMode={iconSizeMode} setIconSizeMode={setIconSizeMode} clockFormat={clockFormat} setClockFormat={setClockFormat} desktopColor={desktopColor} setDesktopColor={setDesktopColor} />,
     textdoc: <TextDocumentApp item={activeTextDoc} onChangeContent={updateTextContent} />,
   };
 
@@ -3669,7 +3919,9 @@ export default function HeroDesktopComputerComponent() {
               borderRadius: "10px",
               overflow: "hidden",
               position: "relative",
-              background: "radial-gradient(circle at 30% 25%, rgba(255,255,255,0.06), transparent 40%), radial-gradient(circle at 70% 60%, rgba(0,0,0,0.15), transparent 55%), linear-gradient(180deg, #0b4aa6, #0a3f90)",
+              background: desktopColor
+                ? desktopColor
+                : "radial-gradient(circle at 30% 25%, rgba(255,255,255,0.06), transparent 40%), radial-gradient(circle at 70% 60%, rgba(0,0,0,0.15), transparent 55%), linear-gradient(180deg, #0b4aa6, #0a3f90)",
               boxShadow: "inset 0 0 30px rgba(0,0,0,0.6)",
               display: "flex",
               flexDirection: "column",
@@ -3724,14 +3976,14 @@ export default function HeroDesktopComputerComponent() {
                     key={icon.id}
                     icon={icon}
                     position={iconPositions[icon.id]}
-                    selected={selectedIcon === icon.id}
+                    selected={selectedIconIds.includes(icon.id)}
                     hovered={hoveredIcon === icon.id || marqueePreviewIds.includes(icon.id)}
                     iconSizeMode={iconSizeMode}
                     onDoubleClick={() => openDesktopItem(icon)}
                     onDragStart={handleIconDragStart}
                     onDragMove={handleIconDragMove}
                     onDrop={handleIconDrop}
-                    onSingleClick={(id) => selectDesktopIcon(id)}
+                    onSingleClick={(id, _x, _y, opts) => selectDesktopIcon(id, opts)}
                     onContextMenu={openIconMenuAt}
                     onHoverChange={setHoveredIcon}
                     isCutPending={clipboardState?.mode === "cut" && clipboardState.id === icon.id}
