@@ -1136,12 +1136,24 @@ export function OSProvider({ children }) {
   }, [findFreeGridPosition, getNextDesktopSlot, itemsById, playUiSound, recycleBinItems, showAlertDialog]);
 
   const permanentlyDeleteRecycleBinItem = useCallback((id) => {
+    if (!recycleBinItems.some((entry) => entry.item.id === id)) {
+      return false;
+    }
+
     setRecycleBinItems((prev) => prev.filter((entry) => entry.item.id !== id));
-  }, []);
+    playUiSound("click");
+    return true;
+  }, [playUiSound, recycleBinItems]);
 
   const emptyRecycleBin = useCallback(() => {
+    if (recycleBinItems.length === 0) {
+      return false;
+    }
+
     setRecycleBinItems([]);
-  }, []);
+    playUiSound("close");
+    return true;
+  }, [playUiSound, recycleBinItems.length]);
 
   const updateTextContent = useCallback((id, content) => {
     setCustomItems((prev) => prev.map((item) => (

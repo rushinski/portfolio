@@ -51,9 +51,9 @@ export const WALLPAPER_PATTERN_BACKGROUNDS = {
 };
 export const SCREENSAVER_OPTIONS = [
   { id: "none", label: "None" },
-  { id: "starfield", label: "Starfield" },
+  { id: "mystify", label: "Mystify" },
   { id: "bouncing-logo", label: "Bouncing Logo" },
-  { id: "matrix-rain", label: "Matrix Rain" },
+  { id: "pipes", label: "Pipes" },
 ];
 export const SCREENSAVER_TIMEOUT_OPTIONS = [
   { value: 60, label: "1 min" },

@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { cloneElement, useMemo, useState } from "react";
 
 import ScreensaverCanvas from "../ScreensaverCanvas";
 import {
   DESKTOP_COLORS,
+  ICON_VIEW_MODES,
   SCREENSAVER_OPTIONS,
   SCREENSAVER_TIMEOUT_OPTIONS,
   WALLPAPER_PATTERNS,
@@ -13,6 +14,7 @@ import { useAudio } from "../hooks/useAudio";
 import { useDialogs } from "../hooks/useDialogs";
 import { useSettings } from "../hooks/useSettings";
 import { useSystem } from "../hooks/useSystem";
+import { Icons } from "../icons";
 import {
   ETCHED_SEPARATOR_STYLE,
   INSET_BORDER,
@@ -91,6 +93,25 @@ function PreviewFrame({ height = 160, children }) {
       <div style={{ minHeight: height, position: "relative", overflow: "hidden", background: "#000000" }}>
         {children}
       </div>
+    </div>
+  );
+}
+
+function DesktopPreviewIcon({ glyph, label, iconSizeMode }) {
+  const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
+  const glyphSize = Math.max(18, Math.round(24 * view.glyphScale));
+  const labelSize = Math.max(9, view.labelSize - 1);
+  const labelWidth = Math.max(44, Math.min(68, view.tileW - 18));
+  const scale = glyphSize / 32;
+
+  return (
+    <div style={{ width: labelWidth, textAlign: "center", color: "#ffffff", fontSize: labelSize, lineHeight: 1.2 }}>
+      <div style={{ width: glyphSize, height: glyphSize, margin: "0 auto 4px", overflow: "hidden" }}>
+        <div style={{ width: 32, height: 32, transform: `scale(${scale})`, transformOrigin: "top left" }}>
+          {cloneElement(glyph)}
+        </div>
+      </div>
+      {label}
     </div>
   );
 }
@@ -240,23 +261,20 @@ export default function SettingsApp() {
                           style={{
                             position: "absolute",
                             inset: 0,
-                            background: wallpaperPattern === "scanline"
+                            backgroundImage: wallpaperPattern === "scanline"
                               ? "repeating-linear-gradient(180deg, rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 1px, transparent 1px, transparent 4px)"
                               : wallpaperPattern === "dot-grid"
                                 ? "radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px)"
                                 : "repeating-linear-gradient(135deg, rgba(255,255,255,0.14) 0 6px, transparent 6px 14px)",
                             backgroundSize: wallpaperPattern === "dot-grid" ? "8px 8px" : "auto",
+                            backgroundRepeat: "repeat",
                           }}
                         />
                       )}
                       {crtEffectEnabled && <div style={{ position: "absolute", inset: 0, background: "repeating-linear-gradient(180deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 4px)" }} />}
                       <div style={{ position: "absolute", left: 12, top: 14, display: "grid", gap: 10 }}>
-                        {["My Computer", "Settings"].map((label) => (
-                          <div key={label} style={{ width: 52, textAlign: "center", color: "#ffffff", fontSize: 10 }}>
-                            <div style={{ width: 24, height: 24, margin: "0 auto 4px", background: "#c0c0c0", border: "1px solid #404040" }} />
-                            {label}
-                          </div>
-                        ))}
+                        <DesktopPreviewIcon glyph={Icons.computer} label="My Computer" iconSizeMode={iconSizeMode} />
+                        <DesktopPreviewIcon glyph={Icons.settings} label="Settings" iconSizeMode={iconSizeMode} />
                       </div>
                     </div>
                   </PreviewFrame>

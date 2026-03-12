@@ -699,7 +699,18 @@ export default function Desktop() {
         <div style={{ width: "100%", flex: 1, minHeight: 0, maxWidth: 1400, maxHeight: 900, background: "linear-gradient(180deg, #d6c9a7 0%, #c9bb98 100%)", borderRadius: "24px", padding: "18px", boxShadow: "0 20px 80px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -3px 0 rgba(0,0,0,0.15)", border: "1px solid rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", animation: "fadeIn 0.6s ease-out" }}>
           <div style={{ flex: 1, background: "#222", borderRadius: "16px", padding: "10px", boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 4px 12px rgba(0,0,0,0.5)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <div style={{ flex: 1, borderRadius: "10px", overflow: "hidden", position: "relative", background: desktopBaseBackground, boxShadow: "inset 0 0 30px rgba(0,0,0,0.6)", display: "flex", flexDirection: "column" }}>
-              <div style={{ position: "absolute", inset: 0, background: wallpaperPatternBackground, backgroundSize: wallpaperPattern === "dot-grid" ? "8px 8px" : "auto", opacity: wallpaperPattern === "solid" ? 0 : 1, pointerEvents: "none", zIndex: 45 }} />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  backgroundImage: wallpaperPatternBackground,
+                  backgroundSize: wallpaperPattern === "dot-grid" ? "8px 8px" : undefined,
+                  backgroundRepeat: "repeat",
+                  opacity: wallpaperPattern === "solid" ? 0 : 1,
+                  pointerEvents: "none",
+                  zIndex: 45,
+                }}
+              />
               <div style={{ position: "absolute", inset: 0, background: "repeating-linear-gradient(to bottom, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 4px)", pointerEvents: "none", zIndex: 50, opacity: crtEffectEnabled ? 1 : 0 }} />
               <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.3) 100%)", pointerEvents: "none", zIndex: 51, opacity: crtEffectEnabled ? 1 : 0 }} />
 
