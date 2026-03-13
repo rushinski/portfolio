@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { SKILLS } from "../data";
 import {
   APP_BODY_STYLE,
@@ -11,41 +13,50 @@ import {
 } from "../ui/retro";
 
 const SKILL_ICON_FILES = {
-  TypeScript: "typescript.webp",
-  JavaScript: "javascript.webp",
-  Python: "python.png",
-  Go: "go.png",
-  SQL: "sql.png",
-  Java: "java.png",
-  "C++": "c__.png",
-  PHP: "php.png",
-  HTML: "html.png",
-  CSS: "css.png",
-  "Node.js": "nodejs.png",
-  "Next.js": "nextjs.png",
-  Flask: "flask.png",
-  React: "react.png",
-  PostgreSQL: "postgresql.png",
-  MySQL: "mysql.png",
-  MongoDB: "mongodb.png",
-  Redis: "redis.png",
-  "Tailwind CSS": "tailwindcss.png",
+  TypeScript: "typescript.png",
+  JavaScript: "javascript.png",
+  Python: "Python.png",
+  Go: "Go.png",
+  Java: "Java.png",
+  "C++": "CPlusPlus.png",
+  PHP: "PHP.png",
+  HTML: "HTML5.png",
+  CSS: "CSS3.png",
+  "Node.js": "Nodejs.png",
+  "Next.js": "Nextjs.png",
+  Flask: "Flask.png",
+  React: "React.png",
+  PostgreSQL: "PostgresSQL.png",
+  MySQL: "MySQL.png",
+  MongoDB: "MongoDB.png",
+  Redis: "Redis.png",
+  "Tailwind CSS": "TailwindCSS.png",
   Stripe: "stripe.webp",
-  Supabase: "supabase.png",
-  "Discord.js": "discord.webp",
-  ADBKit: "andriod.png",
-  "AWS SES": "awsses.png",
-  Docker: "docker.png",
-  Git: "git.png",
-  GitHub: "github.png",
-  "GitHub Actions": "githubactions.png",
-  Vercel: "vercel.png",
-  "Upstash Redis": "redis.png",
-  "GitHub Gist API": "github.png",
+  Supabase: "supabase.webp",
+  "Discord.js": "Discordjs.png",
+  ADBKit: "Android.png",
+  "AWS SES": "AWS.png",
+  Docker: "Docker.png",
+  Git: "Git.png",
+  GitHub: "GitHub.png",
+  "GitHub Actions": "GitHubActions.png",
+  Vercel: "Vercel.png",
+  "Upstash Redis": "Redis.png",
+  "GitHub Gist API": "GitHub.png",
 };
 
 function SkillCard({ name }) {
   const file = SKILL_ICON_FILES[name];
+  const [imageFailed, setImageFailed] = useState(false);
+  const fallbackLabel = name.length <= 4
+    ? name
+    : name
+        .split(/[\s.+-]+/)
+        .filter(Boolean)
+        .map((part) => part[0])
+        .join("")
+        .slice(0, 3)
+        .toUpperCase();
 
   return (
     <div
@@ -59,8 +70,21 @@ function SkillCard({ name }) {
         cursor: "default",
       }}
     >
-      {file ? (
-        <img src={`/skills/${file}`} alt={name} width={40} height={40} style={{ imageRendering: "pixelated", objectFit: "contain", width: 40, height: 40 }} />
+      {file && !imageFailed ? (
+        <img
+          src={`/skills/${file}`}
+          alt={name}
+          width={40}
+          height={40}
+          onError={() => setImageFailed(true)}
+          style={{
+            width: 40,
+            height: 40,
+            objectFit: "contain",
+            objectPosition: "center",
+            imageRendering: "auto",
+          }}
+        />
       ) : (
         <div
           style={{
@@ -73,9 +97,13 @@ function SkillCard({ name }) {
             fontSize: 9,
             fontWeight: 700,
             color: "#333",
+            textTransform: "uppercase",
+            textAlign: "center",
+            letterSpacing: 0.4,
+            padding: 2,
           }}
         >
-          {name.slice(0, 3)}
+          {fallbackLabel}
         </div>
       )}
       <span style={{ fontSize: 9, color: "#000", textAlign: "center", fontWeight: 600, lineHeight: 1.2, maxWidth: 76, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>

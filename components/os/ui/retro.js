@@ -161,7 +161,6 @@ export const APP_BODY_STYLE = {
 };
 
 export const APP_CONTENT_STYLE = {
-  ...INSET_BORDER,
   flex: 1,
   minHeight: 0,
   margin: 6,

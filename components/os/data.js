@@ -15,7 +15,7 @@ export const PERSONAL = {
 };
 
 export const SKILLS = {
-  Languages: ["TypeScript", "JavaScript", "Python", "Go", "SQL", "Java", "C++", "PHP", "HTML", "CSS"],
+  Languages: ["TypeScript", "JavaScript", "Python", "Go", "Java", "C++", "PHP", "HTML", "CSS"],
   Technologies: ["Node.js", "Next.js", "Flask", "React", "PostgreSQL", "MySQL", "MongoDB", "Redis", "Tailwind CSS"],
   Integrations: ["Stripe", "Supabase", "Discord.js", "ADBKit", "AWS SES"],
   "Developer Tools": ["Docker", "Git", "GitHub", "GitHub Actions", "Vercel"],
