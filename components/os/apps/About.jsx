@@ -21,6 +21,13 @@ const LANG_COLORS = {
   "Node.js": "#68a063",
 };
 
+const TOP_SKILL_ICONS = {
+  JavaScript: "/skills/javascript.png",
+  Python: "/skills/Python.png",
+  PostgreSQL: "/skills/PostgresSQL.png",
+  "Next.js": "/skills/Nextjs.png",
+};
+
 function DonutChart({ langs, size = 84 }) {
   if (!langs?.length) return null;
   const totalCount = langs.reduce((sum, language) => sum + language.count, 0);
@@ -123,9 +130,15 @@ export default function AboutApp({ initialGitHubData = null }) {
                 href={social.href}
                 target={social.href.startsWith("mailto") || social.href.startsWith("tel") ? undefined : "_blank"}
                 rel="noopener noreferrer"
-                style={{ display: "flex", alignItems: "center", gap: 6, textDecoration: "none", color: "#000080", fontSize: 11 }}
+                style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#000080", fontSize: 11 }}
               >
-                <img src={`/socials/${social.icon}`} alt={social.label} width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
+                <img
+                  src={`/socials/${social.icon}`}
+                  alt={social.label}
+                  width={16}
+                  height={16}
+                  style={{ width: 16, height: 16, objectFit: "contain", display: "block", flexShrink: 0 }}
+                />
                 {social.value}
               </a>
             ))}
@@ -262,7 +275,14 @@ export default function AboutApp({ initialGitHubData = null }) {
                   <div style={{ fontSize: 9, color: "#888", marginBottom: 8 }}>my strongest technologies</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                     {topSkills.map((skill) => (
-                      <div key={skill} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div key={skill} style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                        <img
+                          src={TOP_SKILL_ICONS[skill]}
+                          alt={skill}
+                          width={16}
+                          height={16}
+                          style={{ width: 16, height: 16, objectFit: "contain", display: "block", flexShrink: 0 }}
+                        />
                         <span style={{ fontSize: 11, color: "#333", fontWeight: 600 }}>{skill}</span>
                       </div>
                     ))}
