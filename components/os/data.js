@@ -21,6 +21,37 @@ export const SKILLS = {
   "Developer Tools": ["Docker", "Git", "GitHub", "GitHub Actions", "Vercel"],
 };
 
+export const SKILL_PROFICIENCY = {
+  TypeScript: 3,
+  JavaScript: 4,
+  Python: 2,
+  Go: 1,
+  Java: 1,
+  "C++": 1,
+  PHP: 1,
+  HTML: 1,
+  CSS: 1,
+  "Node.js": 4,
+  "Next.js": 3,
+  Flask: 2,
+  React: 2,
+  PostgreSQL: 3,
+  MySQL: 2,
+  MongoDB: 1,
+  Redis: 1,
+  "Tailwind CSS": 1,
+  Stripe: 3,
+  Supabase: 3,
+  "Discord.js": 2,
+  ADBKit: 1,
+  "AWS SES": 2,
+  Docker: 2,
+  Git: 3,
+  GitHub: 3,
+  "GitHub Actions": 2,
+  Vercel: 2,
+};
+
 export const EXPERIENCE = [
   {
     company: "Realdealkickzsc",
