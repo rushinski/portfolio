@@ -122,8 +122,8 @@ export default function LocationApp() {
             {!mapError ? (
               <ComposableMap
                 projection="geoMercator"
-                projectionConfig={{ center: [-77.5, 41.0], scale: 5000 }}
-                height={500}
+                projectionConfig={{ center: [-77.5, 41.0], scale: 6500 }}
+                height={440}
                 style={{ width: "100%", height: "auto", display: "block" }}
               >
                 <Geographies geography={GEO_URL}>
@@ -152,15 +152,15 @@ export default function LocationApp() {
                     style={{ cursor: "pointer" }}
                   >
                     {activePin === loc.id && (
-                      <circle r={9} fill="none" stroke={loc.color} strokeWidth={2} opacity={0.5} />
+                      <circle r={18} fill="none" stroke={loc.color} strokeWidth={2} opacity={0.45} />
                     )}
-                    <circle r={5} fill={loc.color} stroke="#fff" strokeWidth={1.5} />
-                    <circle r={2} fill="#fff" opacity={0.5} />
+                    <circle r={11} fill={loc.color} stroke="#fff" strokeWidth={2} />
+                    <circle r={4} fill="#fff" opacity={0.65} />
                     <text
                       textAnchor={loc.id === "philadelphia" ? "end" : "start"}
-                      x={loc.id === "philadelphia" ? -8 : 8}
-                      y={4}
-                      style={{ fontFamily: "sans-serif", fontSize: 8, fontWeight: 700, fill: loc.color, cursor: "pointer", userSelect: "none" }}
+                      x={loc.id === "philadelphia" ? -15 : 15}
+                      y={5}
+                      style={{ fontFamily: "sans-serif", fontSize: 16, fontWeight: 700, fill: loc.color, cursor: "pointer", userSelect: "none", paintOrder: "stroke", stroke: "#fff", strokeWidth: 4, strokeLinejoin: "round" }}
                     >
                       {loc.label.split(",")[0]}
                     </text>

@@ -213,90 +213,64 @@ export function getDialogIconStyles(variant = "info") {
   return variantMap[variant] || variantMap.info;
 }
 
-const WIN95_SCROLLBAR_ARROW_UP = "data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 8 8%27%3E%3Cpath fill=%27%23111%27 d=%27M4 1L1 4h6Z%27/%3E%3C/svg%3E";
-const WIN95_SCROLLBAR_ARROW_DOWN = "data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 8 8%27%3E%3Cpath fill=%27%23111%27 d=%27M1 3h6L4 6Z%27/%3E%3C/svg%3E";
-const WIN95_SCROLLBAR_ARROW_LEFT = "data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 8 8%27%3E%3Cpath fill=%27%23111%27 d=%27M1 4l3-3v6Z%27/%3E%3C/svg%3E";
-const WIN95_SCROLLBAR_ARROW_RIGHT = "data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 8 8%27%3E%3Cpath fill=%27%23111%27 d=%27M3 1l3 3-3 3Z%27/%3E%3C/svg%3E";
-
 export const WIN95_SCROLLBAR_CSS = `
-  * {
-    scrollbar-width: auto;
-    scrollbar-color: #c0c0c0 #d4d0c8;
+  *::-webkit-scrollbar { width: 17px; height: 17px; }
+
+  *::-webkit-scrollbar-track {
+    background-color: #808080;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1' fill='%23c0c0c0'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23c0c0c0'/%3E%3C/svg%3E");
+    background-size: 2px 2px;
   }
-  *::-webkit-scrollbar {
-    width: 16px;
-    height: 16px;
-    background: #d4d0c8;
+
+  *::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    border-radius: 0;
+    min-height: 20px; min-width: 20px;
   }
+  *::-webkit-scrollbar-thumb:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
   *::-webkit-scrollbar-button {
     display: block;
-    width: 16px;
-    height: 16px;
-    background: #c0c0c0;
-    border-left: 2px solid #ffffff;
+    width: 17px; height: 17px;
+    background-color: #c0c0c0;
     border-top: 2px solid #ffffff;
-    border-right: 2px solid #808080;
-    border-bottom: 2px solid #808080;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 7px 7px;
-    box-sizing: border-box;
+    background-size: 8px 8px;
   }
-  *::-webkit-scrollbar-button:single-button:vertical:decrement { background-image: url("${WIN95_SCROLLBAR_ARROW_UP}"); }
-  *::-webkit-scrollbar-button:single-button:vertical:increment { background-image: url("${WIN95_SCROLLBAR_ARROW_DOWN}"); }
-  *::-webkit-scrollbar-button:single-button:horizontal:decrement { background-image: url("${WIN95_SCROLLBAR_ARROW_LEFT}"); }
-  *::-webkit-scrollbar-button:single-button:horizontal:increment { background-image: url("${WIN95_SCROLLBAR_ARROW_RIGHT}"); }
-  *::-webkit-scrollbar-button:hover { background-color: #d4d0c8; }
   *::-webkit-scrollbar-button:active {
-    background-color: #b8b4ac;
-    border-left: 2px solid #808080;
-    border-top: 2px solid #808080;
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
     border-right: 2px solid #ffffff;
     border-bottom: 2px solid #ffffff;
+    background-position: calc(50% + 1px) calc(50% + 1px);
   }
-  *::-webkit-scrollbar-track {
-    background: #d4d0c8;
-    border-left: 1px solid #ffffff;
-    border-top: 1px solid #ffffff;
-    border-right: 1px solid #808080;
-    border-bottom: 1px solid #808080;
+  *::-webkit-scrollbar-button:double-button { display: none; }
+
+  *::-webkit-scrollbar-button:single-button:vertical:decrement {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpolygon points='4,1 7,6 1,6' fill='%23000'/%3E%3C/svg%3E");
   }
-  *::-webkit-scrollbar-track-piece {
-    background-color: #c8c4bc;
-    background-image:
-      linear-gradient(45deg, rgba(255,255,255,0.55) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.55) 75%),
-      linear-gradient(45deg, rgba(255,255,255,0.55) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.55) 75%);
-    background-size: 4px 4px;
-    background-position: 0 0, 2px 2px;
+  *::-webkit-scrollbar-button:single-button:vertical:increment {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpolygon points='1,2 7,2 4,7' fill='%23000'/%3E%3C/svg%3E");
   }
-  *::-webkit-scrollbar-thumb {
-    background-color: #c0c0c0;
-    background-image:
-      linear-gradient(to right,
-        transparent 2px, #808080 2px, #808080 3px, #ffffff 3px, #ffffff 4px,
-        transparent 4px, transparent 6px, #808080 6px, #808080 7px, #ffffff 7px, #ffffff 8px,
-        transparent 8px, transparent 10px, #808080 10px, #808080 11px, #ffffff 11px, #ffffff 12px,
-        transparent 12px
-      );
-    border-left: 2px solid #ffffff;
-    border-top: 2px solid #ffffff;
-    border-right: 2px solid #808080;
-    border-bottom: 2px solid #808080;
-    border-radius: 0;
+  *::-webkit-scrollbar-button:single-button:horizontal:decrement {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpolygon points='1,4 6,1 6,7' fill='%23000'/%3E%3C/svg%3E");
   }
-  *::-webkit-scrollbar-thumb:hover { background-color: #d4d0c8; }
-  *::-webkit-scrollbar-thumb:active {
-    background-color: #b8b4ac;
-    border-left: 2px solid #808080;
-    border-top: 2px solid #808080;
-    border-right: 2px solid #ffffff;
-    border-bottom: 2px solid #ffffff;
+  *::-webkit-scrollbar-button:single-button:horizontal:increment {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpolygon points='7,4 2,1 2,7' fill='%23000'/%3E%3C/svg%3E");
   }
-  *::-webkit-scrollbar-corner {
-    background: #c0c0c0;
-    border-left: 1px solid #ffffff;
-    border-top: 1px solid #ffffff;
-    border-right: 1px solid #808080;
-    border-bottom: 1px solid #808080;
-  }
+
+  *::-webkit-scrollbar-corner { background: #c0c0c0; }
 `;
