@@ -16,10 +16,13 @@ import { useWindowManager } from "./hooks/useWindowManager";
 import { WIN95_FONT_FAMILY, WIN95_SCROLLBAR_CSS } from "./ui/retro";
 import { GLOBAL_CONTEXT_MENU_EVENT, announceContextMenuOpen } from "./ui/contextMenu";
 import AboutApp from "./apps/About";
+import CalculatorApp from "./apps/Calculator";
 import ContactApp from "./apps/Contact";
 import ExperienceApp from "./apps/Experience";
 import FileExplorerApp from "./apps/FileExplorer";
+import HelpApp from "./apps/Help";
 import LocationApp from "./apps/Location";
+import MinesweeperApp from "./apps/Minesweeper";
 import ProjectsApp from "./apps/Projects";
 import RecycleBinApp from "./apps/RecycleBin";
 import ResumeApp from "./apps/Resume";
@@ -137,8 +140,19 @@ function DesktopIcon({
           {selected ? "\u2713" : ""}
         </div>
       )}
-      <div style={{ padding: 4, border: "1px solid transparent", background: "transparent" }}>
+      <div style={{ padding: 4, border: "1px solid transparent", background: "transparent", position: "relative" }}>
         <div style={{ transform: `scale(${view.glyphScale})`, transformOrigin: "center" }}>{icon.glyph}</div>
+        {icon.itemType === "app" && (
+          <div style={{ position: "absolute", left: 2, bottom: 2, pointerEvents: "none", zIndex: 1 }}>
+            <svg width="11" height="11" viewBox="0 0 11 11" shapeRendering="crispEdges">
+              <rect x="1" y="0" width="10" height="10" fill="#000" opacity="0.55" />
+              <rect x="0" y="0" width="3" height="9" fill="#fff" />
+              <rect x="0" y="7" width="9" height="3" fill="#fff" />
+              <rect x="1" y="1" width="1" height="6" fill="#aaa" />
+              <rect x="2" y="7" width="6" height="1" fill="#aaa" />
+            </svg>
+          </div>
+        )}
       </div>
       {isRenaming ? (
         <input
@@ -197,6 +211,9 @@ function TopMenuBar() {
       { label: "Open Terminal", action: () => openWindow("terminal") },
       { label: "Open File Explorer", action: () => openWindow("explorer") },
       { label: "Open Settings", action: () => openWindow("settings") },
+      { label: "Open Calculator", action: () => openWindow("calculator") },
+      { label: "Open Minesweeper", action: () => openWindow("minesweeper") },
+      { label: "Open Help", action: () => openWindow("help") },
       { label: "---------------", action: null },
       { label: "New Folder", action: createFolder },
       { label: "New Text Document", action: createTextDocument },
@@ -251,7 +268,7 @@ function TopMenuBar() {
 }
 
 export default function Desktop() {
-  const { dialog, closeDialog } = useDialogs();
+  const { dialog, closeDialog, showAlertDialog } = useDialogs();
   const {
     iconSizeMode,
     setIconSizeMode,
@@ -267,6 +284,8 @@ export default function Desktop() {
   const {
     openWindows,
     activeWindowId,
+    activateTaskbarEntry,
+    openWindow,
     focusWindow,
     closeWindow,
     minimizeWindow,
@@ -296,13 +315,16 @@ export default function Desktop() {
     openItem,
     setIconPositions,
     alignIconsToGrid,
+    getItemProperties,
   } = fileSystem;
 
   const desktopRef = useRef(null);
   const dragStartRef = useRef({});
   const screensaverTimeoutRef = useRef(null);
   const selectionBoxRef = useRef(null);
+  const altTabRef = useRef(null);
   const [booted, setBooted] = useState(false);
+  const [altTabOverlay, setAltTabOverlay] = useState(null);
   const [screensaverActive, setScreensaverActive] = useState(false);
   const [selectedIconIds, setSelectedIconIds] = useState([]);
   const [desktopSelectionBox, setDesktopSelectionBox] = useState(null);
@@ -316,6 +338,11 @@ export default function Desktop() {
 
   const rootDesktopItems = useMemo(
     () => desktopItems.filter((item) => (item.parentId ?? null) === null),
+    [desktopItems],
+  );
+
+  const desktopItemByWindowId = useMemo(
+    () => new Map(desktopItems.filter((item) => item.windowId).map((item) => [item.windowId, item])),
     [desktopItems],
   );
   const desktopBaseBackground = desktopColor || "linear-gradient(180deg, #0b4aa6, #0a3f90)";
@@ -514,9 +541,25 @@ export default function Desktop() {
     }
     if (action === "pinTaskbar") pinTaskbarItem(id);
     if (action === "unpinTaskbar") unpinTaskbarItem(id);
+    if (action === "properties") {
+      const props = getItemProperties(id);
+      if (props) {
+        const createdStr = props.createdAt
+          ? new Intl.DateTimeFormat("en-US", { month: "short", day: "2-digit", year: "numeric" }).format(new Date(props.createdAt))
+          : "System item";
+        const details = [
+          `Name:     ${props.name}`,
+          `Type:     ${props.type}`,
+          `Location: ${props.location}`,
+          `Size:     ${props.size}`,
+          `Created:  ${createdStr}`,
+        ].join("\n");
+        showAlertDialog(props.name, { title: "Properties", details, variant: "info" });
+      }
+    }
 
     setIconMenu(null);
-  }, [deleteDesktopItem, desktopItems, openItem, pasteDesktopItem, pinTaskbarItem, setClipboardState, unpinTaskbarItem]);
+  }, [deleteDesktopItem, desktopItems, getItemProperties, openItem, pasteDesktopItem, pinTaskbarItem, setClipboardState, showAlertDialog, unpinTaskbarItem]);
 
   const handleIconDragStart = useCallback((id, position) => {
     dragStartRef.current[id] = position;
@@ -610,6 +653,9 @@ export default function Desktop() {
     settings: <SettingsApp />,
     textdoc: <TextDocumentApp />,
     resume: <ResumeApp />,
+    calculator: <CalculatorApp />,
+    minesweeper: <MinesweeperApp />,
+    help: <HelpApp />,
   };
 
   useEffect(() => {
@@ -629,6 +675,41 @@ export default function Desktop() {
 
   useEffect(() => {
     const onKeyDown = (event) => {
+      // Alt+Tab — window switcher (intercept before typing check)
+      if (event.altKey && event.key === "Tab") {
+        event.preventDefault();
+        const wins = openWindows.filter((w) => !w.isMinimized);
+        if (wins.length === 0) return;
+        if (!altTabRef.current) {
+          const index = wins.length > 1 ? 1 : 0;
+          altTabRef.current = { windows: wins, index };
+        } else {
+          const len = altTabRef.current.windows.length;
+          altTabRef.current = {
+            ...altTabRef.current,
+            index: event.shiftKey
+              ? (altTabRef.current.index - 1 + len) % len
+              : (altTabRef.current.index + 1) % len,
+          };
+        }
+        setAltTabOverlay({ ...altTabRef.current });
+        return;
+      }
+
+      // Alt+F4 — close active window
+      if (event.altKey && event.key === "F4") {
+        event.preventDefault();
+        if (activeWindowId) closeWindow(activeWindowId);
+        return;
+      }
+
+      // F1 — open Help
+      if (event.key === "F1") {
+        event.preventDefault();
+        openWindow("help");
+        return;
+      }
+
       const target = event.target;
       const isTyping = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target?.isContentEditable;
       if (isTyping) return;
@@ -640,6 +721,12 @@ export default function Desktop() {
         setDesktopMenu(null);
         setDesktopViewMenuOpen(false);
         cancelRenameDesktopItem();
+        return;
+      }
+
+      if (ctrl && (event.key === "a" || event.key === "A")) {
+        event.preventDefault();
+        setSelectedIconIds(rootDesktopItems.map((item) => item.id));
         return;
       }
 
@@ -693,9 +780,23 @@ export default function Desktop() {
       if (event.shiftKey && event.key === "ArrowDown") { event.preventDefault(); nudgeSelectedIcon(0, 1); }
     };
 
+    const onKeyUp = (event) => {
+      if (event.key === "Alt" && altTabRef.current) {
+        const { windows, index } = altTabRef.current;
+        const selected = windows[index];
+        if (selected) activateTaskbarEntry(selected.id);
+        altTabRef.current = null;
+        setAltTabOverlay(null);
+      }
+    };
+
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [cancelRenameDesktopItem, clipboardState, createFolder, deleteDesktopItem, desktopItems, nudgeSelectedIcon, pasteDesktopItem, selectedIconIds, setClipboardState]);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+    };
+  }, [activateTaskbarEntry, activeWindowId, cancelRenameDesktopItem, clipboardState, closeWindow, createFolder, deleteDesktopItem, desktopItems, nudgeSelectedIcon, openWindow, openWindows, pasteDesktopItem, rootDesktopItems, selectedIconIds, setClipboardState]);
 
   return (
     <>
@@ -795,9 +896,9 @@ export default function Desktop() {
                         )}
                       </div>
                       <button onClick={() => { alignIconsToGrid(); setDesktopMenu(null); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
-                        Sort by Grid
+                        Line Up Icons
                       </button>
-                      <button onClick={() => { alignIconsToGrid(); setDesktopMenu(null); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
+                      <button onClick={() => { setDesktopMenu(null); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
                         Refresh
                       </button>
                       <div style={{ height: 1, background: "#808080", margin: "3px 8px" }} />
@@ -816,16 +917,22 @@ export default function Desktop() {
                   )}
 
                   {iconMenu && (
-                    <div onClick={(event) => event.stopPropagation()} style={{ position: "absolute", left: iconMenu.x, top: iconMenu.y, minWidth: 180, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "3px 3px 10px rgba(0,0,0,0.4)", zIndex: 9200, padding: "2px 0" }}>
+                    <div onClick={(event) => event.stopPropagation()} style={{ position: "absolute", left: iconMenu.x, top: iconMenu.y, minWidth: 188, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "3px 3px 10px rgba(0,0,0,0.4)", zIndex: 9200, padding: "2px 0" }}>
                       {[
                         { key: "open", label: "Open" },
+                        { key: "__sep1__" },
                         { key: "cut", label: "Cut" },
                         { key: "copy", label: "Copy" },
                         ...(clipboardState ? [{ key: "paste", label: "Paste" }] : []),
-                        ...(iconMenuIsPinnable ? [{ key: actualIconMenuPinned ? "unpinTaskbar" : "pinTaskbar", label: actualIconMenuPinned ? "Unpin from Taskbar" : "Pin to Taskbar" }] : []),
+                        ...(iconMenuIsPinnable ? [{ key: "__sep2__" }, { key: actualIconMenuPinned ? "unpinTaskbar" : "pinTaskbar", label: actualIconMenuPinned ? "Unpin from Taskbar" : "Pin to Taskbar" }] : []),
+                        { key: "__sep3__" },
                         { key: "rename", label: "Rename" },
                         { key: "delete", label: "Delete" },
-                      ].map((opt) => (
+                        { key: "__sep4__" },
+                        { key: "properties", label: "Properties" },
+                      ].map((opt) => opt.key.startsWith("__sep") ? (
+                        <div key={opt.key} style={{ height: 1, background: "#808080", margin: "3px 8px" }} />
+                      ) : (
                         <button key={opt.key} onClick={() => handleIconAction(opt.key, iconMenu.id)} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
                           {opt.label}
                         </button>
@@ -838,6 +945,27 @@ export default function Desktop() {
                       {windowContent[win.id]}
                     </WindowFrame>
                   ))}
+
+                  {altTabOverlay && (
+                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9500, pointerEvents: "none" }}>
+                      <div style={{ background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "4px 4px 12px rgba(0,0,0,0.5)", padding: "12px 16px", display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", maxWidth: "80%", justifyContent: "center" }}>
+                        {altTabOverlay.windows.map((win, index) => {
+                          const appItem = desktopItemByWindowId.get(win.id);
+                          const isSelected = altTabOverlay.index === index;
+                          return (
+                            <div key={win.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "6px 8px", background: isSelected ? "#000080" : "transparent", border: isSelected ? "1px dotted #fff" : "1px solid transparent", minWidth: 64, maxWidth: 80 }}>
+                              <div style={{ width: 32, height: 32, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                {appItem?.glyph || null}
+                              </div>
+                              <div style={{ fontSize: 10, color: isSelected ? "#fff" : "#111", textAlign: "center", maxWidth: 76, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", width: "100%" }}>
+                                {win.title}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <Taskbar />

@@ -7,6 +7,7 @@ import { PERSONAL } from "./data";
 import { useFileSystem } from "./hooks/useFileSystem";
 import { useSettings } from "./hooks/useSettings";
 import { useWindowManager } from "./hooks/useWindowManager";
+import Tooltip from "./ui/Tooltip";
 
 export default function Taskbar() {
   const { clockFormat } = useSettings();
@@ -234,12 +235,21 @@ export default function Taskbar() {
         </div>
 
         <div style={{ display: "flex", alignItems: "stretch", gap: 4 }}>
-          <div style={{ background: "#c0c0c0", borderTop: "1px solid #404040", borderLeft: "1px solid #404040", borderRight: "1px solid #fff", borderBottom: "1px solid #fff", padding: "3px 6px", display: "inline-flex", alignItems: "flex-end", gap: 1, minWidth: 20, justifyContent: "center" }}>
-            <span style={{ width: 3, height: 3, background: "#0b3b8f" }} />
-            <span style={{ width: 3, height: 5, background: "#0b3b8f" }} />
-            <span style={{ width: 3, height: 7, background: "#0b3b8f" }} />
-            <span style={{ width: 3, height: 9, background: "#0b3b8f" }} />
-          </div>
+          <Tooltip label="Volume">
+            <div style={{ background: "#c0c0c0", borderTop: "1px solid #404040", borderLeft: "1px solid #404040", borderRight: "1px solid #fff", borderBottom: "1px solid #fff", padding: "3px 6px", display: "inline-flex", alignItems: "center", justifyContent: "center", cursor: "default" }}>
+              <svg width="16" height="14" viewBox="0 0 16 14" shapeRendering="crispEdges">
+                <rect x="1" y="4" width="4" height="6" fill="#0b3b8f" />
+                <rect x="5" y="3" width="1" height="1" fill="#0b3b8f" />
+                <rect x="5" y="10" width="1" height="1" fill="#0b3b8f" />
+                <rect x="6" y="2" width="1" height="1" fill="#0b3b8f" />
+                <rect x="6" y="11" width="1" height="1" fill="#0b3b8f" />
+                <rect x="7" y="1" width="1" height="12" fill="#0b3b8f" />
+                <rect x="9" y="3" width="1" height="8" fill="#0b3b8f" />
+                <rect x="11" y="2" width="1" height="10" fill="#0b3b8f" />
+                <rect x="13" y="1" width="1" height="12" fill="#0b3b8f" />
+              </svg>
+            </div>
+          </Tooltip>
 
           <button
             onClick={(event) => {

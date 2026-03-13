@@ -82,7 +82,14 @@ export function OSProvider({ children }) {
   const sessionStartedAtRef = useRef(Date.now());
   const audioContextRef = useRef(null);
 
-  const [settingsState, setSettingsState] = useState(DEFAULT_SETTINGS);
+  const [settingsState, setSettingsState] = useState(() => {
+    if (typeof window === "undefined") return DEFAULT_SETTINGS;
+    try {
+      const saved = JSON.parse(localStorage.getItem("jacobos-settings") || "null");
+      if (saved && typeof saved === "object") return { ...DEFAULT_SETTINGS, ...saved };
+    } catch {}
+    return DEFAULT_SETTINGS;
+  });
   const [uptimeMs, setUptimeMs] = useState(0);
   const [systemDialog, setSystemDialog] = useState(null);
   const [clipboardState, setClipboardState] = useState(null);
@@ -98,6 +105,12 @@ export function OSProvider({ children }) {
   const iconPositionsRef = useRef(INITIAL_ICON_POSITIONS);
 
   iconPositionsRef.current = iconPositions;
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("jacobos-settings", JSON.stringify(settingsState));
+    } catch {}
+  }, [settingsState]);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -1359,15 +1372,24 @@ export function OSProvider({ children }) {
         return prev;
       }
 
-      const nextWindow = {
-        ...current,
-        isMaximized: !current.isMaximized,
-        z: nextZ(),
-      };
+      if (current.isMaximized) {
+        const restored = current.preMaximizeRect
+          ? normalizeWindowRect(id, { ...current, ...current.preMaximizeRect })
+          : normalizeWindowRect(id, current);
+        return {
+          ...prev,
+          [id]: { ...current, isMaximized: false, ...restored, preMaximizeRect: undefined, z: nextZ() },
+        };
+      }
 
       return {
         ...prev,
-        [id]: nextWindow.isMaximized ? nextWindow : normalizeWindowRect(id, nextWindow),
+        [id]: {
+          ...current,
+          isMaximized: true,
+          preMaximizeRect: { x: current.x, y: current.y, w: current.w, h: current.h },
+          z: nextZ(),
+        },
       };
     });
     playUiSound("click");

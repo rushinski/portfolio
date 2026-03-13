@@ -112,6 +112,9 @@ export const INITIAL_ICON_POSITIONS = {
   terminal: { x: 228, y: 134 },
   location: { x: 228, y: 260 },
   trash: { x: 228, y: 386 },
+  calculator: { x: 336, y: 8 },
+  minesweeper: { x: 336, y: 134 },
+  help: { x: 336, y: 260 },
 };
 
 export const INITIAL_WINDOWS = {
@@ -129,6 +132,9 @@ export const INITIAL_WINDOWS = {
   settings: { id: "settings", title: "Settings", x: 214, y: 88, w: 700, h: 520, isOpen: false, isMinimized: false, isMaximized: false, z: 1 },
   textdoc: { id: "textdoc", title: "Text Document", x: 248, y: 100, w: 560, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 12 },
   resume: { id: "resume", title: "Resume.pdf", x: 112, y: 44, w: 900, h: 620, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
+  calculator: { id: "calculator", title: "Calculator", x: 320, y: 120, w: 272, h: 340, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
+  minesweeper: { id: "minesweeper", title: "Minesweeper", x: 200, y: 80, w: 248, h: 330, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
+  help: { id: "help", title: "JacobOS Help", x: 160, y: 60, w: 600, h: 470, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
 };
 
 export const canPinItemToTaskbar = (item) => item?.itemType === "app" && !!item.windowId;
@@ -157,6 +163,9 @@ const SYSTEM_DESKTOP_ICON_DEFS = [
   { id: "settings", title: "Settings", glyph: Icons.settings, windowId: "settings", itemType: "app", system: true, parentId: null },
   { id: "trash", title: "Recycle Bin", glyph: Icons.trashEmpty, windowId: "trash", itemType: "app", system: true, parentId: null },
   { id: "resume", title: "Resume.pdf", glyph: Icons.resume, windowId: "resume", itemType: "app", system: true, parentId: null },
+  { id: "calculator", title: "Calculator", glyph: Icons.calculator, windowId: "calculator", itemType: "app", system: true, parentId: null },
+  { id: "minesweeper", title: "Minesweeper", glyph: Icons.minesweeper, windowId: "minesweeper", itemType: "app", system: true, parentId: null },
+  { id: "help", title: "Help", glyph: Icons.help, windowId: "help", itemType: "app", system: true, parentId: null },
 ];
 
 export const buildSystemDesktopIcons = (renamedSystemIcons = {}, options = {}) =>

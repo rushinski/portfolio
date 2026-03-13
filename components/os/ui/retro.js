@@ -213,10 +213,22 @@ export function getDialogIconStyles(variant = "info") {
   return variantMap[variant] || variantMap.info;
 }
 
+const WIN95_SCROLLBAR_ARROW_UP = "data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 8 8%27%3E%3Cpath fill=%27%23111%27 d=%27M4 1L1 4h6Z%27/%3E%3C/svg%3E";
+const WIN95_SCROLLBAR_ARROW_DOWN = "data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 8 8%27%3E%3Cpath fill=%27%23111%27 d=%27M1 3h6L4 6Z%27/%3E%3C/svg%3E";
+const WIN95_SCROLLBAR_ARROW_LEFT = "data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 8 8%27%3E%3Cpath fill=%27%23111%27 d=%27M1 4l3-3v6Z%27/%3E%3C/svg%3E";
+const WIN95_SCROLLBAR_ARROW_RIGHT = "data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 8 8%27%3E%3Cpath fill=%27%23111%27 d=%27M3 1l3 3-3 3Z%27/%3E%3C/svg%3E";
+
 export const WIN95_SCROLLBAR_CSS = `
-  scrollbar-color: #c0c0c0 #d4d0c8;
-  ::-webkit-scrollbar { width: 16px; height: 16px; background: #d4d0c8; }
-  ::-webkit-scrollbar-button {
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: #c0c0c0 #d4d0c8;
+  }
+  *::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+    background: #d4d0c8;
+  }
+  *::-webkit-scrollbar-button {
     display: block;
     width: 16px;
     height: 16px;
@@ -225,10 +237,57 @@ export const WIN95_SCROLLBAR_CSS = `
     border-top: 2px solid #ffffff;
     border-right: 2px solid #808080;
     border-bottom: 2px solid #808080;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 7px 7px;
+    box-sizing: border-box;
   }
-  ::-webkit-scrollbar-track { background: #d4d0c8; border-left: 1px solid #ffffff; border-top: 1px solid #ffffff; border-right: 1px solid #808080; border-bottom: 1px solid #808080; }
-  ::-webkit-scrollbar-thumb { background: #c0c0c0; border-left: 2px solid #ffffff; border-top: 2px solid #ffffff; border-right: 2px solid #808080; border-bottom: 2px solid #808080; border-radius: 0; }
-  ::-webkit-scrollbar-thumb:hover { background: #d4d0c8; }
-  ::-webkit-scrollbar-thumb:active { background: #b8b4ac; }
-  ::-webkit-scrollbar-corner { background: #c0c0c0; }
+  *::-webkit-scrollbar-button:single-button:vertical:decrement { background-image: url("${WIN95_SCROLLBAR_ARROW_UP}"); }
+  *::-webkit-scrollbar-button:single-button:vertical:increment { background-image: url("${WIN95_SCROLLBAR_ARROW_DOWN}"); }
+  *::-webkit-scrollbar-button:single-button:horizontal:decrement { background-image: url("${WIN95_SCROLLBAR_ARROW_LEFT}"); }
+  *::-webkit-scrollbar-button:single-button:horizontal:increment { background-image: url("${WIN95_SCROLLBAR_ARROW_RIGHT}"); }
+  *::-webkit-scrollbar-button:hover { background-color: #d4d0c8; }
+  *::-webkit-scrollbar-button:active {
+    background-color: #b8b4ac;
+    border-left: 2px solid #808080;
+    border-top: 2px solid #808080;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+  *::-webkit-scrollbar-track {
+    background: #d4d0c8;
+    border-left: 1px solid #ffffff;
+    border-top: 1px solid #ffffff;
+    border-right: 1px solid #808080;
+    border-bottom: 1px solid #808080;
+  }
+  *::-webkit-scrollbar-track-piece {
+    background: #d4d0c8;
+    box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #808080;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: #c0c0c0;
+    background-image:
+      linear-gradient(to right, transparent 0, transparent 5px, #808080 5px, #808080 6px, #ffffff 6px, #ffffff 7px, transparent 7px, transparent 100%);
+    border-left: 2px solid #ffffff;
+    border-top: 2px solid #ffffff;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
+    border-radius: 0;
+  }
+  *::-webkit-scrollbar-thumb:hover { background-color: #d4d0c8; }
+  *::-webkit-scrollbar-thumb:active {
+    background-color: #b8b4ac;
+    border-left: 2px solid #808080;
+    border-top: 2px solid #808080;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+  *::-webkit-scrollbar-corner {
+    background: #c0c0c0;
+    border-left: 1px solid #ffffff;
+    border-top: 1px solid #ffffff;
+    border-right: 1px solid #808080;
+    border-bottom: 1px solid #808080;
+  }
 `;

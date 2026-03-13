@@ -245,4 +245,63 @@ export const Icons = {
       <line x1="16" y1="21" x2="18.5" y2="22.5" stroke="#c00000" strokeWidth="1" />
     </svg>
   ),
+  calculator: (
+    <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
+      <rect x="3" y="2" width="26" height="29" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
+      <rect x="4" y="3" width="24" height="27" fill="#c0c0c0" />
+      <rect x="5" y="4" width="22" height="8" fill="#6aaa80" stroke="#404040" strokeWidth="1" />
+      <rect x="6" y="5" width="20" height="6" fill="#78ba90" />
+      <rect x="18" y="7" width="7" height="2" fill="#5a9a70" />
+      <rect x="5" y="14" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
+      <rect x="11" y="14" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
+      <rect x="17" y="14" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
+      <rect x="23" y="14" width="4" height="4" fill="#c07878" stroke="#808080" strokeWidth="1" />
+      <rect x="5" y="19" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
+      <rect x="11" y="19" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
+      <rect x="17" y="19" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
+      <rect x="23" y="19" width="4" height="4" fill="#c07878" stroke="#808080" strokeWidth="1" />
+      <rect x="5" y="24" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
+      <rect x="11" y="24" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
+      <rect x="17" y="24" width="5" height="4" fill="#7878c0" stroke="#808080" strokeWidth="1" />
+      <rect x="23" y="24" width="4" height="4" fill="#c07878" stroke="#808080" strokeWidth="1" />
+    </svg>
+  ),
+  minesweeper: (
+    <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
+      <rect x="1" y="1" width="30" height="30" fill="#c0c0c0" stroke="#404040" strokeWidth="1" />
+      <rect x="1" y="1" width="5" height="5" fill="#d4d0c8" stroke="#fff" strokeWidth="1" />
+      <rect x="7" y="1" width="5" height="5" fill="#adadad" stroke="#808080" strokeWidth="1" />
+      <rect x="1" y="7" width="5" height="5" fill="#adadad" stroke="#808080" strokeWidth="1" />
+      <rect x="13" y="1" width="5" height="5" fill="#d4d0c8" stroke="#fff" strokeWidth="1" />
+      <rect x="19" y="1" width="5" height="5" fill="#adadad" stroke="#808080" strokeWidth="1" />
+      <rect x="25" y="1" width="6" height="5" fill="#d4d0c8" stroke="#fff" strokeWidth="1" />
+      <rect x="7" y="7" width="5" height="5" fill="#d4d0c8" stroke="#fff" strokeWidth="1" />
+      <rect x="13" y="7" width="5" height="5" fill="#adadad" stroke="#808080" strokeWidth="1" />
+      <rect x="19" y="7" width="5" height="5" fill="#d4d0c8" stroke="#fff" strokeWidth="1" />
+      <rect x="25" y="7" width="6" height="5" fill="#adadad" stroke="#808080" strokeWidth="1" />
+      <rect x="1" y="13" width="30" height="19" fill="#adadad" stroke="#808080" strokeWidth="1" />
+      <circle cx="10" cy="10" r="3" fill="#000" />
+      <rect x="9" y="7" width="2" height="6" fill="#000" />
+      <rect x="7" y="9" width="6" height="2" fill="#000" />
+      <rect x="9" y="8" width="1" height="1" fill="#fff" opacity="0.6" />
+      <rect x="8" y="3" width="2" height="2" fill="#0000ff" />
+      <rect x="20" y="2" width="2" height="3" fill="#008000" />
+      <rect x="26" y="8" width="1" height="4" fill="#555" />
+      <rect x="27" y="8" width="4" height="3" fill="#ff0000" />
+    </svg>
+  ),
+  help: (
+    <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
+      <rect x="4" y="3" width="24" height="28" fill="#ffffff" stroke="#404040" strokeWidth="1" />
+      <rect x="4" y="3" width="6" height="28" fill="#000080" stroke="#404040" strokeWidth="1" />
+      <rect x="5" y="4" width="4" height="26" fill="#1a1ab0" />
+      <rect x="12" y="8" width="8" height="2" fill="#000080" />
+      <rect x="18" y="10" width="2" height="4" fill="#000080" />
+      <rect x="14" y="13" width="4" height="2" fill="#000080" />
+      <rect x="14" y="16" width="2" height="3" fill="#000080" />
+      <rect x="14" y="21" width="2" height="2" fill="#000080" />
+      <rect x="11" y="26" width="14" height="1" fill="#c0c0c0" />
+      <rect x="11" y="27" width="14" height="1" fill="#c0c0c0" />
+    </svg>
+  ),
 };
