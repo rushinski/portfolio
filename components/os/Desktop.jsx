@@ -265,7 +265,7 @@ function TopMenuBar() {
   );
 }
 
-export default function Desktop() {
+export default function Desktop({ initialGitHubData = null }) {
   const { dialog, closeDialog, showAlertDialog } = useDialogs();
   const {
     iconSizeMode,
@@ -641,7 +641,7 @@ export default function Desktop() {
 
   const windowContent = {
     welcome: <WelcomeApp />,
-    about: <AboutApp />,
+    about: <AboutApp initialGitHubData={initialGitHubData} />,
     skills: <SkillsApp />,
     experience: <ExperienceApp />,
     projects: <ProjectsApp />,

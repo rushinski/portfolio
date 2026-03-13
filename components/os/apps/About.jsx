@@ -55,22 +55,31 @@ function DonutChart({ langs, size = 84 }) {
   );
 }
 
-export default function AboutApp() {
+export default function AboutApp({ initialGitHubData = null }) {
   const { openWindow } = useWindowManager();
-  const [ghData, setGhData] = useState(null);
+  const [ghData, setGhData] = useState(initialGitHubData);
   const [ghHovered, setGhHovered] = useState(null);
+  const [photoFailed, setPhotoFailed] = useState(false);
   const topSkills = ["JavaScript", "Python", "PostgreSQL", "Next.js"];
 
   useEffect(() => {
+    if (ghData) return;
+
+    let cancelled = false;
+
     fetch("/api/github")
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
-        if (data && !data.error) {
+        if (!cancelled && data && !data.error) {
           setGhData(data);
         }
       })
       .catch(() => {});
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ghData]);
 
   const socials = [
     { label: "Email", value: "jacobrushinski@gmail.com", href: "mailto:jacobrushinski@gmail.com", icon: "email.png" },
@@ -84,8 +93,21 @@ export default function AboutApp() {
       <div style={{ display: "flex", gap: 24, marginBottom: 16, alignItems: "flex-start" }}>
         <div style={{ flex: "0 0 270px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-            <div style={{ width: 56, height: 56, background: "#000080", display: "grid", placeItems: "center", color: "#fff", fontSize: 22, fontWeight: 800, flexShrink: 0, border: "2px solid #808080" }}>
-              JR
+            <div style={{ width: 60, height: 60, background: "#c0c0c0", padding: 2, flexShrink: 0, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff" }}>
+              {photoFailed ? (
+                <div style={{ width: "100%", height: "100%", background: "#000080", display: "grid", placeItems: "center", color: "#fff", fontSize: 22, fontWeight: 800 }}>
+                  JR
+                </div>
+              ) : (
+                <img
+                  src="/professional_photo.jpeg"
+                  alt={`${PERSONAL.name} portrait`}
+                  width={56}
+                  height={56}
+                  onError={() => setPhotoFailed(true)}
+                  style={{ width: "100%", height: "100%", display: "block", objectFit: "cover", background: "#efefef" }}
+                />
+              )}
             </div>
             <div>
               <div style={{ fontSize: 18, fontWeight: 800, color: "#111" }}>{PERSONAL.name}</div>
