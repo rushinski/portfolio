@@ -348,7 +348,7 @@ export default function Desktop({ initialGitHubData = null }) {
   );
   const desktopBaseBackground = desktopColor || "linear-gradient(180deg, #0b4aa6, #0a3f90)";
   const wallpaperPatternBackground = WALLPAPER_PATTERN_BACKGROUNDS[wallpaperPattern] || "none";
-  const handleBootComplete = useCallback(() => {
+  const completeBootSequence = useCallback(() => {
     setBooted(true);
   }, []);
 
@@ -829,7 +829,19 @@ export default function Desktop({ initialGitHubData = null }) {
               <div style={{ position: "absolute", inset: 0, background: "repeating-linear-gradient(to bottom, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 4px)", pointerEvents: "none", zIndex: 50, opacity: crtEffectEnabled ? 1 : 0 }} />
               <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.3) 100%)", pointerEvents: "none", zIndex: 51, opacity: crtEffectEnabled ? 1 : 0 }} />
 
-              <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, opacity: booted ? 1 : 0.96, pointerEvents: booted ? "auto" : "none", transition: "opacity 240ms linear" }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, opacity: booted ? 1 : 0.96, pointerEvents: "auto", transition: "opacity 240ms linear" }}
+                onPointerDownCapture={() => {
+                  if (!booted) {
+                    completeBootSequence();
+                  }
+                }}
+                onKeyDownCapture={() => {
+                  if (!booted) {
+                    completeBootSequence();
+                  }
+                }}
+              >
                 <TopMenuBar />
                 <div
                   ref={setDesktopNode}
@@ -992,7 +1004,7 @@ export default function Desktop({ initialGitHubData = null }) {
               )}
 
               {!booted && (
-                <BootSequence embedded onComplete={handleBootComplete} />
+                <BootSequence embedded onComplete={completeBootSequence} />
               )}
             </div>
           </div>
