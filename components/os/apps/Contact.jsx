@@ -115,7 +115,7 @@ export default function ContactApp() {
 
   return (
     <div style={APP_BODY_STYLE}>
-      <div style={{ ...APP_CONTENT_STYLE, display: "grid", gridTemplateColumns: "minmax(240px, 280px) minmax(0, 1fr)", gap: 10 }}>
+      <div style={{ ...APP_CONTENT_STYLE, display: "grid", gridTemplateColumns: "minmax(260px, 320px) minmax(0, 1fr)", gap: 10 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div>
             <div style={{ ...APP_SECTION_HEADER_STYLE, marginBottom: 6 }}>Contact Information</div>
@@ -124,25 +124,25 @@ export default function ContactApp() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {contacts.map((contact) => (
-              <div key={contact.label} style={{ ...APP_PANEL_STYLE, display: "flex", alignItems: "center", gap: 8, padding: "6px 8px" }}>
+              <div key={contact.label} style={{ ...APP_PANEL_STYLE, display: "grid", gridTemplateColumns: "20px 56px minmax(0, 1fr)", alignItems: "start", columnGap: 8, padding: "6px 8px" }}>
                 <div style={{ width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   {contact.icon
                     ? <img src={contact.icon} alt={contact.label} width={16} height={16} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
                     : <span style={{ fontSize: 11, color: "#000080", fontWeight: 700 }}>LOC</span>}
                 </div>
-                <div style={{ minWidth: 56, fontSize: 10, fontWeight: 700, color: "#444", flexShrink: 0 }}>{contact.label}</div>
-                <div style={{ ...APP_FIELD_STYLE, flex: 1, padding: "3px 6px", minHeight: 22 }}>
+                <div style={{ minWidth: 0, fontSize: 10, fontWeight: 700, color: "#444", paddingTop: 4 }}>{contact.label}</div>
+                <div style={{ ...APP_FIELD_STYLE, minWidth: 0, padding: "3px 6px", minHeight: 22, lineHeight: 1.35 }}>
                   {contact.href ? (
                     <a
                       href={contact.href}
                       target={contact.href.startsWith("mailto") || contact.href.startsWith("tel") ? undefined : "_blank"}
                       rel="noopener noreferrer"
-                      style={{ color: "#000080", textDecoration: "none" }}
+                      style={{ color: "#000080", textDecoration: "none", display: "block", overflowWrap: "anywhere", wordBreak: "break-word" }}
                     >
                       {contact.value}
                     </a>
                   ) : (
-                    <span style={{ color: "#333" }}>{contact.value}</span>
+                    <span style={{ color: "#333", display: "block", overflowWrap: "anywhere", wordBreak: "break-word" }}>{contact.value}</span>
                   )}
                 </div>
               </div>

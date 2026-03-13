@@ -21,7 +21,7 @@ export const DEFAULT_PINNED_TASKBAR_IDS = ["about", "skills", "experience", "pro
 export const DEFAULT_SETTINGS = {
   clockFormat: "12h",
   desktopColor: null,
-  iconSizeMode: "medium",
+  iconSizeMode: "large",
   wallpaperPattern: "solid",
   crtEffectEnabled: true,
   masterSoundEnabled: true,
@@ -100,18 +100,18 @@ export const DESKTOP_COLORS = [
 
 export const INITIAL_ICON_POSITIONS = {
   welcome: { x: 12, y: 8 },
-  about: { x: 12, y: 110 },
-  skills: { x: 12, y: 212 },
-  experience: { x: 12, y: 314 },
-  contact: { x: 12, y: 416 },
-  explorer: { x: 112, y: 8 },
-  projects: { x: 112, y: 110 },
-  videos: { x: 112, y: 212 },
-  resume: { x: 112, y: 314 },
-  settings: { x: 212, y: 8 },
-  terminal: { x: 212, y: 110 },
-  location: { x: 212, y: 212 },
-  trash: { x: 212, y: 314 },
+  about: { x: 12, y: 134 },
+  skills: { x: 12, y: 260 },
+  experience: { x: 12, y: 386 },
+  contact: { x: 12, y: 512 },
+  explorer: { x: 120, y: 8 },
+  projects: { x: 120, y: 134 },
+  videos: { x: 120, y: 260 },
+  resume: { x: 120, y: 386 },
+  settings: { x: 228, y: 8 },
+  terminal: { x: 228, y: 134 },
+  location: { x: 228, y: 260 },
+  trash: { x: 228, y: 386 },
 };
 
 export const INITIAL_WINDOWS = {
@@ -391,17 +391,6 @@ export const INITIAL_CUSTOM_ITEMS = [
     createdAt: Date.parse("2026-01-12T10:20:00"),
     content: "[.ShellClassInfo]\nIconResource=JacobOS.dll,3",
     sortOrder: 22,
-  },
-  {
-    id: "pdf-resume-copy",
-    title: "resume.pdf",
-    glyph: Icons.resume,
-    windowId: "resume",
-    itemType: "pdf",
-    system: false,
-    parentId: "folder-documents",
-    createdAt: Date.parse("2026-01-13T14:10:00"),
-    sortOrder: 21,
   },
   {
     id: "text-release-notes",

@@ -13,7 +13,6 @@ import {
 
 function TitleBar({
   title,
-  glyph,
   isActive,
   isMaximized,
   onClose,
@@ -42,11 +41,6 @@ function TitleBar({
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0, flex: 1 }}>
-        {glyph && (
-          <span style={{ width: 18, height: 18, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <span style={{ display: "inline-flex", transform: "scale(0.5)", transformOrigin: "center center" }}>{glyph}</span>
-          </span>
-        )}
         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
           {title}
         </span>
@@ -82,7 +76,6 @@ function TitleBar({
 
 export default function WindowFrame({
   win,
-  glyph,
   isActive,
   onFocus,
   onClose,
@@ -246,7 +239,6 @@ export default function WindowFrame({
       >
         <TitleBar
           title={win.title}
-          glyph={glyph}
           isActive={isActive}
           isMaximized={win.isMaximized}
           onClose={onClose}

@@ -215,9 +215,20 @@ export function getDialogIconStyles(variant = "info") {
 
 export const WIN95_SCROLLBAR_CSS = `
   scrollbar-color: #c0c0c0 #d4d0c8;
-  ::-webkit-scrollbar { width: 15px; height: 15px; background: #d4d0c8; }
+  ::-webkit-scrollbar { width: 16px; height: 16px; background: #d4d0c8; }
+  ::-webkit-scrollbar-button {
+    display: block;
+    width: 16px;
+    height: 16px;
+    background: #c0c0c0;
+    border-left: 2px solid #ffffff;
+    border-top: 2px solid #ffffff;
+    border-right: 2px solid #808080;
+    border-bottom: 2px solid #808080;
+  }
   ::-webkit-scrollbar-track { background: #d4d0c8; border-left: 1px solid #ffffff; border-top: 1px solid #ffffff; border-right: 1px solid #808080; border-bottom: 1px solid #808080; }
-  ::-webkit-scrollbar-thumb { background: #c0c0c0; border-left: 2px solid #ffffff; border-top: 2px solid #ffffff; border-right: 2px solid #808080; border-bottom: 2px solid #808080; }
+  ::-webkit-scrollbar-thumb { background: #c0c0c0; border-left: 2px solid #ffffff; border-top: 2px solid #ffffff; border-right: 2px solid #808080; border-bottom: 2px solid #808080; border-radius: 0; }
   ::-webkit-scrollbar-thumb:hover { background: #d4d0c8; }
+  ::-webkit-scrollbar-thumb:active { background: #b8b4ac; }
   ::-webkit-scrollbar-corner { background: #c0c0c0; }
 `;
