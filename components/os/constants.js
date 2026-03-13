@@ -120,7 +120,7 @@ export const INITIAL_ICON_POSITIONS = {
 };
 
 export const INITIAL_WINDOWS = {
-  welcome: { id: "welcome", title: "Welcome", x: 220, y: 56, w: 820, h: 560, isOpen: true, isMinimized: false, isMaximized: false, z: 11 },
+  welcome: { id: "welcome", title: "Welcome", x: 220, y: 56, w: 750, h: 480, isOpen: true, isMinimized: false, isMaximized: false, z: 11 },
   about: { id: "about", title: "About", x: 72, y: 44, w: 1150, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 10 },
   skills: { id: "skills", title: "Skills", x: 132, y: 68, w: 1150, h: 650, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
   experience: { id: "experience", title: "Experience", x: 188, y: 82, w: 720, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },

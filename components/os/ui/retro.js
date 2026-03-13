@@ -171,7 +171,6 @@ export const APP_CONTENT_STYLE = {
 };
 
 export const APP_PANEL_STYLE = {
-  ...RAISED_BORDER,
   background: WIN95_COLORS.surfaceRaised,
   padding: "8px 10px",
   boxSizing: "border-box",

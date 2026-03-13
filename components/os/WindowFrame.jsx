@@ -6,7 +6,6 @@ import { WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, clamp, snap } from "./constants";
 import {
   WIN95_COLORS,
   getWin95ButtonStyle,
-  getWin95FieldStyle,
   getWin95TitleBarStyle,
   getWin95WindowStyle,
 } from "./ui/retro";
@@ -249,13 +248,13 @@ export default function WindowFrame({
         />
         <div
           style={{
-            ...getWin95FieldStyle(),
-            margin: "3px",
+            background: WIN95_COLORS.field,
             flex: 1,
             overflow: "auto",
             fontSize: "13px",
             lineHeight: 1.55,
             minHeight: 0,
+            boxSizing: "border-box",
           }}
         >
           {children}
