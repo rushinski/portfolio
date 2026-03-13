@@ -47,6 +47,7 @@ function getButtonStyle(type, pressed) {
 
 export default function CalculatorApp() {
   const [display, setDisplay] = useState("0");
+  const [equation, setEquation] = useState("");
   const [operand1, setOperand1] = useState(null);
   const [operator, setOperator] = useState(null);
   const [waiting, setWaiting] = useState(false);
@@ -60,12 +61,22 @@ export default function CalculatorApp() {
 
   const handleNumber = useCallback((digit) => {
     if (waiting) {
-      setDisplay(digit === "." ? "0." : digit);
+      const newVal = digit === "." ? "0." : digit;
+      setDisplay(newVal);
       setWaiting(false);
+      setEquation((prev) => prev + newVal);
     } else if (digit === ".") {
-      if (!display.includes(".")) setDisplay((prev) => prev + ".");
+      if (!display.includes(".")) {
+        setDisplay((prev) => prev + ".");
+        setEquation((prev) => prev + ".");
+      }
     } else {
-      setDisplay((prev) => (prev === "0" ? digit : prev.length >= 16 ? prev : prev + digit));
+      setDisplay((prev) => {
+        const next = prev === "0" ? digit : prev.length >= 16 ? prev : prev + digit;
+        if (prev === "0") setEquation((eq) => eq.slice(0, -0) + digit);
+        else setEquation((eq) => eq + digit);
+        return next;
+      });
     }
   }, [display, waiting]);
 
@@ -76,8 +87,10 @@ export default function CalculatorApp() {
       const resultStr = formatResult(result);
       setDisplay(resultStr);
       setOperand1(parseFloat(resultStr));
+      setEquation(resultStr + " " + op + " ");
     } else {
       setOperand1(current);
+      setEquation(display + " " + op + " ");
     }
     setOperator(op);
     setWaiting(true);
@@ -86,7 +99,9 @@ export default function CalculatorApp() {
   const handleEquals = useCallback(() => {
     if (operand1 === null || operator === null) return;
     const result = calculate(operand1, parseFloat(display), operator);
-    setDisplay(formatResult(result));
+    const resultStr = formatResult(result);
+    setEquation((prev) => prev + display + " =");
+    setDisplay(resultStr);
     setOperand1(null);
     setOperator(null);
     setWaiting(true);
@@ -97,9 +112,9 @@ export default function CalculatorApp() {
     if (type === "num") { handleNumber(label); return; }
     if (type === "op") { handleOperator(label); return; }
     if (type === "eq") { handleEquals(); return; }
-    if (label === "C") { setDisplay("0"); setOperand1(null); setOperator(null); setWaiting(false); return; }
+    if (label === "C") { setDisplay("0"); setEquation(""); setOperand1(null); setOperator(null); setWaiting(false); return; }
     if (label === "CE") { setDisplay("0"); return; }
-    if (label === "Back") { setDisplay((prev) => (prev.length > 1 && prev !== "-0" ? prev.slice(0, -1) : "0")); return; }
+    if (label === "Back") { setDisplay((prev) => { const next = prev.length > 1 && prev !== "-0" ? prev.slice(0, -1) : "0"; setEquation((eq) => eq.slice(0, -1)); return next; }); return; }
     if (label === "±") { setDisplay((prev) => (prev === "0" ? "0" : prev.startsWith("-") ? prev.slice(1) : "-" + prev)); return; }
   };
 
@@ -107,13 +122,20 @@ export default function CalculatorApp() {
 
   return (
     <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 6, background: "#c0c0c0", height: "100%", boxSizing: "border-box" }}>
-      {/* Memory indicator + display */}
-      <div style={{ display: "flex", alignItems: "stretch", gap: 4 }}>
-        <div style={{ width: 14, fontSize: 10, color: "#555", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          {memoryDisplay}
+      {/* Equation + display */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        {/* Equation line */}
+        <div style={{ borderTop: "2px solid #404040", borderLeft: "2px solid #404040", borderRight: "2px solid #fff", borderBottom: "2px solid #fff", background: "#f0f0e8", padding: "2px 8px", textAlign: "right", fontFamily: "'Courier New', monospace", fontSize: 11, minHeight: 18, color: "#555", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
+          {equation || "\u00a0"}
         </div>
-        <div style={{ flex: 1, borderTop: "2px solid #404040", borderLeft: "2px solid #404040", borderRight: "2px solid #fff", borderBottom: "2px solid #fff", background: "#f0f0e8", padding: "4px 8px", textAlign: "right", fontFamily: "'Courier New', monospace", fontSize: 22, minHeight: 40, display: "flex", alignItems: "center", justifyContent: "flex-end", overflow: "hidden" }}>
-          <span style={{ maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{display}</span>
+        {/* Main display */}
+        <div style={{ display: "flex", alignItems: "stretch", gap: 4 }}>
+          <div style={{ width: 14, fontSize: 10, color: "#555", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            {memoryDisplay}
+          </div>
+          <div style={{ flex: 1, borderTop: "2px solid #404040", borderLeft: "2px solid #404040", borderRight: "2px solid #fff", borderBottom: "2px solid #fff", background: "#f0f0e8", padding: "4px 8px", textAlign: "right", fontFamily: "'Courier New', monospace", fontSize: 22, minHeight: 40, display: "flex", alignItems: "center", justifyContent: "flex-end", overflow: "hidden" }}>
+            <span style={{ maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{display}</span>
+          </div>
         </div>
       </div>
 

@@ -16,7 +16,6 @@ import { useWindowManager } from "./hooks/useWindowManager";
 import { WIN95_FONT_FAMILY, WIN95_SCROLLBAR_CSS } from "./ui/retro";
 import { GLOBAL_CONTEXT_MENU_EVENT, announceContextMenuOpen } from "./ui/contextMenu";
 import AboutApp from "./apps/About";
-import CalculatorApp from "./apps/Calculator";
 import ContactApp from "./apps/Contact";
 import ExperienceApp from "./apps/Experience";
 import FileExplorerApp from "./apps/FileExplorer";
@@ -211,7 +210,6 @@ function TopMenuBar() {
       { label: "Open Terminal", action: () => openWindow("terminal") },
       { label: "Open File Explorer", action: () => openWindow("explorer") },
       { label: "Open Settings", action: () => openWindow("settings") },
-      { label: "Open Calculator", action: () => openWindow("calculator") },
       { label: "Open Minesweeper", action: () => openWindow("minesweeper") },
       { label: "Open Help", action: () => openWindow("help") },
       { label: "---------------", action: null },
@@ -332,6 +330,9 @@ export default function Desktop() {
   const [hoveredIcon, setHoveredIcon] = useState(null);
   const [desktopMenu, setDesktopMenu] = useState(null);
   const [desktopViewMenuOpen, setDesktopViewMenuOpen] = useState(false);
+  const [viewMenuFlip, setViewMenuFlip] = useState(false);
+  const [newMenuOpen, setNewMenuOpen] = useState(false);
+  const [newMenuFlip, setNewMenuFlip] = useState(false);
   const [iconMenu, setIconMenu] = useState(null);
   const [renamingItem, setRenamingItem] = useState(null);
   const [desktopDropActive, setDesktopDropActive] = useState(false);
@@ -653,7 +654,6 @@ export default function Desktop() {
     settings: <SettingsApp />,
     textdoc: <TextDocumentApp />,
     resume: <ResumeApp />,
-    calculator: <CalculatorApp />,
     minesweeper: <MinesweeperApp />,
     help: <HelpApp />,
   };
@@ -862,7 +862,7 @@ export default function Desktop() {
 
                   {desktopMenu && (
                     <div onClick={(event) => event.stopPropagation()} style={{ position: "absolute", left: desktopMenu.x, top: desktopMenu.y, minWidth: 190, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "3px 3px 10px rgba(0,0,0,0.4)", zIndex: 9100, padding: "2px 0" }}>
-                      <div onMouseEnter={() => setDesktopViewMenuOpen(true)} onMouseLeave={() => setDesktopViewMenuOpen(false)} style={{ position: "relative" }}>
+                      <div onMouseEnter={(e) => { const r = e.currentTarget.getBoundingClientRect(); setViewMenuFlip(r.right + 185 > window.innerWidth); setDesktopViewMenuOpen(true); }} onMouseLeave={() => setDesktopViewMenuOpen(false)} style={{ position: "relative" }}>
                         <button
                           style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }}
                           onClick={() => setDesktopViewMenuOpen((prev) => !prev)}
@@ -872,7 +872,7 @@ export default function Desktop() {
                           View  &gt;
                         </button>
                         {desktopViewMenuOpen && (
-                          <div onMouseEnter={() => setDesktopViewMenuOpen(true)} onMouseLeave={() => setDesktopViewMenuOpen(false)} style={{ position: "absolute", left: "100%", top: 0, minWidth: 180, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "3px 3px 10px rgba(0,0,0,0.4)" }}>
+                          <div onMouseEnter={() => setDesktopViewMenuOpen(true)} onMouseLeave={() => setDesktopViewMenuOpen(false)} style={{ position: "absolute", ...(viewMenuFlip ? { right: "100%" } : { left: "100%" }), top: 0, minWidth: 180, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "3px 3px 10px rgba(0,0,0,0.4)" }}>
                             {[
                               { key: "large", label: "Large icons" },
                               { key: "medium", label: "Medium icons" },
@@ -902,12 +902,21 @@ export default function Desktop() {
                         Refresh
                       </button>
                       <div style={{ height: 1, background: "#808080", margin: "3px 8px" }} />
-                      <button onClick={() => { const createdId = createFolder(); if (createdId) setSelectedIconIds([createdId]); setDesktopMenu(null); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
-                        New Folder
-                      </button>
-                      <button onClick={() => { const createdId = createTextDocument(); if (createdId) setSelectedIconIds([createdId]); setDesktopMenu(null); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
-                        New Text Document
-                      </button>
+                      <div onMouseEnter={(e) => { const r = e.currentTarget.getBoundingClientRect(); setNewMenuFlip(r.right + 185 > window.innerWidth); setNewMenuOpen(true); }} onMouseLeave={() => setNewMenuOpen(false)} style={{ position: "relative" }}>
+                        <button style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
+                          New  &gt;
+                        </button>
+                        {newMenuOpen && (
+                          <div onMouseEnter={() => setNewMenuOpen(true)} onMouseLeave={() => setNewMenuOpen(false)} style={{ position: "absolute", ...(newMenuFlip ? { right: "100%" } : { left: "100%" }), top: 0, minWidth: 180, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "3px 3px 10px rgba(0,0,0,0.4)" }}>
+                            <button onClick={() => { const createdId = createFolder(); if (createdId) setSelectedIconIds([createdId]); setDesktopMenu(null); setNewMenuOpen(false); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
+                              Folder
+                            </button>
+                            <button onClick={() => { const createdId = createTextDocument(); if (createdId) setSelectedIconIds([createdId]); setDesktopMenu(null); setNewMenuOpen(false); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
+                              Text Document
+                            </button>
+                          </div>
+                        )}
+                      </div>
                       {clipboardState && (
                         <button onClick={() => { const pastedId = pasteDesktopItem(); if (pastedId) setSelectedIconIds([pastedId]); setDesktopMenu(null); }} style={{ width: "100%", border: "none", background: "transparent", color: MENU_TEXT_COLOR, textAlign: "left", padding: "6px 14px", fontSize: 12, fontFamily: "inherit", cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#000080"; event.currentTarget.style.color = "#fff"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; event.currentTarget.style.color = MENU_TEXT_COLOR; }}>
                           Paste

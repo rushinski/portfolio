@@ -3,305 +3,861 @@
 export const Icons = {
   computer: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="4" y="7" width="13" height="11" fill="#c0c0c0" stroke="#404040" strokeWidth="1" />
-      <rect x="5" y="8" width="11" height="1" fill="#ffffff" />
-      <rect x="5" y="9" width="11" height="8" fill="#000080" />
-      <rect x="6" y="10" width="9" height="6" fill="#3cb5ff" />
-      <rect x="18" y="5" width="9" height="16" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
-      <rect x="19" y="6" width="7" height="1" fill="#ffffff" />
-      <rect x="19" y="9" width="7" height="8" fill="#9a9a9a" stroke="#606060" strokeWidth="1" />
-      <rect x="20" y="18" width="2" height="1" fill="#00a000" />
-      <rect x="23" y="18" width="2" height="1" fill="#a00000" />
-      <rect x="9" y="18" width="3" height="3" fill="#a0a0a0" stroke="#606060" strokeWidth="1" />
-      <rect x="6" y="23" width="14" height="3" fill="#d4d0c8" stroke="#606060" strokeWidth="1" />
-      <rect x="7" y="24" width="12" height="1" fill="#ffffff" />
-      <rect x="11" y="26" width="6" height="1" fill="#808080" />
+      {/* Monitor body */}
+      <rect x="2" y="4" width="20" height="15" fill="#c0c0c0" />
+      <rect x="2" y="4" width="20" height="1" fill="#ffffff" />
+      <rect x="2" y="4" width="1" height="15" fill="#ffffff" />
+      <rect x="21" y="4" width="1" height="15" fill="#808080" />
+      <rect x="2" y="18" width="20" height="1" fill="#808080" />
+      {/* Screen */}
+      <rect x="4" y="6" width="16" height="11" fill="#000080" />
+      <rect x="4" y="6" width="16" height="1" fill="#0000c0" />
+      <rect x="5" y="9" width="12" height="1" fill="#6699ff" />
+      <rect x="5" y="11" width="10" height="1" fill="#6699ff" />
+      <rect x="5" y="13" width="8" height="1" fill="#6699ff" />
+      {/* Neck */}
+      <rect x="10" y="19" width="4" height="2" fill="#a0a0a0" />
+      <rect x="10" y="19" width="1" height="2" fill="#c0c0c0" />
+      {/* Base */}
+      <rect x="7" y="21" width="10" height="2" fill="#c0c0c0" />
+      <rect x="7" y="21" width="10" height="1" fill="#ffffff" />
+      <rect x="7" y="22" width="1" height="1" fill="#ffffff" />
+      <rect x="16" y="22" width="1" height="1" fill="#808080" />
+      <rect x="7" y="23" width="10" height="1" fill="#808080" />
+      {/* Tower */}
+      <rect x="23" y="6" width="8" height="18" fill="#c0c0c0" />
+      <rect x="23" y="6" width="8" height="1" fill="#ffffff" />
+      <rect x="23" y="6" width="1" height="18" fill="#ffffff" />
+      <rect x="30" y="6" width="1" height="18" fill="#808080" />
+      <rect x="23" y="23" width="8" height="1" fill="#808080" />
+      {/* Drive bays */}
+      <rect x="24" y="8" width="6" height="3" fill="#a8a8a8" />
+      <rect x="24" y="8" width="6" height="1" fill="#808080" />
+      <rect x="25" y="12" width="4" height="2" fill="#808080" />
+      <rect x="26" y="13" width="2" height="1" fill="#404040" />
+      {/* Power LED */}
+      <rect x="25" y="20" width="1" height="1" fill="#00cc00" />
+      <rect x="27" y="20" width="1" height="1" fill="#ffcc00" />
     </svg>
   ),
   folder: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <path d="M2 8 H12 L14 10 H30 V12 H2 Z" fill="#d1ac1f" stroke="#806000" strokeWidth="1" />
-      <rect x="2" y="11" width="28" height="14" fill="#f0c400" stroke="#806000" strokeWidth="1" />
-      <rect x="3" y="12" width="26" height="12" fill="#ffd84a" />
-      <rect x="4" y="13" width="24" height="1" fill="#fff2a8" />
-      <rect x="4" y="13" width="1" height="10" fill="#fff2a8" />
-      <rect x="5" y="15" width="22" height="7" fill="#f2cd38" />
-      <rect x="3" y="24" width="26" height="1" fill="#9a7300" />
+      {/* Tab */}
+      <rect x="2" y="9" width="9" height="3" fill="#c8a000" />
+      <rect x="2" y="9" width="9" height="1" fill="#ffd84a" />
+      <rect x="2" y="9" width="1" height="3" fill="#ffd84a" />
+      <rect x="10" y="9" width="1" height="3" fill="#806000" />
+      {/* Body */}
+      <rect x="2" y="12" width="28" height="16" fill="#c8a000" />
+      <rect x="2" y="12" width="28" height="1" fill="#ffd84a" />
+      <rect x="2" y="12" width="1" height="16" fill="#ffd84a" />
+      <rect x="29" y="12" width="1" height="16" fill="#806000" />
+      <rect x="2" y="27" width="28" height="1" fill="#806000" />
+      {/* Inner highlight */}
+      <rect x="4" y="14" width="24" height="11" fill="#ffd84a" />
+      <rect x="4" y="14" width="1" height="11" fill="#fff2a8" />
+      <rect x="4" y="14" width="24" height="1" fill="#fff2a8" />
+      {/* Shadow on content */}
+      <rect x="5" y="20" width="22" height="5" fill="#f0c400" />
     </svg>
   ),
   file: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <path d="M7 3 H20 L25 8 V25 H7 Z" fill="#ffffff" stroke="#404040" strokeWidth="1" />
-      <path d="M20 3 V8 H25" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
-      <rect x="10" y="7" width="8" height="2" fill="#000080" />
-      <rect x="10" y="11" width="12" height="1" fill="#808080" />
-      <rect x="10" y="14" width="11" height="1" fill="#808080" />
-      <rect x="10" y="17" width="12" height="1" fill="#808080" />
-      <rect x="10" y="20" width="8" height="1" fill="#808080" />
-      <rect x="8" y="25" width="16" height="1" fill="#808080" />
+      {/* Page body */}
+      <rect x="6" y="2" width="14" height="28" fill="#ffffff" />
+      <rect x="6" y="2" width="1" height="21" fill="#ffffff" />
+      <rect x="6" y="2" width="10" height="1" fill="#404040" />
+      <rect x="6" y="2" width="1" height="28" fill="#404040" />
+      <rect x="6" y="29" width="20" height="1" fill="#404040" />
+      <rect x="25" y="9" width="1" height="20" fill="#404040" />
+      <rect x="16" y="8" width="10" height="1" fill="#404040" />
+      {/* Dog-ear fold */}
+      <rect x="16" y="2" width="9" height="7" fill="#d4d0c8" />
+      <rect x="16" y="2" width="1" height="7" fill="#808080" />
+      <rect x="17" y="3" width="4" height="1" fill="#a0a0a0" />
+      <rect x="18" y="4" width="3" height="1" fill="#a0a0a0" />
+      <rect x="19" y="5" width="2" height="1" fill="#a0a0a0" />
+      <rect x="20" y="6" width="1" height="1" fill="#a0a0a0" />
+      {/* Text lines */}
+      <rect x="9" y="12" width="10" height="1" fill="#000080" />
+      <rect x="9" y="15" width="13" height="1" fill="#808080" />
+      <rect x="9" y="17" width="11" height="1" fill="#808080" />
+      <rect x="9" y="19" width="12" height="1" fill="#808080" />
+      <rect x="9" y="21" width="9" height="1" fill="#808080" />
+      <rect x="9" y="24" width="13" height="1" fill="#808080" />
     </svg>
   ),
   drive: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="7" y="7" width="18" height="4" fill="#efefef" stroke="#606060" strokeWidth="1" />
-      <rect x="5" y="10" width="22" height="8" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
-      <rect x="6" y="11" width="20" height="1" fill="#ffffff" />
-      <rect x="6" y="18" width="20" height="5" fill="#a8a8a8" stroke="#606060" strokeWidth="1" />
-      <rect x="8" y="19" width="6" height="2" fill="#7db5ff" stroke="#404040" strokeWidth="1" />
-      <rect x="16" y="20" width="4" height="1" fill="#404040" />
-      <rect x="22" y="20" width="2" height="1" fill="#00a000" />
-      <rect x="24" y="20" width="1" height="1" fill="#a00000" />
-      <rect x="10" y="24" width="12" height="1" fill="#808080" />
+      {/* Floppy body */}
+      <rect x="4" y="3" width="24" height="26" fill="#1a1a8c" />
+      <rect x="4" y="3" width="24" height="1" fill="#4040b0" />
+      <rect x="4" y="3" width="1" height="26" fill="#4040b0" />
+      <rect x="27" y="3" width="1" height="26" fill="#000040" />
+      <rect x="4" y="28" width="24" height="1" fill="#000040" />
+      {/* Label area */}
+      <rect x="6" y="5" width="17" height="10" fill="#d8d8e8" />
+      <rect x="6" y="5" width="17" height="1" fill="#ffffff" />
+      <rect x="6" y="5" width="1" height="10" fill="#ffffff" />
+      <rect x="22" y="5" width="1" height="10" fill="#a0a0b0" />
+      <rect x="6" y="14" width="17" height="1" fill="#a0a0b0" />
+      {/* Label lines */}
+      <rect x="8" y="7" width="12" height="1" fill="#000080" />
+      <rect x="8" y="9" width="10" height="1" fill="#808080" />
+      <rect x="8" y="11" width="11" height="1" fill="#808080" />
+      {/* Write protect notch */}
+      <rect x="24" y="4" width="3" height="4" fill="#4040a0" />
+      <rect x="25" y="5" width="1" height="2" fill="#000020" />
+      {/* Metal shutter */}
+      <rect x="6" y="18" width="20" height="9" fill="#808080" />
+      <rect x="6" y="18" width="20" height="1" fill="#a0a0a0" />
+      <rect x="6" y="18" width="1" height="9" fill="#a0a0a0" />
+      <rect x="25" y="18" width="1" height="9" fill="#606060" />
+      <rect x="6" y="26" width="20" height="1" fill="#606060" />
+      {/* Shutter slot */}
+      <rect x="10" y="20" width="12" height="5" fill="#606060" />
+      <rect x="10" y="20" width="12" height="1" fill="#404040" />
+      <rect x="10" y="20" width="1" height="5" fill="#404040" />
     </svg>
   ),
   terminal: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="4" y="5" width="20" height="15" fill="#c0c0c0" stroke="#404040" strokeWidth="1" />
-      <rect x="5" y="6" width="18" height="2" fill="#000080" />
-      <rect x="6" y="9" width="16" height="9" fill="#000000" />
-      <rect x="8" y="11" width="3" height="1" fill="#00d000" />
-      <rect x="10" y="12" width="1" height="1" fill="#00d000" />
-      <rect x="13" y="11" width="5" height="1" fill="#00d000" />
-      <rect x="8" y="14" width="10" height="1" fill="#00a000" />
-      <rect x="8" y="16" width="7" height="1" fill="#008800" />
-      <rect x="11" y="20" width="6" height="3" fill="#b0b0b0" stroke="#606060" strokeWidth="1" />
-      <rect x="8" y="24" width="12" height="2" fill="#d4d0c8" stroke="#606060" strokeWidth="1" />
+      {/* Window frame */}
+      <rect x="2" y="3" width="28" height="26" fill="#c0c0c0" />
+      <rect x="2" y="3" width="28" height="1" fill="#ffffff" />
+      <rect x="2" y="3" width="1" height="26" fill="#ffffff" />
+      <rect x="29" y="3" width="1" height="26" fill="#808080" />
+      <rect x="2" y="28" width="28" height="1" fill="#808080" />
+      {/* Title bar */}
+      <rect x="3" y="4" width="26" height="7" fill="#000080" />
+      <rect x="3" y="4" width="26" height="1" fill="#1a1ab0" />
+      {/* Close button */}
+      <rect x="26" y="5" width="4" height="5" fill="#c0c0c0" />
+      <rect x="26" y="5" width="4" height="1" fill="#ffffff" />
+      <rect x="26" y="5" width="1" height="5" fill="#ffffff" />
+      <rect x="29" y="5" width="1" height="5" fill="#808080" />
+      <rect x="26" y="9" width="4" height="1" fill="#808080" />
+      <rect x="27" y="7" width="2" height="1" fill="#404040" />
+      {/* Terminal screen */}
+      <rect x="3" y="12" width="26" height="15" fill="#000000" />
+      {/* Prompt */}
+      <rect x="5" y="14" width="2" height="1" fill="#c0c0c0" />
+      <rect x="8" y="14" width="6" height="1" fill="#00cc00" />
+      {/* Text line 2 */}
+      <rect x="5" y="16" width="8" height="1" fill="#00cc00" />
+      <rect x="14" y="16" width="5" height="1" fill="#c0c0c0" />
+      {/* Text line 3 */}
+      <rect x="5" y="18" width="10" height="1" fill="#c0c0c0" />
+      {/* Cursor */}
+      <rect x="5" y="20" width="2" height="5" fill="#c0c0c0" />
     </svg>
   ),
   trashEmpty: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="10" y="6" width="12" height="2" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
-      <path d="M11 8 L9 25 H23 L21 8 Z" fill="#f7f7f7" stroke="#404040" strokeWidth="1" />
-      <rect x="12" y="11" width="1" height="11" fill="#7db5ff" />
-      <rect x="15" y="10" width="1" height="13" fill="#7db5ff" />
-      <rect x="18" y="11" width="1" height="11" fill="#7db5ff" />
-      <rect x="10" y="14" width="12" height="1" fill="#7db5ff" />
-      <rect x="10" y="18" width="12" height="1" fill="#7db5ff" />
-      <rect x="10" y="22" width="12" height="1" fill="#7db5ff" />
-      <rect x="14" y="4" width="4" height="2" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
+      {/* Handle */}
+      <rect x="13" y="4" width="6" height="3" fill="#c0c0c0" />
+      <rect x="13" y="4" width="6" height="1" fill="#ffffff" />
+      <rect x="13" y="4" width="1" height="3" fill="#ffffff" />
+      <rect x="18" y="4" width="1" height="3" fill="#808080" />
+      <rect x="13" y="6" width="6" height="1" fill="#808080" />
+      {/* Lid */}
+      <rect x="7" y="7" width="18" height="3" fill="#c0c0c0" />
+      <rect x="7" y="7" width="18" height="1" fill="#ffffff" />
+      <rect x="7" y="7" width="1" height="3" fill="#ffffff" />
+      <rect x="24" y="7" width="1" height="3" fill="#808080" />
+      <rect x="7" y="9" width="18" height="1" fill="#808080" />
+      {/* Can body */}
+      <rect x="8" y="10" width="16" height="17" fill="#d4d0c8" />
+      <rect x="8" y="10" width="1" height="17" fill="#ffffff" />
+      <rect x="23" y="10" width="1" height="17" fill="#808080" />
+      <rect x="8" y="26" width="16" height="1" fill="#808080" />
+      {/* Ribs */}
+      <rect x="11" y="12" width="1" height="13" fill="#a8a8a8" />
+      <rect x="14" y="12" width="1" height="13" fill="#a8a8a8" />
+      <rect x="17" y="12" width="1" height="13" fill="#a8a8a8" />
+      <rect x="20" y="12" width="1" height="13" fill="#a8a8a8" />
+      {/* Base */}
+      <rect x="9" y="27" width="14" height="2" fill="#c0c0c0" />
+      <rect x="9" y="27" width="14" height="1" fill="#a0a0a0" />
+      <rect x="9" y="28" width="1" height="1" fill="#a0a0a0" />
+      <rect x="22" y="28" width="1" height="1" fill="#808080" />
     </svg>
   ),
   trashFull: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="10" y="6" width="12" height="2" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
-      <path d="M11 8 L9 25 H23 L21 8 Z" fill="#f7f7f7" stroke="#404040" strokeWidth="1" />
-      <rect x="12" y="11" width="1" height="11" fill="#7db5ff" />
-      <rect x="15" y="10" width="1" height="13" fill="#7db5ff" />
-      <rect x="18" y="11" width="1" height="11" fill="#7db5ff" />
-      <rect x="10" y="14" width="12" height="1" fill="#7db5ff" />
-      <rect x="10" y="18" width="12" height="1" fill="#7db5ff" />
-      <rect x="10" y="22" width="12" height="1" fill="#7db5ff" />
-      <rect x="14" y="4" width="4" height="2" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
-      <path d="M12 11 H18 L20 13 V18 H12 Z" fill="#ffffff" stroke="#808080" strokeWidth="1" />
-      <rect x="13" y="15" width="6" height="1" fill="#808080" />
-      <path d="M14 13 H18 V15 H14 Z" fill="#e4e4e4" />
+      {/* Paper sticking out */}
+      <rect x="10" y="3" width="5" height="8" fill="#ffffff" />
+      <rect x="10" y="3" width="5" height="1" fill="#c0c0c0" />
+      <rect x="10" y="3" width="1" height="8" fill="#c0c0c0" />
+      <rect x="14" y="3" width="1" height="8" fill="#808080" />
+      <rect x="11" y="5" width="3" height="1" fill="#808080" />
+      <rect x="11" y="7" width="3" height="1" fill="#808080" />
+      {/* Another paper */}
+      <rect x="17" y="4" width="4" height="7" fill="#ffffff" />
+      <rect x="17" y="4" width="4" height="1" fill="#c0c0c0" />
+      <rect x="17" y="4" width="1" height="7" fill="#c0c0c0" />
+      <rect x="20" y="4" width="1" height="7" fill="#808080" />
+      {/* Lid (pushed up) */}
+      <rect x="6" y="10" width="20" height="3" fill="#c0c0c0" />
+      <rect x="6" y="10" width="20" height="1" fill="#ffffff" />
+      <rect x="6" y="10" width="1" height="3" fill="#ffffff" />
+      <rect x="25" y="10" width="1" height="3" fill="#808080" />
+      <rect x="6" y="12" width="20" height="1" fill="#808080" />
+      {/* Can body */}
+      <rect x="8" y="13" width="16" height="14" fill="#d4d0c8" />
+      <rect x="8" y="13" width="1" height="14" fill="#ffffff" />
+      <rect x="23" y="13" width="1" height="14" fill="#808080" />
+      <rect x="8" y="26" width="16" height="1" fill="#808080" />
+      {/* Ribs */}
+      <rect x="11" y="15" width="1" height="10" fill="#a8a8a8" />
+      <rect x="14" y="15" width="1" height="10" fill="#a8a8a8" />
+      <rect x="17" y="15" width="1" height="10" fill="#a8a8a8" />
+      <rect x="20" y="15" width="1" height="10" fill="#a8a8a8" />
+      {/* Base */}
+      <rect x="9" y="27" width="14" height="2" fill="#c0c0c0" />
+      <rect x="9" y="27" width="14" height="1" fill="#a0a0a0" />
     </svg>
   ),
   trash: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="10" y="6" width="12" height="2" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
-      <path d="M11 8 L9 25 H23 L21 8 Z" fill="#f7f7f7" stroke="#404040" strokeWidth="1" />
-      <rect x="12" y="11" width="1" height="11" fill="#7db5ff" />
-      <rect x="15" y="10" width="1" height="13" fill="#7db5ff" />
-      <rect x="18" y="11" width="1" height="11" fill="#7db5ff" />
-      <rect x="10" y="14" width="12" height="1" fill="#7db5ff" />
-      <rect x="10" y="18" width="12" height="1" fill="#7db5ff" />
-      <rect x="10" y="22" width="12" height="1" fill="#7db5ff" />
-      <rect x="14" y="4" width="4" height="2" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
+      {/* Handle */}
+      <rect x="13" y="4" width="6" height="3" fill="#c0c0c0" />
+      <rect x="13" y="4" width="6" height="1" fill="#ffffff" />
+      <rect x="13" y="4" width="1" height="3" fill="#ffffff" />
+      <rect x="18" y="4" width="1" height="3" fill="#808080" />
+      <rect x="13" y="6" width="6" height="1" fill="#808080" />
+      {/* Lid */}
+      <rect x="7" y="7" width="18" height="3" fill="#c0c0c0" />
+      <rect x="7" y="7" width="18" height="1" fill="#ffffff" />
+      <rect x="7" y="7" width="1" height="3" fill="#ffffff" />
+      <rect x="24" y="7" width="1" height="3" fill="#808080" />
+      <rect x="7" y="9" width="18" height="1" fill="#808080" />
+      {/* Can body */}
+      <rect x="8" y="10" width="16" height="17" fill="#d4d0c8" />
+      <rect x="8" y="10" width="1" height="17" fill="#ffffff" />
+      <rect x="23" y="10" width="1" height="17" fill="#808080" />
+      <rect x="8" y="26" width="16" height="1" fill="#808080" />
+      {/* Ribs */}
+      <rect x="11" y="12" width="1" height="13" fill="#a8a8a8" />
+      <rect x="14" y="12" width="1" height="13" fill="#a8a8a8" />
+      <rect x="17" y="12" width="1" height="13" fill="#a8a8a8" />
+      <rect x="20" y="12" width="1" height="13" fill="#a8a8a8" />
+      {/* Base */}
+      <rect x="9" y="27" width="14" height="2" fill="#c0c0c0" />
+      <rect x="9" y="27" width="14" height="1" fill="#a0a0a0" />
+      <rect x="9" y="28" width="1" height="1" fill="#a0a0a0" />
+      <rect x="22" y="28" width="1" height="1" fill="#808080" />
     </svg>
   ),
   contact: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="4" y="8" width="24" height="16" fill="#efe2a0" stroke="#806000" strokeWidth="1" />
-      <path d="M4 8 L16 17 L28 8" fill="none" stroke="#806000" strokeWidth="1" />
-      <path d="M4 24 L12 16" fill="none" stroke="#806000" strokeWidth="1" />
-      <path d="M28 24 L20 16" fill="none" stroke="#806000" strokeWidth="1" />
-      <rect x="18" y="10" width="5" height="4" fill="#000080" stroke="#404040" strokeWidth="1" />
-      <rect x="7" y="10" width="8" height="1" fill="#fff5c8" />
-      <rect x="7" y="12" width="7" height="1" fill="#fff5c8" />
-      <rect x="7" y="14" width="6" height="1" fill="#fff5c8" />
+      {/* Card body */}
+      <rect x="3" y="5" width="26" height="22" fill="#ffffff" />
+      <rect x="3" y="5" width="26" height="1" fill="#ffffff" />
+      <rect x="3" y="5" width="1" height="22" fill="#ffffff" />
+      <rect x="28" y="5" width="1" height="22" fill="#808080" />
+      <rect x="3" y="26" width="26" height="1" fill="#808080" />
+      <rect x="3" y="5" width="26" height="22" stroke="#404040" strokeWidth="1" fill="none" />
+      {/* Blue left strip */}
+      <rect x="3" y="5" width="6" height="22" fill="#000080" />
+      <rect x="3" y="5" width="1" height="22" fill="#0000a0" />
+      {/* Strip dividers */}
+      <rect x="4" y="9" width="4" height="1" fill="#0000c0" />
+      <rect x="4" y="13" width="4" height="1" fill="#0000c0" />
+      <rect x="4" y="17" width="4" height="1" fill="#0000c0" />
+      <rect x="4" y="21" width="4" height="1" fill="#0000c0" />
+      {/* Person head */}
+      <rect x="11" y="8" width="5" height="5" fill="#ffc080" />
+      <rect x="11" y="8" width="5" height="1" fill="#ffd0a0" />
+      <rect x="11" y="8" width="1" height="5" fill="#ffd0a0" />
+      {/* Hair */}
+      <rect x="11" y="7" width="5" height="2" fill="#604020" />
+      {/* Person body/shoulders */}
+      <rect x="10" y="13" width="7" height="4" fill="#000080" />
+      <rect x="10" y="13" width="7" height="1" fill="#0000a0" />
+      {/* Info text lines */}
+      <rect x="19" y="9" width="8" height="2" fill="#000080" />
+      <rect x="19" y="13" width="8" height="1" fill="#808080" />
+      <rect x="19" y="15" width="6" height="1" fill="#808080" />
+      <rect x="11" y="19" width="16" height="1" fill="#808080" />
+      <rect x="11" y="21" width="14" height="1" fill="#808080" />
+      <rect x="11" y="23" width="12" height="1" fill="#808080" />
     </svg>
   ),
   github: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="4" y="5" width="22" height="16" fill="#c0c0c0" stroke="#404040" strokeWidth="1" />
-      <rect x="5" y="6" width="20" height="3" fill="#000080" />
-      <rect x="7" y="10" width="16" height="9" fill="#ffffff" stroke="#808080" strokeWidth="1" />
-      <path d="M11 12 L8 15 L11 18" fill="none" stroke="#111111" strokeWidth="1.5" />
-      <path d="M19 12 L22 15 L19 18" fill="none" stroke="#111111" strokeWidth="1.5" />
-      <rect x="15" y="11" width="1" height="8" fill="#00a000" />
-      <rect x="11" y="22" width="8" height="3" fill="#b0b0b0" stroke="#606060" strokeWidth="1" />
-      <rect x="8" y="25" width="14" height="1" fill="#808080" />
+      {/* Monitor */}
+      <rect x="2" y="4" width="24" height="18" fill="#c0c0c0" />
+      <rect x="2" y="4" width="24" height="1" fill="#ffffff" />
+      <rect x="2" y="4" width="1" height="18" fill="#ffffff" />
+      <rect x="25" y="4" width="1" height="18" fill="#808080" />
+      <rect x="2" y="21" width="24" height="1" fill="#808080" />
+      {/* Title bar */}
+      <rect x="3" y="5" width="22" height="5" fill="#000080" />
+      {/* Close button */}
+      <rect x="22" y="6" width="3" height="3" fill="#c0c0c0" />
+      <rect x="22" y="6" width="3" height="1" fill="#ffffff" />
+      <rect x="22" y="6" width="1" height="3" fill="#ffffff" />
+      <rect x="24" y="6" width="1" height="3" fill="#808080" />
+      <rect x="22" y="8" width="3" height="1" fill="#808080" />
+      {/* Code area */}
+      <rect x="4" y="11" width="20" height="9" fill="#1e1e1e" />
+      {/* < bracket */}
+      <rect x="6" y="13" width="2" height="1" fill="#569cd6" />
+      <rect x="5" y="14" width="1" height="1" fill="#569cd6" />
+      <rect x="6" y="15" width="2" height="1" fill="#569cd6" />
+      {/* / */}
+      <rect x="9" y="13" width="1" height="3" fill="#c0c0c0" />
+      {/* > bracket */}
+      <rect x="11" y="13" width="2" height="1" fill="#569cd6" />
+      <rect x="13" y="14" width="1" height="1" fill="#569cd6" />
+      <rect x="11" y="15" width="2" height="1" fill="#569cd6" />
+      {/* Second code line */}
+      <rect x="6" y="17" width="14" height="1" fill="#4ec94c" />
+      {/* Stand */}
+      <rect x="11" y="22" width="4" height="2" fill="#a0a0a0" />
+      <rect x="8" y="24" width="10" height="2" fill="#c0c0c0" />
+      <rect x="8" y="24" width="10" height="1" fill="#ffffff" />
+      {/* Octocat badge */}
+      <rect x="27" y="6" width="4" height="4" fill="#1a1a1a" />
+      <rect x="28" y="6" width="2" height="1" fill="#333333" />
+      <rect x="27" y="8" width="1" height="1" fill="#ffffff" />
+      <rect x="29" y="8" width="1" height="1" fill="#ffffff" />
+      <rect x="27" y="10" width="4" height="4" fill="#1a1a1a" />
+      <rect x="26" y="11" width="1" height="2" fill="#1a1a1a" />
+      <rect x="31" y="11" width="1" height="2" fill="#1a1a1a" />
     </svg>
   ),
   skills: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="5" y="3" width="19" height="25" fill="#f6f6dc" stroke="#404040" strokeWidth="1" />
-      <rect x="3" y="3" width="4" height="25" fill="#000080" stroke="#404040" strokeWidth="1" />
-      <line x1="6" y1="7" x2="22" y2="7" stroke="#ffffff" strokeWidth="1" />
-      <line x1="8" y1="11" x2="21" y2="11" stroke="#404040" strokeWidth="1" />
-      <line x1="8" y1="15" x2="21" y2="15" stroke="#404040" strokeWidth="1" />
-      <line x1="8" y1="19" x2="20" y2="19" stroke="#404040" strokeWidth="1" />
-      <rect x="19" y="22" width="8" height="4" fill="#ffd800" stroke="#806000" strokeWidth="1" />
-      <rect x="20" y="23" width="6" height="2" fill="#fff2a8" />
+      {/* Right page */}
+      <rect x="16" y="5" width="13" height="22" fill="#fffef0" />
+      <rect x="16" y="5" width="13" height="1" fill="#ffffff" />
+      <rect x="28" y="5" width="1" height="22" fill="#808080" />
+      <rect x="16" y="26" width="13" height="1" fill="#808080" />
+      {/* Left page */}
+      <rect x="3" y="5" width="13" height="22" fill="#fffef0" />
+      <rect x="3" y="5" width="13" height="1" fill="#ffffff" />
+      <rect x="3" y="5" width="1" height="22" fill="#ffffff" />
+      <rect x="3" y="26" width="13" height="1" fill="#808080" />
+      {/* Spine */}
+      <rect x="15" y="4" width="2" height="25" fill="#000080" />
+      <rect x="15" y="4" width="1" height="25" fill="#0000a0" />
+      {/* Binding lines */}
+      <rect x="15" y="8" width="2" height="1" fill="#404040" />
+      <rect x="15" y="12" width="2" height="1" fill="#404040" />
+      <rect x="15" y="16" width="2" height="1" fill="#404040" />
+      <rect x="15" y="20" width="2" height="1" fill="#404040" />
+      {/* Left page lines */}
+      <rect x="5" y="9" width="8" height="1" fill="#808080" />
+      <rect x="5" y="12" width="9" height="1" fill="#808080" />
+      <rect x="5" y="15" width="7" height="1" fill="#808080" />
+      <rect x="5" y="18" width="8" height="1" fill="#808080" />
+      <rect x="5" y="21" width="6" height="1" fill="#808080" />
+      {/* Right page checkmarks */}
+      <rect x="18" y="9" width="2" height="1" fill="#008000" />
+      <rect x="20" y="10" width="2" height="1" fill="#008000" />
+      <rect x="23" y="8" width="5" height="1" fill="#404040" />
+      <rect x="18" y="13" width="2" height="1" fill="#008000" />
+      <rect x="20" y="14" width="2" height="1" fill="#008000" />
+      <rect x="23" y="12" width="4" height="1" fill="#404040" />
+      <rect x="18" y="17" width="2" height="1" fill="#008000" />
+      <rect x="20" y="18" width="2" height="1" fill="#008000" />
+      <rect x="23" y="16" width="5" height="1" fill="#404040" />
+      <rect x="18" y="21" width="2" height="1" fill="#c08000" />
+      <rect x="20" y="22" width="2" height="1" fill="#c08000" />
+      <rect x="23" y="20" width="3" height="1" fill="#404040" />
     </svg>
   ),
   experience: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="4" y="12" width="24" height="15" fill="#c09050" stroke="#5f4323" strokeWidth="1" />
-      <rect x="5" y="13" width="22" height="3" fill="#e1b26d" />
-      <rect x="4" y="17" width="24" height="2" fill="#9a6a35" />
-      <rect x="13" y="16" width="6" height="5" fill="#dbc48a" stroke="#5f4323" strokeWidth="1" />
-      <rect x="14" y="18" width="4" height="1" fill="#8b5d2b" />
-      <path d="M11 12 V9 H21 V12" fill="none" stroke="#5f4323" strokeWidth="2" />
-      <rect x="12" y="8" width="8" height="2" fill="#e4c68b" stroke="#5f4323" strokeWidth="1" />
+      {/* Handle left post */}
+      <rect x="10" y="9" width="2" height="5" fill="#5a4000" />
+      <rect x="10" y="9" width="1" height="5" fill="#8b6914" />
+      {/* Handle top bar */}
+      <rect x="10" y="9" width="12" height="2" fill="#5a4000" />
+      <rect x="10" y="9" width="12" height="1" fill="#8b6914" />
+      {/* Handle right post */}
+      <rect x="20" y="9" width="2" height="5" fill="#5a4000" />
+      <rect x="21" y="9" width="1" height="5" fill="#3a2800" />
+      {/* Handle base attachments */}
+      <rect x="9" y="12" width="4" height="3" fill="#8b6914" />
+      <rect x="9" y="12" width="4" height="1" fill="#c08020" />
+      <rect x="19" y="12" width="4" height="3" fill="#8b6914" />
+      <rect x="22" y="12" width="1" height="3" fill="#5a4000" />
+      {/* Briefcase body */}
+      <rect x="3" y="14" width="26" height="15" fill="#8b6914" />
+      <rect x="3" y="14" width="26" height="1" fill="#c08020" />
+      <rect x="3" y="14" width="1" height="15" fill="#c08020" />
+      <rect x="28" y="14" width="1" height="15" fill="#5a4000" />
+      <rect x="3" y="28" width="26" height="1" fill="#5a4000" />
+      {/* Body inner fill */}
+      <rect x="4" y="15" width="24" height="13" fill="#a07820" />
+      {/* Center latch band */}
+      <rect x="3" y="20" width="26" height="3" fill="#8b6914" />
+      <rect x="3" y="20" width="26" height="1" fill="#c08020" />
+      <rect x="3" y="22" width="26" height="1" fill="#5a4000" />
+      {/* Latch/clasp */}
+      <rect x="13" y="18" width="6" height="7" fill="#c8c820" />
+      <rect x="13" y="18" width="6" height="1" fill="#ffff40" />
+      <rect x="13" y="18" width="1" height="7" fill="#ffff40" />
+      <rect x="18" y="18" width="1" height="7" fill="#808000" />
+      <rect x="13" y="24" width="6" height="1" fill="#808000" />
+      {/* Latch keyhole */}
+      <rect x="15" y="20" width="2" height="3" fill="#5a4000" />
     </svg>
   ),
   about: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="4" y="5" width="22" height="18" fill="#c0c0c0" stroke="#404040" strokeWidth="1" />
-      <rect x="5" y="6" width="20" height="3" fill="#000080" />
-      <rect x="7" y="10" width="16" height="10" fill="#ffffff" stroke="#808080" strokeWidth="1" />
-      <circle cx="11" cy="14" r="2" fill="#c00000" stroke="#404040" strokeWidth="1" />
-      <rect x="15" y="12" width="6" height="1" fill="#404040" />
-      <rect x="15" y="15" width="5" height="1" fill="#404040" />
-      <rect x="15" y="18" width="4" height="1" fill="#404040" />
-      <rect x="11" y="24" width="8" height="3" fill="#b0b0b0" stroke="#606060" strokeWidth="1" />
-      <rect x="8" y="27" width="14" height="1" fill="#808080" />
+      {/* Window frame */}
+      <rect x="3" y="4" width="26" height="24" fill="#c0c0c0" />
+      <rect x="3" y="4" width="26" height="1" fill="#ffffff" />
+      <rect x="3" y="4" width="1" height="24" fill="#ffffff" />
+      <rect x="28" y="4" width="1" height="24" fill="#808080" />
+      <rect x="3" y="27" width="26" height="1" fill="#808080" />
+      {/* Title bar */}
+      <rect x="4" y="5" width="24" height="7" fill="#000080" />
+      {/* Window buttons */}
+      <rect x="24" y="6" width="4" height="5" fill="#c0c0c0" />
+      <rect x="24" y="6" width="4" height="1" fill="#ffffff" />
+      <rect x="24" y="6" width="1" height="5" fill="#ffffff" />
+      <rect x="27" y="6" width="1" height="5" fill="#808080" />
+      <rect x="24" y="10" width="4" height="1" fill="#808080" />
+      <rect x="25" y="8" width="2" height="1" fill="#000080" />
+      {/* Person head */}
+      <rect x="8" y="14" width="6" height="6" fill="#ffc080" />
+      <rect x="8" y="14" width="1" height="6" fill="#ffd0a0" />
+      <rect x="9" y="13" width="4" height="2" fill="#604020" />
+      <rect x="13" y="14" width="1" height="6" fill="#e0a060" />
+      {/* Person shoulders */}
+      <rect x="6" y="20" width="10" height="6" fill="#000080" />
+      <rect x="7" y="20" width="8" height="1" fill="#0000a0" />
+      {/* Info text */}
+      <rect x="17" y="14" width="10" height="2" fill="#000080" />
+      <rect x="17" y="17" width="9" height="1" fill="#808080" />
+      <rect x="17" y="19" width="8" height="1" fill="#808080" />
+      <rect x="17" y="21" width="10" height="1" fill="#808080" />
+      <rect x="17" y="23" width="7" height="1" fill="#808080" />
     </svg>
   ),
   projects: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="6" y="8" width="8" height="16" fill="#ff4e4e" stroke="#404040" strokeWidth="1" />
-      <rect x="14" y="6" width="8" height="18" fill="#00d0ff" stroke="#404040" strokeWidth="1" />
-      <rect x="22" y="10" width="4" height="14" fill="#ffd800" stroke="#404040" strokeWidth="1" />
-      <rect x="7" y="9" width="6" height="2" fill="#ff9a9a" />
-      <rect x="15" y="7" width="6" height="2" fill="#9ff3ff" />
-      <rect x="23" y="11" width="2" height="2" fill="#fff0a0" />
-      <rect x="4" y="24" width="24" height="3" fill="#808080" />
-      <rect x="9" y="3" width="3" height="5" fill="#3cff4f" stroke="#404040" strokeWidth="1" />
-      <rect x="20" y="2" width="3" height="4" fill="#ff5ad6" stroke="#404040" strokeWidth="1" />
+      {/* Folder tab */}
+      <rect x="2" y="9" width="9" height="3" fill="#c8a000" />
+      <rect x="2" y="9" width="9" height="1" fill="#ffd84a" />
+      <rect x="2" y="9" width="1" height="3" fill="#ffd84a" />
+      <rect x="10" y="9" width="1" height="3" fill="#806000" />
+      {/* Folder body */}
+      <rect x="2" y="12" width="20" height="16" fill="#c8a000" />
+      <rect x="2" y="12" width="20" height="1" fill="#ffd84a" />
+      <rect x="2" y="12" width="1" height="16" fill="#ffd84a" />
+      <rect x="21" y="12" width="1" height="16" fill="#806000" />
+      <rect x="2" y="27" width="20" height="1" fill="#806000" />
+      {/* Folder inner */}
+      <rect x="4" y="14" width="16" height="12" fill="#ffd84a" />
+      <rect x="4" y="14" width="1" height="12" fill="#fff2a8" />
+      <rect x="4" y="14" width="16" height="1" fill="#fff2a8" />
+      {/* Star shape */}
+      <rect x="23" y="7" width="3" height="11" fill="#ffd800" />
+      <rect x="20" y="10" width="9" height="3" fill="#ffd800" />
+      <rect x="21" y="8" width="1" height="1" fill="#ffd800" />
+      <rect x="25" y="8" width="1" height="1" fill="#ffd800" />
+      <rect x="20" y="13" width="1" height="1" fill="#ffd800" />
+      <rect x="26" y="13" width="1" height="1" fill="#ffd800" />
+      <rect x="23" y="7" width="1" height="1" fill="#ffe060" />
+      <rect x="21" y="8" width="1" height="1" fill="#c08000" />
+      <rect x="25" y="8" width="1" height="1" fill="#c08000" />
     </svg>
   ),
   videos: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="5" y="7" width="18" height="14" fill="#c0c0c0" stroke="#404040" strokeWidth="1" />
-      <rect x="7" y="9" width="14" height="10" fill="#000080" stroke="#ffffff" strokeWidth="1" />
-      <path d="M12 11 L18 14 L12 17 Z" fill="#ffffff" />
-      <rect x="23" y="10" width="4" height="8" fill="#8a8a8a" stroke="#404040" strokeWidth="1" />
-      <rect x="24" y="8" width="2" height="2" fill="#8a8a8a" stroke="#404040" strokeWidth="1" />
-      <rect x="11" y="21" width="6" height="3" fill="#a0a0a0" stroke="#606060" strokeWidth="1" />
-      <rect x="8" y="24" width="12" height="2" fill="#808080" />
+      {/* TV body */}
+      <rect x="2" y="6" width="22" height="17" fill="#c0c0c0" />
+      <rect x="2" y="6" width="22" height="1" fill="#ffffff" />
+      <rect x="2" y="6" width="1" height="17" fill="#ffffff" />
+      <rect x="23" y="6" width="1" height="17" fill="#808080" />
+      <rect x="2" y="22" width="22" height="1" fill="#808080" />
+      {/* Screen */}
+      <rect x="4" y="8" width="16" height="12" fill="#000040" />
+      <rect x="4" y="8" width="16" height="1" fill="#000080" />
+      {/* Play button */}
+      <rect x="9" y="11" width="2" height="6" fill="#ffffff" />
+      <rect x="11" y="12" width="2" height="4" fill="#ffffff" />
+      <rect x="13" y="13" width="2" height="2" fill="#ffffff" />
+      <rect x="15" y="13" width="1" height="2" fill="#ffffff" />
+      {/* Camera/VHS part */}
+      <rect x="24" y="10" width="7" height="6" fill="#808080" />
+      <rect x="24" y="10" width="7" height="1" fill="#a0a0a0" />
+      <rect x="24" y="10" width="1" height="6" fill="#a0a0a0" />
+      <rect x="30" y="10" width="1" height="6" fill="#606060" />
+      <rect x="24" y="15" width="7" height="1" fill="#606060" />
+      <rect x="25" y="8" width="2" height="3" fill="#808080" />
+      <rect x="25" y="8" width="2" height="1" fill="#a0a0a0" />
+      {/* Antennas */}
+      <rect x="7" y="3" width="1" height="4" fill="#808080" />
+      <rect x="17" y="3" width="1" height="4" fill="#808080" />
+      {/* Stand */}
+      <rect x="9" y="23" width="6" height="2" fill="#a0a0a0" />
+      <rect x="7" y="25" width="10" height="2" fill="#c0c0c0" />
+      <rect x="7" y="25" width="10" height="1" fill="#ffffff" />
     </svg>
   ),
   welcome: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="4" y="5" width="22" height="16" fill="#c0c0c0" stroke="#404040" strokeWidth="1" />
-      <rect x="5" y="6" width="20" height="3" fill="#000080" />
-      <rect x="7" y="10" width="16" height="9" fill="#3cb5ff" />
-      <rect x="14" y="11" width="2" height="6" fill="#fff000" />
-      <rect x="12" y="13" width="6" height="2" fill="#fff000" />
-      <rect x="13" y="12" width="4" height="4" fill="#ffe06a" />
-      <rect x="11" y="22" width="8" height="3" fill="#b0b0b0" stroke="#606060" strokeWidth="1" />
-      <rect x="8" y="25" width="14" height="1" fill="#808080" />
+      {/* Window */}
+      <rect x="3" y="4" width="26" height="24" fill="#c0c0c0" />
+      <rect x="3" y="4" width="26" height="1" fill="#ffffff" />
+      <rect x="3" y="4" width="1" height="24" fill="#ffffff" />
+      <rect x="28" y="4" width="1" height="24" fill="#808080" />
+      <rect x="3" y="27" width="26" height="1" fill="#808080" />
+      {/* Title bar */}
+      <rect x="4" y="5" width="24" height="6" fill="#000080" />
+      {/* Windows 4-color flag */}
+      <rect x="6" y="13" width="8" height="6" fill="#ff0000" />
+      <rect x="15" y="13" width="8" height="6" fill="#00a000" />
+      <rect x="6" y="20" width="8" height="5" fill="#0000cc" />
+      <rect x="15" y="20" width="8" height="5" fill="#ffd800" />
+      {/* Flag divider cross */}
+      <rect x="13" y="13" width="3" height="12" fill="#c0c0c0" />
+      <rect x="6" y="19" width="17" height="2" fill="#c0c0c0" />
+      {/* Highlight on flag */}
+      <rect x="6" y="13" width="8" height="1" fill="#ff4040" />
+      <rect x="15" y="13" width="8" height="1" fill="#40c040" />
     </svg>
   ),
   settings: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="4" y="5" width="22" height="18" fill="#c0c0c0" stroke="#404040" strokeWidth="1" />
-      <rect x="6" y="7" width="18" height="14" fill="#efefef" stroke="#808080" strokeWidth="1" />
-      <line x1="10" y1="10" x2="20" y2="10" stroke="#404040" strokeWidth="1" />
-      <line x1="10" y1="14" x2="20" y2="14" stroke="#404040" strokeWidth="1" />
-      <line x1="10" y1="18" x2="20" y2="18" stroke="#404040" strokeWidth="1" />
-      <rect x="12" y="9" width="3" height="3" fill="#000080" stroke="#404040" strokeWidth="1" />
-      <rect x="17" y="13" width="3" height="3" fill="#ff0000" stroke="#404040" strokeWidth="1" />
-      <rect x="9" y="17" width="3" height="3" fill="#008000" stroke="#404040" strokeWidth="1" />
-      <rect x="11" y="23" width="8" height="3" fill="#b0b0b0" stroke="#606060" strokeWidth="1" />
-      <rect x="8" y="26" width="14" height="1" fill="#808080" />
+      {/* Control panel frame */}
+      <rect x="3" y="4" width="26" height="24" fill="#c0c0c0" />
+      <rect x="3" y="4" width="26" height="1" fill="#ffffff" />
+      <rect x="3" y="4" width="1" height="24" fill="#ffffff" />
+      <rect x="28" y="4" width="1" height="24" fill="#808080" />
+      <rect x="3" y="27" width="26" height="1" fill="#808080" />
+      {/* Title bar */}
+      <rect x="4" y="5" width="24" height="6" fill="#000080" />
+      {/* Inner panel */}
+      <rect x="5" y="12" width="22" height="14" fill="#efefef" />
+      <rect x="5" y="12" width="22" height="1" fill="#808080" />
+      <rect x="5" y="12" width="1" height="14" fill="#808080" />
+      <rect x="26" y="12" width="1" height="14" fill="#ffffff" />
+      <rect x="5" y="25" width="22" height="1" fill="#ffffff" />
+      {/* Slider track 1 */}
+      <rect x="7" y="15" width="16" height="2" fill="#808080" />
+      <rect x="7" y="15" width="16" height="1" fill="#606060" />
+      {/* Slider knob 1 */}
+      <rect x="15" y="14" width="4" height="4" fill="#c0c0c0" />
+      <rect x="15" y="14" width="4" height="1" fill="#ffffff" />
+      <rect x="15" y="14" width="1" height="4" fill="#ffffff" />
+      <rect x="18" y="14" width="1" height="4" fill="#808080" />
+      <rect x="15" y="17" width="4" height="1" fill="#808080" />
+      {/* Slider track 2 */}
+      <rect x="7" y="21" width="16" height="2" fill="#808080" />
+      <rect x="7" y="21" width="16" height="1" fill="#606060" />
+      {/* Slider knob 2 */}
+      <rect x="10" y="20" width="4" height="4" fill="#c0c0c0" />
+      <rect x="10" y="20" width="4" height="1" fill="#ffffff" />
+      <rect x="10" y="20" width="1" height="4" fill="#ffffff" />
+      <rect x="13" y="20" width="1" height="4" fill="#808080" />
+      <rect x="10" y="23" width="4" height="1" fill="#808080" />
+      {/* Color swatches */}
+      <rect x="24" y="14" width="3" height="3" fill="#ff0000" />
+      <rect x="24" y="18" width="3" height="3" fill="#0000ff" />
+      <rect x="24" y="22" width="3" height="3" fill="#00a000" />
     </svg>
   ),
   resume: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <path d="M7 3 H20 L25 8 V25 H7 Z" fill="#ffffff" stroke="#404040" strokeWidth="1" />
-      <path d="M20 3 V8 H25" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
-      <rect x="10" y="7" width="9" height="1" fill="#606060" />
-      <rect x="10" y="10" width="11" height="1" fill="#909090" />
-      <rect x="10" y="13" width="10" height="1" fill="#909090" />
-      <rect x="10" y="16" width="8" height="1" fill="#909090" />
-      <rect x="7" y="19" width="18" height="6" fill="#c00000" />
-      <text x="10" y="24" fontSize="5" fontWeight="bold" fill="#ffffff" fontFamily="Arial,sans-serif">PDF</text>
+      {/* Page borders */}
+      <rect x="6" y="2" width="10" height="1" fill="#404040" />
+      <rect x="6" y="2" width="1" height="20" fill="#404040" />
+      <rect x="6" y="22" width="16" height="1" fill="#404040" />
+      <rect x="21" y="9" width="1" height="13" fill="#404040" />
+      <rect x="16" y="8" width="6" height="1" fill="#404040" />
+      {/* Page fill */}
+      <rect x="7" y="3" width="9" height="19" fill="#ffffff" />
+      <rect x="16" y="9" width="5" height="13" fill="#ffffff" />
+      {/* Dog-ear */}
+      <rect x="16" y="2" width="6" height="7" fill="#d4d0c8" />
+      <rect x="16" y="2" width="1" height="7" fill="#808080" />
+      <rect x="17" y="3" width="4" height="1" fill="#b0b0b0" />
+      <rect x="18" y="4" width="3" height="1" fill="#b0b0b0" />
+      <rect x="19" y="5" width="2" height="1" fill="#b0b0b0" />
+      <rect x="20" y="6" width="1" height="1" fill="#b0b0b0" />
+      {/* Name header */}
+      <rect x="9" y="5" width="10" height="2" fill="#000080" />
+      {/* Content lines */}
+      <rect x="9" y="10" width="2" height="1" fill="#606060" />
+      <rect x="12" y="10" width="7" height="1" fill="#808080" />
+      <rect x="9" y="12" width="11" height="1" fill="#a0a0a0" />
+      <rect x="9" y="14" width="10" height="1" fill="#a0a0a0" />
+      <rect x="9" y="16" width="11" height="1" fill="#a0a0a0" />
+      <rect x="9" y="18" width="8" height="1" fill="#a0a0a0" />
+      {/* PDF badge */}
+      <rect x="6" y="23" width="16" height="7" fill="#c00000" />
+      <rect x="6" y="23" width="16" height="1" fill="#e00000" />
+      <rect x="6" y="23" width="1" height="7" fill="#e00000" />
+      <rect x="21" y="23" width="1" height="7" fill="#900000" />
+      <rect x="6" y="29" width="16" height="1" fill="#900000" />
+      {/* PDF letters */}
+      <rect x="8" y="25" width="2" height="3" fill="#ffffff" />
+      <rect x="8" y="25" width="3" height="1" fill="#ffffff" />
+      <rect x="8" y="27" width="3" height="1" fill="#ffffff" />
+      <rect x="12" y="25" width="1" height="4" fill="#ffffff" />
+      <rect x="12" y="25" width="3" height="1" fill="#ffffff" />
+      <rect x="12" y="27" width="3" height="1" fill="#ffffff" />
+      <rect x="12" y="28" width="3" height="1" fill="#ffffff" />
+      <rect x="16" y="25" width="1" height="3" fill="#ffffff" />
+      <rect x="16" y="25" width="3" height="1" fill="#ffffff" />
+      <rect x="16" y="27" width="2" height="1" fill="#ffffff" />
     </svg>
   ),
   location: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="6" y="4" width="20" height="22" fill="#ffffff" stroke="#404040" strokeWidth="1" />
-      <rect x="6" y="4" width="20" height="5" fill="#c00000" />
-      <rect x="9" y="2" width="2" height="4" fill="#808080" />
-      <rect x="21" y="2" width="2" height="4" fill="#808080" />
-      <line x1="9" y1="13" x2="23" y2="13" stroke="#c0c0c0" strokeWidth="1" />
-      <line x1="9" y1="17" x2="23" y2="17" stroke="#c0c0c0" strokeWidth="1" />
-      <circle cx="16" cy="21" r="4" fill="#ffffd8" stroke="#404040" strokeWidth="1" />
-      <line x1="16" y1="21" x2="16" y2="18.5" stroke="#111" strokeWidth="1" />
-      <line x1="16" y1="21" x2="18.5" y2="22.5" stroke="#c00000" strokeWidth="1" />
+      {/* Map background */}
+      <rect x="3" y="6" width="26" height="22" fill="#c8dff0" />
+      <rect x="3" y="6" width="26" height="1" fill="#e0f0ff" />
+      <rect x="3" y="6" width="1" height="22" fill="#e0f0ff" />
+      <rect x="28" y="6" width="1" height="22" fill="#a0b8cc" />
+      <rect x="3" y="27" width="26" height="1" fill="#a0b8cc" />
+      <rect x="3" y="6" width="26" height="22" stroke="#404040" strokeWidth="1" fill="none" />
+      {/* Land mass */}
+      <rect x="5" y="8" width="12" height="6" fill="#c8e8b0" />
+      <rect x="8" y="14" width="8" height="5" fill="#c8e8b0" />
+      <rect x="6" y="14" width="4" height="3" fill="#c8e8b0" />
+      <rect x="14" y="10" width="10" height="8" fill="#c8e8b0" />
+      <rect x="16" y="18" width="8" height="4" fill="#c8e8b0" />
+      {/* Map pin body */}
+      <rect x="15" y="10" width="4" height="4" fill="#c00000" />
+      <rect x="15" y="10" width="4" height="1" fill="#ff2020" />
+      <rect x="15" y="10" width="1" height="4" fill="#ff2020" />
+      <rect x="18" y="10" width="1" height="4" fill="#900000" />
+      <rect x="15" y="13" width="4" height="1" fill="#900000" />
+      {/* Pin hole */}
+      <rect x="16" y="11" width="2" height="2" fill="#ffffff" />
+      {/* Pin tip */}
+      <rect x="16" y="14" width="2" height="3" fill="#c00000" />
+      <rect x="16" y="17" width="2" height="1" fill="#900000" />
+      {/* Grid lines */}
+      <rect x="4" y="16" width="24" height="1" fill="#a0b8d0" />
+      <rect x="16" y="7" width="1" height="20" fill="#a0b8d0" />
     </svg>
   ),
   calculator: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="3" y="2" width="26" height="29" fill="#d4d0c8" stroke="#404040" strokeWidth="1" />
-      <rect x="4" y="3" width="24" height="27" fill="#c0c0c0" />
-      <rect x="5" y="4" width="22" height="8" fill="#6aaa80" stroke="#404040" strokeWidth="1" />
-      <rect x="6" y="5" width="20" height="6" fill="#78ba90" />
-      <rect x="18" y="7" width="7" height="2" fill="#5a9a70" />
-      <rect x="5" y="14" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
-      <rect x="11" y="14" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
-      <rect x="17" y="14" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
-      <rect x="23" y="14" width="4" height="4" fill="#c07878" stroke="#808080" strokeWidth="1" />
-      <rect x="5" y="19" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
-      <rect x="11" y="19" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
-      <rect x="17" y="19" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
-      <rect x="23" y="19" width="4" height="4" fill="#c07878" stroke="#808080" strokeWidth="1" />
-      <rect x="5" y="24" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
-      <rect x="11" y="24" width="5" height="4" fill="#b8b8b4" stroke="#808080" strokeWidth="1" />
-      <rect x="17" y="24" width="5" height="4" fill="#7878c0" stroke="#808080" strokeWidth="1" />
-      <rect x="23" y="24" width="4" height="4" fill="#c07878" stroke="#808080" strokeWidth="1" />
+      {/* Body */}
+      <rect x="4" y="2" width="24" height="28" fill="#c0c0c0" />
+      <rect x="4" y="2" width="24" height="1" fill="#ffffff" />
+      <rect x="4" y="2" width="1" height="28" fill="#ffffff" />
+      <rect x="27" y="2" width="1" height="28" fill="#808080" />
+      <rect x="4" y="29" width="24" height="1" fill="#808080" />
+      {/* Display */}
+      <rect x="6" y="4" width="20" height="7" fill="#6aaa80" />
+      <rect x="6" y="4" width="20" height="1" fill="#808080" />
+      <rect x="6" y="4" width="1" height="7" fill="#808080" />
+      <rect x="25" y="4" width="1" height="7" fill="#4a8a60" />
+      <rect x="6" y="10" width="20" height="1" fill="#4a8a60" />
+      {/* Display number */}
+      <rect x="18" y="6" width="6" height="3" fill="#5a9a70" />
+      <rect x="19" y="6" width="4" height="1" fill="#78ba90" />
+      {/* Row 1 buttons */}
+      <rect x="6" y="13" width="4" height="3" fill="#b8b8b4" />
+      <rect x="6" y="13" width="4" height="1" fill="#d0d0cc" />
+      <rect x="6" y="13" width="1" height="3" fill="#d0d0cc" />
+      <rect x="9" y="13" width="1" height="3" fill="#808080" />
+      <rect x="6" y="15" width="4" height="1" fill="#808080" />
+      <rect x="11" y="13" width="4" height="3" fill="#b8b8b4" />
+      <rect x="11" y="13" width="4" height="1" fill="#d0d0cc" />
+      <rect x="11" y="13" width="1" height="3" fill="#d0d0cc" />
+      <rect x="14" y="13" width="1" height="3" fill="#808080" />
+      <rect x="11" y="15" width="4" height="1" fill="#808080" />
+      <rect x="16" y="13" width="4" height="3" fill="#b8b8b4" />
+      <rect x="16" y="13" width="4" height="1" fill="#d0d0cc" />
+      <rect x="16" y="13" width="1" height="3" fill="#d0d0cc" />
+      <rect x="19" y="13" width="1" height="3" fill="#808080" />
+      <rect x="16" y="15" width="4" height="1" fill="#808080" />
+      <rect x="21" y="13" width="5" height="3" fill="#c07878" />
+      <rect x="21" y="13" width="5" height="1" fill="#e09898" />
+      <rect x="21" y="13" width="1" height="3" fill="#e09898" />
+      <rect x="25" y="13" width="1" height="3" fill="#905858" />
+      <rect x="21" y="15" width="5" height="1" fill="#905858" />
+      {/* Row 2 buttons */}
+      <rect x="6" y="17" width="4" height="3" fill="#b8b8b4" />
+      <rect x="6" y="17" width="4" height="1" fill="#d0d0cc" />
+      <rect x="6" y="17" width="1" height="3" fill="#d0d0cc" />
+      <rect x="9" y="17" width="1" height="3" fill="#808080" />
+      <rect x="6" y="19" width="4" height="1" fill="#808080" />
+      <rect x="11" y="17" width="4" height="3" fill="#b8b8b4" />
+      <rect x="11" y="17" width="4" height="1" fill="#d0d0cc" />
+      <rect x="11" y="17" width="1" height="3" fill="#d0d0cc" />
+      <rect x="14" y="17" width="1" height="3" fill="#808080" />
+      <rect x="11" y="19" width="4" height="1" fill="#808080" />
+      <rect x="16" y="17" width="4" height="3" fill="#b8b8b4" />
+      <rect x="16" y="17" width="4" height="1" fill="#d0d0cc" />
+      <rect x="16" y="17" width="1" height="3" fill="#d0d0cc" />
+      <rect x="19" y="17" width="1" height="3" fill="#808080" />
+      <rect x="16" y="19" width="4" height="1" fill="#808080" />
+      <rect x="21" y="17" width="5" height="3" fill="#7878c0" />
+      <rect x="21" y="17" width="5" height="1" fill="#9898e0" />
+      <rect x="21" y="17" width="1" height="3" fill="#9898e0" />
+      <rect x="25" y="17" width="1" height="3" fill="#5858a0" />
+      <rect x="21" y="19" width="5" height="1" fill="#5858a0" />
+      {/* Row 3 buttons */}
+      <rect x="6" y="21" width="4" height="3" fill="#b8b8b4" />
+      <rect x="6" y="21" width="4" height="1" fill="#d0d0cc" />
+      <rect x="6" y="21" width="1" height="3" fill="#d0d0cc" />
+      <rect x="9" y="21" width="1" height="3" fill="#808080" />
+      <rect x="6" y="23" width="4" height="1" fill="#808080" />
+      <rect x="11" y="21" width="4" height="3" fill="#b8b8b4" />
+      <rect x="11" y="21" width="4" height="1" fill="#d0d0cc" />
+      <rect x="11" y="21" width="1" height="3" fill="#d0d0cc" />
+      <rect x="14" y="21" width="1" height="3" fill="#808080" />
+      <rect x="11" y="23" width="4" height="1" fill="#808080" />
+      <rect x="16" y="21" width="4" height="3" fill="#b8b8b4" />
+      <rect x="16" y="21" width="4" height="1" fill="#d0d0cc" />
+      <rect x="16" y="21" width="1" height="3" fill="#d0d0cc" />
+      <rect x="19" y="21" width="1" height="3" fill="#808080" />
+      <rect x="16" y="23" width="4" height="1" fill="#808080" />
+      <rect x="21" y="21" width="5" height="3" fill="#7878c0" />
+      <rect x="21" y="21" width="5" height="1" fill="#9898e0" />
+      <rect x="21" y="21" width="1" height="3" fill="#9898e0" />
+      <rect x="25" y="21" width="1" height="3" fill="#5858a0" />
+      <rect x="21" y="23" width="5" height="1" fill="#5858a0" />
+      {/* Row 4 buttons */}
+      <rect x="6" y="25" width="4" height="3" fill="#b8b8b4" />
+      <rect x="6" y="25" width="4" height="1" fill="#d0d0cc" />
+      <rect x="6" y="25" width="1" height="3" fill="#d0d0cc" />
+      <rect x="9" y="25" width="1" height="3" fill="#808080" />
+      <rect x="6" y="27" width="4" height="1" fill="#808080" />
+      <rect x="11" y="25" width="4" height="3" fill="#b8b8b4" />
+      <rect x="11" y="25" width="4" height="1" fill="#d0d0cc" />
+      <rect x="11" y="25" width="1" height="3" fill="#d0d0cc" />
+      <rect x="14" y="25" width="1" height="3" fill="#808080" />
+      <rect x="11" y="27" width="4" height="1" fill="#808080" />
+      <rect x="16" y="25" width="4" height="3" fill="#7878c0" />
+      <rect x="16" y="25" width="4" height="1" fill="#9898e0" />
+      <rect x="16" y="25" width="1" height="3" fill="#9898e0" />
+      <rect x="19" y="25" width="1" height="3" fill="#5858a0" />
+      <rect x="16" y="27" width="4" height="1" fill="#5858a0" />
+      <rect x="21" y="25" width="5" height="3" fill="#7878c0" />
+      <rect x="21" y="25" width="5" height="1" fill="#9898e0" />
+      <rect x="21" y="25" width="1" height="3" fill="#9898e0" />
+      <rect x="25" y="25" width="1" height="3" fill="#5858a0" />
+      <rect x="21" y="27" width="5" height="1" fill="#5858a0" />
     </svg>
   ),
   minesweeper: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="1" y="1" width="30" height="30" fill="#c0c0c0" stroke="#404040" strokeWidth="1" />
-      <rect x="1" y="1" width="5" height="5" fill="#d4d0c8" stroke="#fff" strokeWidth="1" />
-      <rect x="7" y="1" width="5" height="5" fill="#adadad" stroke="#808080" strokeWidth="1" />
-      <rect x="1" y="7" width="5" height="5" fill="#adadad" stroke="#808080" strokeWidth="1" />
-      <rect x="13" y="1" width="5" height="5" fill="#d4d0c8" stroke="#fff" strokeWidth="1" />
-      <rect x="19" y="1" width="5" height="5" fill="#adadad" stroke="#808080" strokeWidth="1" />
-      <rect x="25" y="1" width="6" height="5" fill="#d4d0c8" stroke="#fff" strokeWidth="1" />
-      <rect x="7" y="7" width="5" height="5" fill="#d4d0c8" stroke="#fff" strokeWidth="1" />
-      <rect x="13" y="7" width="5" height="5" fill="#adadad" stroke="#808080" strokeWidth="1" />
-      <rect x="19" y="7" width="5" height="5" fill="#d4d0c8" stroke="#fff" strokeWidth="1" />
-      <rect x="25" y="7" width="6" height="5" fill="#adadad" stroke="#808080" strokeWidth="1" />
-      <rect x="1" y="13" width="30" height="19" fill="#adadad" stroke="#808080" strokeWidth="1" />
-      <circle cx="10" cy="10" r="3" fill="#000" />
-      <rect x="9" y="7" width="2" height="6" fill="#000" />
-      <rect x="7" y="9" width="6" height="2" fill="#000" />
-      <rect x="9" y="8" width="1" height="1" fill="#fff" opacity="0.6" />
-      <rect x="8" y="3" width="2" height="2" fill="#0000ff" />
-      <rect x="20" y="2" width="2" height="3" fill="#008000" />
-      <rect x="26" y="8" width="1" height="4" fill="#555" />
-      <rect x="27" y="8" width="4" height="3" fill="#ff0000" />
+      {/* Window frame */}
+      <rect x="1" y="2" width="30" height="28" fill="#c0c0c0" />
+      <rect x="1" y="2" width="30" height="1" fill="#ffffff" />
+      <rect x="1" y="2" width="1" height="28" fill="#ffffff" />
+      <rect x="30" y="2" width="1" height="28" fill="#808080" />
+      <rect x="1" y="29" width="30" height="1" fill="#808080" />
+      {/* Title bar */}
+      <rect x="2" y="3" width="28" height="5" fill="#000080" />
+      {/* Game grid background */}
+      <rect x="3" y="9" width="26" height="19" fill="#808080" />
+      {/* Cell 1,1 raised */}
+      <rect x="4" y="10" width="5" height="5" fill="#c0c0c0" />
+      <rect x="4" y="10" width="5" height="1" fill="#ffffff" />
+      <rect x="4" y="10" width="1" height="5" fill="#ffffff" />
+      <rect x="8" y="10" width="1" height="5" fill="#808080" />
+      <rect x="4" y="14" width="5" height="1" fill="#808080" />
+      {/* Cell 1,2 revealed number */}
+      <rect x="10" y="10" width="5" height="5" fill="#d4d0c8" />
+      <rect x="10" y="10" width="5" height="1" fill="#808080" />
+      <rect x="10" y="10" width="1" height="5" fill="#808080" />
+      <rect x="12" y="11" width="1" height="3" fill="#0000ff" />
+      {/* Cell 1,3 raised */}
+      <rect x="16" y="10" width="5" height="5" fill="#c0c0c0" />
+      <rect x="16" y="10" width="5" height="1" fill="#ffffff" />
+      <rect x="16" y="10" width="1" height="5" fill="#ffffff" />
+      <rect x="20" y="10" width="1" height="5" fill="#808080" />
+      <rect x="16" y="14" width="5" height="1" fill="#808080" />
+      {/* Cell 1,4 number 2 */}
+      <rect x="22" y="10" width="5" height="5" fill="#d4d0c8" />
+      <rect x="22" y="10" width="5" height="1" fill="#808080" />
+      <rect x="22" y="10" width="1" height="5" fill="#808080" />
+      <rect x="24" y="11" width="1" height="3" fill="#008000" />
+      <rect x="25" y="11" width="1" height="3" fill="#008000" />
+      {/* Row 2, Cell 1 */}
+      <rect x="4" y="16" width="5" height="5" fill="#d4d0c8" />
+      <rect x="4" y="16" width="5" height="1" fill="#808080" />
+      <rect x="4" y="16" width="1" height="5" fill="#808080" />
+      {/* MINE cell */}
+      <rect x="10" y="16" width="5" height="5" fill="#ff0000" />
+      <rect x="10" y="16" width="5" height="1" fill="#ff4040" />
+      <rect x="10" y="16" width="1" height="5" fill="#ff4040" />
+      <rect x="11" y="18" width="3" height="1" fill="#000000" />
+      <rect x="12" y="17" width="1" height="3" fill="#000000" />
+      <rect x="11" y="17" width="1" height="1" fill="#000000" />
+      <rect x="13" y="17" width="1" height="1" fill="#000000" />
+      <rect x="11" y="19" width="1" height="1" fill="#000000" />
+      <rect x="13" y="19" width="1" height="1" fill="#000000" />
+      {/* Row 2 cells */}
+      <rect x="16" y="16" width="5" height="5" fill="#c0c0c0" />
+      <rect x="16" y="16" width="5" height="1" fill="#ffffff" />
+      <rect x="16" y="16" width="1" height="5" fill="#ffffff" />
+      <rect x="20" y="16" width="1" height="5" fill="#808080" />
+      <rect x="16" y="20" width="5" height="1" fill="#808080" />
+      <rect x="22" y="16" width="5" height="5" fill="#c0c0c0" />
+      <rect x="22" y="16" width="5" height="1" fill="#ffffff" />
+      <rect x="22" y="16" width="1" height="5" fill="#ffffff" />
+      <rect x="26" y="16" width="1" height="5" fill="#808080" />
+      <rect x="22" y="20" width="5" height="1" fill="#808080" />
+      {/* Row 3 cells */}
+      <rect x="4" y="22" width="5" height="5" fill="#c0c0c0" />
+      <rect x="4" y="22" width="5" height="1" fill="#ffffff" />
+      <rect x="4" y="22" width="1" height="5" fill="#ffffff" />
+      <rect x="8" y="22" width="1" height="5" fill="#808080" />
+      <rect x="4" y="26" width="5" height="1" fill="#808080" />
+      {/* Flag cell */}
+      <rect x="10" y="22" width="5" height="5" fill="#c0c0c0" />
+      <rect x="10" y="22" width="5" height="1" fill="#ffffff" />
+      <rect x="10" y="22" width="1" height="5" fill="#ffffff" />
+      <rect x="14" y="22" width="1" height="5" fill="#808080" />
+      <rect x="10" y="26" width="5" height="1" fill="#808080" />
+      <rect x="12" y="23" width="1" height="3" fill="#808080" />
+      <rect x="12" y="23" width="2" height="2" fill="#ff0000" />
+      <rect x="12" y="26" width="2" height="1" fill="#808080" />
+      {/* Row 3 more */}
+      <rect x="16" y="22" width="5" height="5" fill="#c0c0c0" />
+      <rect x="16" y="22" width="5" height="1" fill="#ffffff" />
+      <rect x="16" y="22" width="1" height="5" fill="#ffffff" />
+      <rect x="20" y="22" width="1" height="5" fill="#808080" />
+      <rect x="16" y="26" width="5" height="1" fill="#808080" />
+      <rect x="22" y="22" width="5" height="5" fill="#d4d0c8" />
+      <rect x="22" y="22" width="5" height="1" fill="#808080" />
+      <rect x="22" y="22" width="1" height="5" fill="#808080" />
     </svg>
   ),
   help: (
     <svg width="32" height="32" viewBox="0 0 32 32" shapeRendering="crispEdges">
-      <rect x="4" y="3" width="24" height="28" fill="#ffffff" stroke="#404040" strokeWidth="1" />
-      <rect x="4" y="3" width="6" height="28" fill="#000080" stroke="#404040" strokeWidth="1" />
-      <rect x="5" y="4" width="4" height="26" fill="#1a1ab0" />
-      <rect x="12" y="8" width="8" height="2" fill="#000080" />
-      <rect x="18" y="10" width="2" height="4" fill="#000080" />
+      {/* Book body */}
+      <rect x="4" y="3" width="22" height="26" fill="#ffd800" />
+      <rect x="4" y="3" width="22" height="1" fill="#ffe860" />
+      <rect x="4" y="3" width="1" height="26" fill="#ffe860" />
+      <rect x="25" y="3" width="1" height="26" fill="#c0a000" />
+      <rect x="4" y="28" width="22" height="1" fill="#c0a000" />
+      {/* Spine */}
+      <rect x="4" y="3" width="5" height="26" fill="#c0a000" />
+      <rect x="4" y="3" width="1" height="26" fill="#d0b000" />
+      <rect x="8" y="3" width="1" height="26" fill="#a08000" />
+      {/* Binding lines */}
+      <rect x="5" y="7" width="3" height="1" fill="#a08000" />
+      <rect x="5" y="11" width="3" height="1" fill="#a08000" />
+      <rect x="5" y="15" width="3" height="1" fill="#a08000" />
+      <rect x="5" y="19" width="3" height="1" fill="#a08000" />
+      <rect x="5" y="23" width="3" height="1" fill="#a08000" />
+      {/* Question mark top arc */}
+      <rect x="14" y="8" width="6" height="2" fill="#000080" />
+      <rect x="18" y="10" width="2" height="3" fill="#000080" />
+      {/* Question mark curve */}
       <rect x="14" y="13" width="4" height="2" fill="#000080" />
-      <rect x="14" y="16" width="2" height="3" fill="#000080" />
-      <rect x="14" y="21" width="2" height="2" fill="#000080" />
-      <rect x="11" y="26" width="14" height="1" fill="#c0c0c0" />
-      <rect x="11" y="27" width="14" height="1" fill="#c0c0c0" />
+      {/* Question mark stem */}
+      <rect x="14" y="16" width="2" height="4" fill="#000080" />
+      {/* Question mark dot */}
+      <rect x="14" y="22" width="2" height="3" fill="#000080" />
     </svg>
   ),
 };

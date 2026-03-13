@@ -146,10 +146,9 @@ export default function Taskbar() {
                 event.preventDefault();
                 event.stopPropagation();
               }}
-              style={{ border: "none", borderTop: "1px solid #fff", borderLeft: "1px solid #fff", borderRight: "1px solid #404040", borderBottom: "1px solid #404040", background: "#c0c0c0", padding: "2px 8px", fontSize: 11, color: "#222", fontFamily: "inherit", cursor: "pointer", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160, lineHeight: 1.25, display: "flex", alignItems: "center", gap: 5 }}
+              style={{ border: "none", borderTop: "1px solid #fff", borderLeft: "1px solid #fff", borderRight: "1px solid #404040", borderBottom: "1px solid #404040", background: "#c0c0c0", padding: "2px 8px", fontSize: 11, color: "#222", fontFamily: "inherit", cursor: "pointer", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160, lineHeight: 1.25 }}
             >
-              {renderTaskbarGlyph(entry.glyph)}
-              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.title}</span>
+              {entry.title}
             </button>
           ))}
         </div>
@@ -299,7 +298,7 @@ export default function Taskbar() {
                 </span>
               </div>
               <div style={{ flex: 1 }}>
-                {desktopItems.filter((item) => item.itemType === "app" && item.id !== "trash").map((icon) => (
+                {desktopItems.filter((item) => item.itemType === "app" && item.id !== "trash" && item.id !== "resume").map((icon) => (
                   <button
                     key={icon.id}
                     onClick={() => {
@@ -322,25 +321,6 @@ export default function Taskbar() {
                     {icon.title}
                   </button>
                 ))}
-                <div style={{ height: 1, background: "#808080", margin: "2px 8px" }} />
-                <button
-                  onClick={() => {
-                    window.open(PERSONAL.resumeUrl, "_blank");
-                    setStartOpen(false);
-                  }}
-                  style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "6px 10px", border: "none", background: "transparent", cursor: "pointer", fontSize: 12, fontFamily: "inherit", textAlign: "left", color: "#111" }}
-                  onMouseEnter={(event) => {
-                    event.currentTarget.style.background = "#000080";
-                    event.currentTarget.style.color = "#fff";
-                  }}
-                  onMouseLeave={(event) => {
-                    event.currentTarget.style.background = "transparent";
-                    event.currentTarget.style.color = "#111";
-                  }}
-                >
-                  <span style={{ width: 26, textAlign: "center" }}>DOC</span>
-                  Resume.pdf
-                </button>
               </div>
             </div>
           </div>

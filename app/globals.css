@@ -100,12 +100,22 @@ body {
   border-bottom: 1px solid #808080;
 }
 *::-webkit-scrollbar-track-piece {
-  background: #d4d0c8;
-  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #808080;
+  background-color: #c8c4bc;
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,0.55) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.55) 75%),
+    linear-gradient(45deg, rgba(255,255,255,0.55) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.55) 75%);
+  background-size: 4px 4px;
+  background-position: 0 0, 2px 2px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #c0c0c0;
-  background-image: linear-gradient(to right, transparent 0, transparent 5px, #808080 5px, #808080 6px, #ffffff 6px, #ffffff 7px, transparent 7px, transparent 100%);
+  background-color: #c0c0c0;
+  background-image:
+    linear-gradient(to right,
+      transparent 2px, #808080 2px, #808080 3px, #ffffff 3px, #ffffff 4px,
+      transparent 4px, transparent 6px, #808080 6px, #808080 7px, #ffffff 7px, #ffffff 8px,
+      transparent 8px, transparent 10px, #808080 10px, #808080 11px, #ffffff 11px, #ffffff 12px,
+      transparent 12px
+    );
   border-left: 2px solid #ffffff;
   border-top: 2px solid #ffffff;
   border-right: 2px solid #808080;
