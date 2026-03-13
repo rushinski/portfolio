@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { canPinItemToTaskbar, MENU_TEXT_COLOR } from "./constants";
 import { PERSONAL } from "./data";
@@ -10,7 +10,7 @@ import { useWindowManager } from "./hooks/useWindowManager";
 
 export default function Taskbar() {
   const { clockFormat } = useSettings();
-  const { desktopItems, openItem } = useFileSystem();
+  const { activeTextDoc, desktopItems, openItem } = useFileSystem();
   const {
     windows,
     openWindows,
@@ -23,6 +23,7 @@ export default function Taskbar() {
   const [clock, setClock] = useState("");
   const [startOpen, setStartOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const taskbarRef = useRef(null);
   const [calendarViewDate, setCalendarViewDate] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -42,7 +43,12 @@ export default function Taskbar() {
   }, [clockFormat]);
 
   useEffect(() => {
-    const closeMenus = () => {
+    const closeMenus = (event) => {
+      const target = event.target;
+      if (target instanceof Node && taskbarRef.current?.contains(target)) {
+        return;
+      }
+
       setStartOpen(false);
       setCalendarOpen(false);
     };
@@ -54,6 +60,31 @@ export default function Taskbar() {
     () => new Map(desktopItems.filter((item) => canPinItemToTaskbar(item)).map((item) => [item.id, item])),
     [desktopItems],
   );
+  const desktopAppsByWindowId = useMemo(() => {
+    const map = new Map();
+
+    desktopItems
+      .filter((item) => canPinItemToTaskbar(item) && (item.parentId ?? null) === null)
+      .forEach((item) => {
+        if (!map.has(item.windowId)) {
+          map.set(item.windowId, item);
+        }
+      });
+
+    return map;
+  }, [desktopItems]);
+
+  const renderTaskbarGlyph = (glyph) => {
+    if (!glyph) {
+      return null;
+    }
+
+    return (
+      <span style={{ width: 18, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+        <span style={{ display: "inline-flex", transform: "scale(0.52)", transformOrigin: "center center" }}>{glyph}</span>
+      </span>
+    );
+  };
 
   const normalizedPinnedIds = pinnedTaskbarAppIds.filter((id) => desktopAppsById.has(id));
   const pinnedTaskbarEntries = normalizedPinnedIds
@@ -64,15 +95,17 @@ export default function Taskbar() {
       return {
         id,
         title: appItem?.title || win?.title || id,
+        glyph: appItem?.glyph || null,
       };
     });
 
   const openTaskbarEntries = openWindows.map((win) => {
-    const appItem = desktopAppsById.get(win.id);
+    const appItem = desktopAppsByWindowId.get(win.id);
     return {
       id: win.id,
       win,
       title: appItem?.title || win.title || win.id,
+      glyph: win.id === "textdoc" ? (activeTextDoc?.glyph || null) : (appItem?.glyph || null),
     };
   });
 
@@ -94,7 +127,7 @@ export default function Taskbar() {
   );
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 1, flexShrink: 0 }}>
+    <div ref={taskbarRef} style={{ display: "flex", flexDirection: "column", gap: 1, flexShrink: 0 }}>
       <div style={{ background: "#b9b9b9", borderTop: "1px solid #fff", borderBottom: "1px solid #707070", borderLeft: "1px solid #d6d6d6", borderRight: "1px solid #707070", padding: "2px 6px", display: "flex", alignItems: "center", gap: 6, minHeight: 26 }}>
         <span style={{ fontSize: 10, color: "#4a4a4a", fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", flexShrink: 0 }}>Pinned</span>
         <div style={{ width: 1, height: 14, background: "#808080", flexShrink: 0 }} />
@@ -112,9 +145,10 @@ export default function Taskbar() {
                 event.preventDefault();
                 event.stopPropagation();
               }}
-              style={{ border: "none", borderTop: "1px solid #fff", borderLeft: "1px solid #fff", borderRight: "1px solid #404040", borderBottom: "1px solid #404040", background: "#c0c0c0", padding: "2px 8px", fontSize: 11, color: "#222", fontFamily: "inherit", cursor: "pointer", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 140, lineHeight: 1.25 }}
+              style={{ border: "none", borderTop: "1px solid #fff", borderLeft: "1px solid #fff", borderRight: "1px solid #404040", borderBottom: "1px solid #404040", background: "#c0c0c0", padding: "2px 8px", fontSize: 11, color: "#222", fontFamily: "inherit", cursor: "pointer", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160, lineHeight: 1.25, display: "flex", alignItems: "center", gap: 5 }}
             >
-              {entry.title}
+              {renderTaskbarGlyph(entry.glyph)}
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.title}</span>
             </button>
           ))}
         </div>
@@ -180,6 +214,7 @@ export default function Taskbar() {
                   }}
                   style={{ background: "transparent", border: "none", padding: "3px 6px", fontSize: 11, cursor: "pointer", fontFamily: "inherit", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "left", flex: 1, color: "#111", display: "flex", alignItems: "center", gap: 6 }}
                 >
+                  {renderTaskbarGlyph(entry.glyph)}
                   <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.2, paddingBottom: 1, minWidth: 0, flex: 1 }}>
                     {entry.title}
                   </span>

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 
-import { clamp, snap } from "./constants";
+import { WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH, clamp, snap } from "./constants";
 import {
   WIN95_COLORS,
   getWin95ButtonStyle,
@@ -13,6 +13,7 @@ import {
 
 function TitleBar({
   title,
+  glyph,
   isActive,
   isMaximized,
   onClose,
@@ -40,9 +41,16 @@ function TitleBar({
         userSelect: "none",
       }}
     >
-      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
-        {title}
-      </span>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0, flex: 1 }}>
+        {glyph && (
+          <span style={{ width: 18, height: 18, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <span style={{ display: "inline-flex", transform: "scale(0.5)", transformOrigin: "center center" }}>{glyph}</span>
+          </span>
+        )}
+        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+          {title}
+        </span>
+      </div>
       <div style={{ display: "flex", gap: "2px", flexShrink: 0 }}>
         {controls.map((button) => (
           <button
@@ -74,6 +82,7 @@ function TitleBar({
 
 export default function WindowFrame({
   win,
+  glyph,
   isActive,
   onFocus,
   onClose,
@@ -100,6 +109,8 @@ export default function WindowFrame({
 
     offsetRef.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
     setIsDragging(true);
+    const windowWidth = rect.width;
+    const windowHeight = rect.height;
 
     const handlePointerMove = (pointerEvent) => {
       const parent = dragRef.current?.parentElement?.getBoundingClientRect();
@@ -110,8 +121,8 @@ export default function WindowFrame({
       let nextX = pointerEvent.clientX - parent.left - offsetRef.current.x;
       let nextY = pointerEvent.clientY - parent.top - offsetRef.current.y;
 
-      nextX = clamp(nextX, -win.w + 60, parent.width - 60);
-      nextY = clamp(nextY, 0, parent.height - 30);
+      nextX = clamp(nextX, 0, Math.max(0, parent.width - windowWidth));
+      nextY = clamp(nextY, 0, Math.max(0, parent.height - windowHeight));
 
       onMove(snap(nextX), snap(nextY));
     };
@@ -137,6 +148,10 @@ export default function WindowFrame({
     const startHeight = win.h || 400;
     const startLeft = win.x;
     const startTop = win.y;
+    const parentRect = dragRef.current?.parentElement?.getBoundingClientRect();
+    if (!parentRect) {
+      return;
+    }
 
     const handleMove = (pointerEvent) => {
       const deltaX = pointerEvent.clientX - startX;
@@ -147,18 +162,49 @@ export default function WindowFrame({
       let nextX = startLeft;
       let nextY = startTop;
 
-      if (direction.includes("e")) nextWidth = Math.max(250, startWidth + deltaX);
-      if (direction.includes("s")) nextHeight = Math.max(150, startHeight + deltaY);
+      if (direction.includes("e")) {
+        nextWidth = clamp(
+          startWidth + deltaX,
+          WINDOW_MIN_WIDTH,
+          Math.max(WINDOW_MIN_WIDTH, parentRect.width - startLeft),
+        );
+      }
+      if (direction.includes("s")) {
+        nextHeight = clamp(
+          startHeight + deltaY,
+          WINDOW_MIN_HEIGHT,
+          Math.max(WINDOW_MIN_HEIGHT, parentRect.height - startTop),
+        );
+      }
       if (direction.includes("w")) {
-        nextWidth = Math.max(250, startWidth - deltaX);
-        nextX = startLeft + (startWidth - nextWidth);
+        nextX = clamp(
+          startLeft + deltaX,
+          0,
+          Math.max(0, startLeft + startWidth - WINDOW_MIN_WIDTH),
+        );
+        nextWidth = clamp(
+          startWidth + (startLeft - nextX),
+          WINDOW_MIN_WIDTH,
+          Math.max(WINDOW_MIN_WIDTH, parentRect.width - nextX),
+        );
       }
       if (direction.includes("n")) {
-        nextHeight = Math.max(150, startHeight - deltaY);
-        nextY = startTop + (startHeight - nextHeight);
+        nextY = clamp(
+          startTop + deltaY,
+          0,
+          Math.max(0, startTop + startHeight - WINDOW_MIN_HEIGHT),
+        );
+        nextHeight = clamp(
+          startHeight + (startTop - nextY),
+          WINDOW_MIN_HEIGHT,
+          Math.max(WINDOW_MIN_HEIGHT, parentRect.height - nextY),
+        );
       }
 
-      onResize(nextX, nextY, nextWidth, nextHeight);
+      nextWidth = clamp(nextWidth, WINDOW_MIN_WIDTH, Math.max(WINDOW_MIN_WIDTH, parentRect.width - nextX));
+      nextHeight = clamp(nextHeight, WINDOW_MIN_HEIGHT, Math.max(WINDOW_MIN_HEIGHT, parentRect.height - nextY));
+
+      onResize(snap(nextX), snap(nextY), snap(nextWidth), snap(nextHeight));
     };
 
     const handleUp = () => {
@@ -200,6 +246,7 @@ export default function WindowFrame({
       >
         <TitleBar
           title={win.title}
+          glyph={glyph}
           isActive={isActive}
           isMaximized={win.isMaximized}
           onClose={onClose}

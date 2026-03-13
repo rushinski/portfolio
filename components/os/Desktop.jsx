@@ -277,6 +277,7 @@ export default function Desktop() {
     unpinTaskbarItem,
   } = windowManager;
   const {
+    activeTextDoc,
     desktopItems,
     iconPositions,
     clipboardState,
@@ -318,6 +319,23 @@ export default function Desktop() {
     () => desktopItems.filter((item) => (item.parentId ?? null) === null),
     [desktopItems],
   );
+  const windowGlyphsById = useMemo(() => {
+    const map = new Map();
+
+    desktopItems
+      .filter((item) => item.windowId && (item.parentId ?? null) === null)
+      .forEach((item) => {
+        if (!map.has(item.windowId)) {
+          map.set(item.windowId, item.glyph);
+        }
+      });
+
+    if (activeTextDoc?.glyph) {
+      map.set("textdoc", activeTextDoc.glyph);
+    }
+
+    return map;
+  }, [activeTextDoc, desktopItems]);
   const desktopBaseBackground = desktopColor || "linear-gradient(180deg, #0b4aa6, #0a3f90)";
   const wallpaperPatternBackground = WALLPAPER_PATTERN_BACKGROUNDS[wallpaperPattern] || "none";
   const handleBootComplete = useCallback(() => {
@@ -344,10 +362,6 @@ export default function Desktop() {
       setScreensaverActive(true);
     }, screensaverTimeout * 1000);
   }, [booted, screensaverTimeout, screensaverType]);
-
-  useEffect(() => {
-    alignIconsToGrid();
-  }, [alignIconsToGrid]);
 
   useEffect(() => {
     resetScreensaverTimer();
@@ -838,7 +852,7 @@ export default function Desktop() {
                   )}
 
                   {openWindows.filter((win) => !win.isMinimized).sort((a, b) => a.z - b.z).map((win) => (
-                    <WindowFrame key={win.id} win={win} isActive={win.id === activeWindowId} onFocus={() => focusWindow(win.id)} onClose={() => closeWindow(win.id)} onMinimize={() => minimizeWindow(win.id)} onMaximize={() => maximizeWindow(win.id)} onMove={(x, y) => moveWindow(win.id, x, y)} onResize={(x, y, width, height) => resizeWindow(win.id, x, y, width, height)}>
+                    <WindowFrame key={win.id} win={win} glyph={windowGlyphsById.get(win.id)} isActive={win.id === activeWindowId} onFocus={() => focusWindow(win.id)} onClose={() => closeWindow(win.id)} onMinimize={() => minimizeWindow(win.id)} onMaximize={() => maximizeWindow(win.id)} onMove={(x, y) => moveWindow(win.id, x, y)} onResize={(x, y, width, height) => resizeWindow(win.id, x, y, width, height)}>
                       {windowContent[win.id]}
                     </WindowFrame>
                   ))}

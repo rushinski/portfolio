@@ -28,6 +28,7 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-color: #c0c0c0 #d4d0c8;
 }
 
 body {
@@ -55,10 +56,22 @@ body {
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--terminal-bg); }
-::-webkit-scrollbar-thumb { background: var(--terminal-dim); border-radius: 0; }
-::-webkit-scrollbar-thumb:hover { background: var(--terminal-green); }
+::-webkit-scrollbar { width: 15px; height: 15px; }
+::-webkit-scrollbar-track {
+  background: #d4d0c8;
+  border-left: 1px solid #ffffff;
+  border-top: 1px solid #ffffff;
+  border-right: 1px solid #808080;
+  border-bottom: 1px solid #808080;
+}
+::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border-left: 2px solid #ffffff;
+  border-top: 2px solid #ffffff;
+  border-right: 2px solid #808080;
+  border-bottom: 2px solid #808080;
+}
+::-webkit-scrollbar-thumb:hover { background: #d4d0c8; }
 
 /* Selection */
 ::selection { background: var(--terminal-green); color: var(--terminal-bg); }
@@ -233,7 +246,7 @@ body {
 }
 
 .os-titlebar {
-  background: linear-gradient(180deg, #1a56c9, var(--os-title));
+  background: var(--os-title);
   color: var(--os-title-text);
   font-weight: 700;
   font-size: 12px;

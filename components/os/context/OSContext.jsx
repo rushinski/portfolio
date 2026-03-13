@@ -14,6 +14,8 @@ import {
   INITIAL_ICON_POSITIONS,
   INITIAL_WINDOWS,
   SYSTEM_SPECS,
+  WINDOW_MIN_HEIGHT,
+  WINDOW_MIN_WIDTH,
   buildExplorerSystemItems,
   buildSystemDesktopIcons,
   canPinItemToTaskbar,
@@ -117,10 +119,6 @@ export function OSProvider({ children }) {
     setSettingsState((prev) => ({ ...prev, desktopColor }));
   }, []);
 
-  const setIconSizeMode = useCallback((iconSizeMode) => {
-    setSettingsState((prev) => ({ ...prev, iconSizeMode }));
-  }, []);
-
   const setWallpaperPattern = useCallback((wallpaperPattern) => {
     setSettingsState((prev) => ({ ...prev, wallpaperPattern }));
   }, []);
@@ -178,6 +176,70 @@ export function OSProvider({ children }) {
   );
 
   const nextZ = useCallback(() => ++topZRef.current, []);
+
+  const getDesktopBounds = useCallback(() => {
+    const rect = desktopElementRef.current?.getBoundingClientRect();
+    return {
+      width: Math.max(WINDOW_MIN_WIDTH + 40, Math.floor(rect?.width ?? 1200)),
+      height: Math.max(WINDOW_MIN_HEIGHT + 40, Math.floor(rect?.height ?? 700)),
+    };
+  }, []);
+
+  const normalizeWindowRect = useCallback((id, rect) => {
+    const bounds = getDesktopBounds();
+    const baseWindow = INITIAL_WINDOWS[id] || INITIAL_WINDOWS.welcome;
+    const width = clamp(
+      Math.round(rect.w ?? baseWindow.w ?? WINDOW_MIN_WIDTH),
+      WINDOW_MIN_WIDTH,
+      Math.max(WINDOW_MIN_WIDTH, bounds.width),
+    );
+    const height = clamp(
+      Math.round(rect.h ?? baseWindow.h ?? WINDOW_MIN_HEIGHT),
+      WINDOW_MIN_HEIGHT,
+      Math.max(WINDOW_MIN_HEIGHT, bounds.height),
+    );
+    const maxX = Math.max(0, bounds.width - width);
+    const maxY = Math.max(0, bounds.height - height);
+
+    return {
+      ...rect,
+      x: clamp(Math.round(rect.x ?? baseWindow.x ?? 0), 0, maxX),
+      y: clamp(Math.round(rect.y ?? baseWindow.y ?? 0), 0, maxY),
+      w: width,
+      h: height,
+    };
+  }, [getDesktopBounds]);
+
+  const centerWindowRect = useCallback((id, rect) => {
+    const bounds = getDesktopBounds();
+    const normalized = normalizeWindowRect(id, rect);
+
+    return {
+      ...normalized,
+      x: clamp(Math.round((bounds.width - normalized.w) / 2), 0, Math.max(0, bounds.width - normalized.w)),
+      y: clamp(Math.round((bounds.height - normalized.h) / 5), 0, Math.max(0, bounds.height - normalized.h)),
+    };
+  }, [getDesktopBounds, normalizeWindowRect]);
+
+  const normalizeWindowsForDesktop = useCallback((currentWindows) => {
+    let changed = false;
+    const next = { ...currentWindows };
+
+    Object.keys(next).forEach((id) => {
+      const win = next[id];
+      if (!win || win.isMaximized) {
+        return;
+      }
+
+      const normalized = normalizeWindowRect(id, win);
+      if (win.x !== normalized.x || win.y !== normalized.y || win.w !== normalized.w || win.h !== normalized.h) {
+        next[id] = { ...win, ...normalized };
+        changed = true;
+      }
+    });
+
+    return changed ? next : currentWindows;
+  }, [normalizeWindowRect]);
 
   const showAlertDialog = useCallback((message, options = {}) => {
     setSystemDialog({
@@ -319,7 +381,12 @@ export function OSProvider({ children }) {
 
   const registerDesktopElement = useCallback((node) => {
     desktopElementRef.current = node;
-  }, []);
+    if (!node) {
+      return;
+    }
+
+    setWindows((prev) => normalizeWindowsForDesktop(prev));
+  }, [normalizeWindowsForDesktop]);
 
   const showProtectedDeleteAlert = useCallback(() => {
     showAlertDialog(
@@ -363,23 +430,6 @@ export function OSProvider({ children }) {
     };
   }, []);
 
-  const normalizeIconPosition = useCallback((x, y) => {
-    const rect = desktopElementRef.current?.getBoundingClientRect();
-    const view = ICON_VIEW_MODES[allSettings.iconSizeMode] || ICON_VIEW_MODES.medium;
-    const maxWidth = rect?.width ?? 1200;
-    const maxHeight = rect?.height ?? 700;
-    const snapped = snapIconToGrid(x, y, allSettings.iconSizeMode, 12, 8);
-    const maxCol = Math.max(0, Math.floor((maxWidth - 12 - view.tileW) / view.cellX));
-    const maxRow = Math.max(0, Math.floor((maxHeight - 8 - view.tileH) / view.cellY));
-    const col = clamp(Math.round((snapped.x - 12) / view.cellX), 0, maxCol);
-    const row = clamp(Math.round((snapped.y - 8) / view.cellY), 0, maxRow);
-
-    return {
-      x: 12 + col * view.cellX,
-      y: 8 + row * view.cellY,
-    };
-  }, [allSettings.iconSizeMode]);
-
   const getItemsInFolder = useCallback((folderId = null) => (
     allFileSystemItems.filter((item) => (item.parentId ?? null) === (folderId ?? null))
   ), [allFileSystemItems]);
@@ -389,24 +439,54 @@ export function OSProvider({ children }) {
     [desktopItems],
   );
 
-  const getNextDesktopSlot = useCallback(() => {
+  const getIconView = useCallback((mode = allSettings.iconSizeMode) => (
+    ICON_VIEW_MODES[mode] || ICON_VIEW_MODES.medium
+  ), [allSettings.iconSizeMode]);
+
+  const getIconGridBounds = useCallback((mode = allSettings.iconSizeMode) => {
     const rect = desktopElementRef.current?.getBoundingClientRect();
-    const view = ICON_VIEW_MODES[allSettings.iconSizeMode] || ICON_VIEW_MODES.medium;
-    const rows = Math.max(1, Math.floor(((rect?.height ?? 700) - 8 - view.tileH) / view.cellY) + 1);
+    const view = getIconView(mode);
+    const maxWidth = rect?.width ?? 1200;
+    const maxHeight = rect?.height ?? 700;
+
+    return {
+      view,
+      maxWidth,
+      maxHeight,
+      maxCol: Math.max(0, Math.floor((maxWidth - 12 - view.tileW) / view.cellX)),
+      maxRow: Math.max(0, Math.floor((maxHeight - 8 - view.tileH) / view.cellY)),
+    };
+  }, [allSettings.iconSizeMode, getIconView]);
+
+  const normalizeIconPositionForMode = useCallback((x, y, mode = allSettings.iconSizeMode) => {
+    const { view, maxCol, maxRow } = getIconGridBounds(mode);
+    const snapped = snapIconToGrid(x, y, mode, 12, 8);
+    const col = clamp(Math.round((snapped.x - 12) / view.cellX), 0, maxCol);
+    const row = clamp(Math.round((snapped.y - 8) / view.cellY), 0, maxRow);
+
+    return {
+      x: 12 + col * view.cellX,
+      y: 8 + row * view.cellY,
+    };
+  }, [allSettings.iconSizeMode, getIconGridBounds]);
+
+  const normalizeIconPosition = useCallback((x, y) => (
+    normalizeIconPositionForMode(x, y, allSettings.iconSizeMode)
+  ), [allSettings.iconSizeMode, normalizeIconPositionForMode]);
+
+  const getNextDesktopSlot = useCallback((mode = allSettings.iconSizeMode) => {
+    const { view, maxHeight } = getIconGridBounds(mode);
+    const rows = Math.max(1, Math.floor((maxHeight - 8 - view.tileH) / view.cellY) + 1);
     const index = getRootDesktopItems().length;
     const col = Math.floor(index / rows);
     const row = index % rows;
 
-    return normalizeIconPosition(12 + col * view.cellX, 8 + row * view.cellY);
-  }, [allSettings.iconSizeMode, getRootDesktopItems, normalizeIconPosition]);
+    return normalizeIconPositionForMode(12 + col * view.cellX, 8 + row * view.cellY, mode);
+  }, [allSettings.iconSizeMode, getIconGridBounds, getRootDesktopItems, normalizeIconPositionForMode]);
 
-  const findFreeGridPosition = useCallback((targetX, targetY, excludeId = null, positions = iconPositionsRef.current) => {
-    const rect = desktopElementRef.current?.getBoundingClientRect();
-    const view = ICON_VIEW_MODES[allSettings.iconSizeMode] || ICON_VIEW_MODES.medium;
-    const maxCol = Math.max(0, Math.floor(((rect?.width ?? 1200) - 12 - view.tileW) / view.cellX));
-    const maxRow = Math.max(0, Math.floor(((rect?.height ?? 700) - 8 - view.tileH) / view.cellY));
-
-    const desired = normalizeIconPosition(targetX, targetY);
+  const findFreeGridPositionForMode = useCallback((targetX, targetY, mode = allSettings.iconSizeMode, excludeId = null, positions = iconPositionsRef.current) => {
+    const { view, maxCol, maxRow } = getIconGridBounds(mode);
+    const desired = normalizeIconPositionForMode(targetX, targetY, mode);
     const startCol = clamp(Math.round((desired.x - 12) / view.cellX), 0, maxCol);
     const startRow = clamp(Math.round((desired.y - 8) / view.cellY), 0, maxRow);
     const occupied = new Set();
@@ -447,7 +527,48 @@ export function OSProvider({ children }) {
     }
 
     return desired;
-  }, [allSettings.iconSizeMode, getRootDesktopItems, normalizeIconPosition]);
+  }, [allSettings.iconSizeMode, getIconGridBounds, getRootDesktopItems, normalizeIconPositionForMode]);
+
+  const findFreeGridPosition = useCallback((targetX, targetY, excludeId = null, positions = iconPositionsRef.current) => (
+    findFreeGridPositionForMode(targetX, targetY, allSettings.iconSizeMode, excludeId, positions)
+  ), [allSettings.iconSizeMode, findFreeGridPositionForMode]);
+
+  const setIconSizeMode = useCallback((nextIconSizeMode) => {
+    if (!ICON_VIEW_MODES[nextIconSizeMode] || nextIconSizeMode === allSettings.iconSizeMode) {
+      return;
+    }
+
+    const previousView = getIconView(allSettings.iconSizeMode);
+    const nextView = getIconView(nextIconSizeMode);
+
+    setIconPositions((prev) => {
+      const ordered = [...getRootDesktopItems()].sort((a, b) => {
+        const positionA = prev[a.id] || INITIAL_ICON_POSITIONS[a.id] || { x: 99999, y: 99999 };
+        const positionB = prev[b.id] || INITIAL_ICON_POSITIONS[b.id] || { x: 99999, y: 99999 };
+        if (positionA.x === positionB.x) {
+          return positionA.y - positionB.y;
+        }
+        return positionA.x - positionB.x;
+      });
+      const next = { ...prev };
+      const assignedPositions = {};
+
+      ordered.forEach((item) => {
+        const current = prev[item.id] || INITIAL_ICON_POSITIONS[item.id] || { x: 12, y: 8 };
+        const col = Math.max(0, Math.round((current.x - 12) / previousView.cellX));
+        const row = Math.max(0, Math.round((current.y - 8) / previousView.cellY));
+        const targetX = 12 + col * nextView.cellX;
+        const targetY = 8 + row * nextView.cellY;
+        const mappedPosition = findFreeGridPositionForMode(targetX, targetY, nextIconSizeMode, item.id, assignedPositions);
+        assignedPositions[item.id] = mappedPosition;
+        next[item.id] = mappedPosition;
+      });
+
+      return next;
+    });
+
+    setSettingsState((prev) => ({ ...prev, iconSizeMode: nextIconSizeMode }));
+  }, [allSettings.iconSizeMode, findFreeGridPositionForMode, getIconView, getRootDesktopItems]);
 
   const getItemById = useCallback((id) => itemsById.get(id) || null, [itemsById]);
 
@@ -602,36 +723,43 @@ export function OSProvider({ children }) {
       };
 
       if (id === "welcome") {
+        const welcomeWindow = centerWindowRect(id, {
+          ...INITIAL_WINDOWS.welcome,
+          ...openedWindow,
+          isOpen: true,
+          isMinimized: false,
+          isMaximized: false,
+        });
         return {
           ...prev,
-          [id]: {
-            ...openedWindow,
-            isMaximized: false,
-            x: 250,
-            y: 95,
-            w: 800,
-            h: 540,
-          },
+          [id]: welcomeWindow,
         };
       }
 
       if (id === "explorer") {
+        const explorerWindow = openedWindow.isMaximized
+          ? openedWindow
+          : normalizeWindowRect("explorer", openedWindow);
         return {
           ...prev,
           explorer: {
-            ...openedWindow,
+            ...explorerWindow,
             title: getExplorerTitle(explorerState.currentFolderId),
           },
         };
       }
 
+      const normalizedWindow = openedWindow.isMaximized
+        ? openedWindow
+        : normalizeWindowRect(id, openedWindow);
+
       return {
         ...prev,
-        [id]: openedWindow,
+        [id]: normalizedWindow,
       };
     });
     playUiSound("open");
-  }, [explorerState.currentFolderId, getExplorerTitle, nextZ, playUiSound]);
+  }, [centerWindowRect, explorerState.currentFolderId, getExplorerTitle, nextZ, normalizeWindowRect, playUiSound]);
 
   const openVideoApp = useCallback((videoId = null) => {
     if (videoId && VIDEO_LIBRARY_BY_ID[videoId]) {
@@ -650,19 +778,25 @@ export function OSProvider({ children }) {
       searchQuery: options.preserveSearch ? prev.searchQuery : "",
     }));
 
-    setWindows((prev) => ({
-      ...prev,
-      explorer: {
+    setWindows((prev) => {
+      const explorerWindow = {
         ...prev.explorer,
         title: getExplorerTitle(folderId),
         isOpen: true,
         isMinimized: false,
         z: nextZ(),
-      },
-    }));
+      };
+
+      return {
+        ...prev,
+        explorer: explorerWindow.isMaximized
+          ? explorerWindow
+          : normalizeWindowRect("explorer", explorerWindow),
+      };
+    });
 
     playUiSound("open");
-  }, [getExplorerTitle, nextZ, playUiSound]);
+  }, [getExplorerTitle, nextZ, normalizeWindowRect, playUiSound]);
 
   const explorerNavigateTo = useCallback((folderId) => {
     setExplorerState((prev) => ({
@@ -1219,12 +1353,25 @@ export function OSProvider({ children }) {
   }, [playUiSound]);
 
   const maximizeWindow = useCallback((id) => {
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], isMaximized: !prev[id].isMaximized, z: nextZ() },
-    }));
+    setWindows((prev) => {
+      const current = prev[id];
+      if (!current) {
+        return prev;
+      }
+
+      const nextWindow = {
+        ...current,
+        isMaximized: !current.isMaximized,
+        z: nextZ(),
+      };
+
+      return {
+        ...prev,
+        [id]: nextWindow.isMaximized ? nextWindow : normalizeWindowRect(id, nextWindow),
+      };
+    });
     playUiSound("click");
-  }, [nextZ, playUiSound]);
+  }, [nextZ, normalizeWindowRect, playUiSound]);
 
   const focusWindow = useCallback((id) => {
     setWindows((prev) => {
@@ -1245,18 +1392,32 @@ export function OSProvider({ children }) {
   }, [nextZ]);
 
   const moveWindow = useCallback((id, x, y) => {
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], x, y, isMaximized: false },
-    }));
-  }, []);
+    setWindows((prev) => {
+      const current = prev[id];
+      if (!current) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        [id]: normalizeWindowRect(id, { ...current, x, y, isMaximized: false }),
+      };
+    });
+  }, [normalizeWindowRect]);
 
   const resizeWindow = useCallback((id, x, y, w, h) => {
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], x, y, w, h, isMaximized: false },
-    }));
-  }, []);
+    setWindows((prev) => {
+      const current = prev[id];
+      if (!current) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        [id]: normalizeWindowRect(id, { ...current, x, y, w, h, isMaximized: false }),
+      };
+    });
+  }, [normalizeWindowRect]);
 
   const closeAllWindows = useCallback(() => {
     setWindows((prev) => {
@@ -1269,20 +1430,32 @@ export function OSProvider({ children }) {
   }, []);
 
   const cascadeWindows = useCallback(() => {
+    const bounds = getDesktopBounds();
     setWindows((prev) => {
       const next = { ...prev };
       let offset = 0;
       Object.keys(next).forEach((id) => {
         if (next[id].isOpen) {
-          next[id] = { ...next[id], x: 100 + offset, y: 20 + offset, isMaximized: false, isMinimized: false, z: nextZ() };
-          offset += 30;
+          const cascadedWindow = normalizeWindowRect(id, {
+            ...next[id],
+            x: 32 + offset,
+            y: 24 + offset,
+            w: Math.min(next[id].w ?? INITIAL_WINDOWS[id]?.w ?? 760, bounds.width),
+            h: Math.min(next[id].h ?? INITIAL_WINDOWS[id]?.h ?? 520, bounds.height),
+            isMaximized: false,
+            isMinimized: false,
+            z: nextZ(),
+          });
+          next[id] = { ...next[id], ...cascadedWindow };
+          offset = (offset + 28) % 168;
         }
       });
       return next;
     });
-  }, [nextZ]);
+  }, [getDesktopBounds, nextZ, normalizeWindowRect]);
 
   const tileWindows = useCallback(() => {
+    const bounds = getDesktopBounds();
     setWindows((prev) => {
       const next = { ...prev };
       const openIds = Object.keys(next).filter((id) => next[id].isOpen);
@@ -1296,12 +1469,16 @@ export function OSProvider({ children }) {
       openIds.forEach((id, index) => {
         const col = index % cols;
         const row = Math.floor(index / cols);
+        const x = Math.floor((col * bounds.width) / cols);
+        const y = Math.floor((row * bounds.height) / rows);
+        const nextX = Math.max(0, x);
+        const nextY = Math.max(0, y);
         next[id] = {
           ...next[id],
-          x: col * (800 / cols),
-          y: row * (550 / rows),
-          w: 800 / cols,
-          h: 550 / rows,
+          x: nextX,
+          y: nextY,
+          w: Math.max(1, Math.floor(((col + 1) * bounds.width) / cols) - nextX),
+          h: Math.max(1, Math.floor(((row + 1) * bounds.height) / rows) - nextY),
           isMaximized: false,
           isMinimized: false,
           z: nextZ(),
@@ -1310,7 +1487,7 @@ export function OSProvider({ children }) {
 
       return next;
     });
-  }, [nextZ]);
+  }, [getDesktopBounds, nextZ]);
 
   const openWindows = useMemo(
     () => Object.values(windows).filter((win) => win.isOpen),

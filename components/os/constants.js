@@ -5,6 +5,8 @@ import { Icons } from "./icons";
 export const GRID = 1;
 export const snap = (n) => Math.round(n / GRID) * GRID;
 export const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
+export const WINDOW_MIN_WIDTH = 280;
+export const WINDOW_MIN_HEIGHT = 180;
 
 export const ICON_VIEW_MODES = {
   small: { tileW: 68, tileH: 80, glyphScale: 0.85, labelSize: 10, cellX: 78, cellY: 94, maxLabel: 72 },
@@ -98,36 +100,35 @@ export const DESKTOP_COLORS = [
 
 export const INITIAL_ICON_POSITIONS = {
   welcome: { x: 12, y: 8 },
-  about: { x: 12, y: 104 },
-  skills: { x: 12, y: 200 },
-  experience: { x: 12, y: 296 },
-  projects: { x: 12, y: 392 },
-  videos: { x: 112, y: 296 },
-  github: { x: 12, y: 488 },
-  contact: { x: 12, y: 584 },
-  terminal: { x: 12, y: 680 },
-  trash: { x: 112, y: 680 },
+  about: { x: 12, y: 110 },
+  skills: { x: 12, y: 212 },
+  experience: { x: 12, y: 314 },
+  contact: { x: 12, y: 416 },
   explorer: { x: 112, y: 8 },
-  settings: { x: 112, y: 104 },
-  location: { x: 112, y: 200 },
-  resume: { x: 112, y: 392 },
+  projects: { x: 112, y: 110 },
+  videos: { x: 112, y: 212 },
+  resume: { x: 112, y: 314 },
+  settings: { x: 212, y: 8 },
+  terminal: { x: 212, y: 110 },
+  location: { x: 212, y: 212 },
+  trash: { x: 212, y: 314 },
 };
 
 export const INITIAL_WINDOWS = {
-  welcome: { id: "welcome", title: "Welcome", x: 250, y: 95, w: 800, h: 500, isOpen: true, isMinimized: false, isMaximized: false, z: 11 },
-  about: { id: "about", title: "About", x: 30, y: 20, w: 1200, h: 600, isOpen: false, isMinimized: false, isMaximized: false, z: 10 },
-  skills: { id: "skills", title: "Skills", x: 180, y: 50, w: 950, h: 550, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
-  experience: { id: "experience", title: "Experience", x: 180, y: 50, w: 560, h: 480, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
-  projects: { id: "projects", title: "Projects", x: 100, y: 20, w: 600, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
-  videos: { id: "videos", title: "Videos", x: 140, y: 40, w: 840, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
-  contact: { id: "contact", title: "Contact", x: 260, y: 80, w: 400, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
-  location: { id: "location", title: "Jacobs Time", x: 280, y: 110, w: 560, h: 300, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
-  terminal: { id: "terminal", title: "Terminal", x: 120, y: 50, w: 500, h: 350, isOpen: false, isMinimized: false, isMaximized: false, z: 4 },
-  trash: { id: "trash", title: "Recycle Bin", x: 300, y: 100, w: 320, h: 260, isOpen: false, isMinimized: false, isMaximized: false, z: 3 },
-  explorer: { id: "explorer", title: "File Explorer", x: 180, y: 64, w: 660, h: 430, isOpen: false, isMinimized: false, isMaximized: false, z: 2 },
-  settings: { id: "settings", title: "Settings", x: 220, y: 76, w: 600, h: 460, isOpen: false, isMinimized: false, isMaximized: false, z: 1 },
-  textdoc: { id: "textdoc", title: "Text Document", x: 240, y: 80, w: 520, h: 360, isOpen: false, isMinimized: false, isMaximized: false, z: 12 },
-  resume: { id: "resume", title: "Resume.pdf", x: 80, y: 30, w: 760, h: 600, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
+  welcome: { id: "welcome", title: "Welcome", x: 220, y: 56, w: 820, h: 560, isOpen: true, isMinimized: false, isMaximized: false, z: 11 },
+  about: { id: "about", title: "About", x: 72, y: 44, w: 920, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 10 },
+  skills: { id: "skills", title: "Skills", x: 132, y: 68, w: 860, h: 520, isOpen: false, isMinimized: false, isMaximized: false, z: 9 },
+  experience: { id: "experience", title: "Experience", x: 188, y: 82, w: 720, h: 500, isOpen: false, isMinimized: false, isMaximized: false, z: 8 },
+  projects: { id: "projects", title: "Projects", x: 156, y: 60, w: 820, h: 560, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
+  videos: { id: "videos", title: "Videos", x: 140, y: 52, w: 920, h: 580, isOpen: false, isMinimized: false, isMaximized: false, z: 7 },
+  contact: { id: "contact", title: "Contact", x: 292, y: 92, w: 460, h: 420, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
+  location: { id: "location", title: "Jacobs Time", x: 324, y: 118, w: 460, h: 272, isOpen: false, isMinimized: false, isMaximized: false, z: 5 },
+  terminal: { id: "terminal", title: "Terminal", x: 124, y: 92, w: 640, h: 400, isOpen: false, isMinimized: false, isMaximized: false, z: 4 },
+  trash: { id: "trash", title: "Recycle Bin", x: 380, y: 126, w: 420, h: 300, isOpen: false, isMinimized: false, isMaximized: false, z: 3 },
+  explorer: { id: "explorer", title: "File Explorer", x: 148, y: 66, w: 860, h: 540, isOpen: false, isMinimized: false, isMaximized: false, z: 2 },
+  settings: { id: "settings", title: "Settings", x: 214, y: 88, w: 700, h: 520, isOpen: false, isMinimized: false, isMaximized: false, z: 1 },
+  textdoc: { id: "textdoc", title: "Text Document", x: 248, y: 100, w: 560, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 12 },
+  resume: { id: "resume", title: "Resume.pdf", x: 112, y: 44, w: 900, h: 620, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
 };
 
 export const canPinItemToTaskbar = (item) => item?.itemType === "app" && !!item.windowId;
