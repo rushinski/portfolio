@@ -23,8 +23,8 @@ const SKILL_ICON_FILES = {
   PHP: "PHP.png",
   HTML: "HTML5.png",
   CSS: "CSS3.png",
-  "Node.js": "Node.js.png",
-  "Next.js": "Next.js.png",
+  "Node.js": "Nodejs.png",
+  "Next.js": "Nextjs.png",
   Flask: "Flask.png",
   React: "React.png",
   PostgreSQL: "PostgresSQL.png",
@@ -33,8 +33,8 @@ const SKILL_ICON_FILES = {
   Redis: "Redis.png",
   "Tailwind CSS": "TailwindCSS.png",
   Stripe: "stripe.webp",
-  Supabase: "supabase.png",
-  "Discord.js": "Discord.js.png",
+  Supabase: "supabase.webp",
+  "Discord.js": "Discordjs.png",
   ADBKit: "Android.png",
   "AWS SES": "AWS.png",
   Docker: "Docker.png",
@@ -55,7 +55,7 @@ const PROFICIENCY_LABELS = {
 };
 
 const PROFICIENCY_COLORS = {
-  1: "#b9d7ff",
+  1: "#c8e0ff",
   2: "#8fb8ee",
   3: "#5f92da",
   4: "#2f67bf",
@@ -73,7 +73,6 @@ function getLevelColor(level) {
 function ProficiencyMeter({ level, compact = false }) {
   const segmentWidth = compact ? 12 : 13;
   const segmentHeight = compact ? 7 : 8;
-  const fillColor = getLevelColor(level);
 
   return (
     <div
@@ -87,14 +86,16 @@ function ProficiencyMeter({ level, compact = false }) {
       }}
     >
       {Array.from({ length: 5 }, (_, index) => {
+        const segmentLevel = index + 1;
         const filled = index < level;
+
         return (
           <span
             key={`${level}-${index}`}
             style={{
               width: segmentWidth,
               height: segmentHeight,
-              background: filled ? fillColor : "#e7e7e7",
+              background: filled ? getLevelColor(segmentLevel) : "#e7e7e7",
               border: `1px solid ${filled ? "#404040" : "#9b9b9b"}`,
               boxSizing: "border-box",
             }}
@@ -125,36 +126,66 @@ function ProficiencyKey() {
   );
 }
 
-function SkillLevelChart({ counts }) {
-  const maxCount = Math.max(...Object.values(counts), 1);
+function SkillLevelDonutChart({ counts }) {
+  const items = [1, 2, 3, 4, 5].map((level) => ({
+    level,
+    label: PROFICIENCY_LABELS[level],
+    count: counts[level] || 0,
+    color: getLevelColor(level),
+  }));
+  const totalCount = items.reduce((sum, item) => sum + item.count, 0);
+  const donutItems = items.filter((item) => item.count > 0);
+
+  if (totalCount === 0) {
+    return null;
+  }
+
+  const size = 78;
+  const cx = size / 2;
+  const cy = size / 2;
+  const radius = size / 2 - 2;
+  const innerRadius = radius * 0.52;
+  let angle = -Math.PI / 2;
+
+  const paths = donutItems.map((item) => {
+    const sweep = Math.min((item.count / totalCount) * 2 * Math.PI, 2 * Math.PI * 0.9999);
+    const start = angle;
+    const end = angle + sweep;
+    angle += (item.count / totalCount) * 2 * Math.PI;
+
+    const large = sweep > Math.PI ? 1 : 0;
+    const format = (value) => value.toFixed(2);
+
+    return {
+      key: item.level,
+      color: item.color,
+      d: `M ${format(cx + radius * Math.cos(start))} ${format(cy + radius * Math.sin(start))} A ${radius} ${radius} 0 ${large} 1 ${format(cx + radius * Math.cos(end))} ${format(cy + radius * Math.sin(end))} L ${format(cx + innerRadius * Math.cos(end))} ${format(cy + innerRadius * Math.sin(end))} A ${innerRadius} ${innerRadius} 0 ${large} 0 ${format(cx + innerRadius * Math.cos(start))} ${format(cy + innerRadius * Math.sin(start))} Z`,
+    };
+  });
 
   return (
     <div style={{ ...APP_PANEL_STYLE, padding: "8px 10px" }}>
-      <div style={{ fontSize: 10, fontWeight: 700, color: "#444", marginBottom: 8 }}>Skill Level Breakdown</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-        {[1, 2, 3, 4, 5].map((level) => {
-          const count = counts[level] || 0;
-          const width = `${(count / maxCount) * 100}%`;
+      <div style={{ fontSize: 10, fontWeight: 700, color: "#444", marginBottom: 2 }}>Skill Levels</div>
+      <div style={{ fontSize: 9, color: "#777", marginBottom: 8 }}>by share of skills</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: "block", flexShrink: 0 }}>
+          {paths.map((path) => (
+            <path key={path.key} d={path.d} fill={path.color} stroke={WIN95_COLORS.surface} strokeWidth={1} />
+          ))}
+        </svg>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
+          {items.map((item) => {
+            const percentage = Math.round((item.count / totalCount) * 100);
 
-          return (
-            <div key={level} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 10, color: "#333" }}>
-                <span>{PROFICIENCY_LABELS[level]}</span>
-                <span>{count}</span>
+            return (
+              <div key={item.level} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, color: "#333", minWidth: 0 }}>
+                <span style={{ width: 8, height: 8, background: item.color, border: "1px solid rgba(0,0,0,0.15)", boxSizing: "border-box", flexShrink: 0 }} />
+                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>{item.label}</span>
+                <span style={{ color: "#666", marginLeft: "auto", flexShrink: 0 }}>{percentage}%</span>
               </div>
-              <div style={{ ...RAISED_BORDER, background: "#ececec", padding: 2 }}>
-                <div
-                  style={{
-                    height: 10,
-                    width,
-                    minWidth: count > 0 ? 10 : 0,
-                    background: getLevelColor(level),
-                  }}
-                />
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -282,7 +313,7 @@ export default function SkillsApp() {
 
           <div style={{ flex: "0 0 230px", width: 230, display: "flex", flexDirection: "column", gap: 10 }}>
             <ProficiencyKey />
-            <SkillLevelChart counts={levelBreakdown} />
+            <SkillLevelDonutChart counts={levelBreakdown} />
           </div>
         </div>
       </div>
