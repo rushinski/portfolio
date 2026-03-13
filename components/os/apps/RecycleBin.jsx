@@ -5,6 +5,7 @@ import { cloneElement, useEffect, useMemo, useState } from "react";
 import { useDialogs } from "../hooks/useDialogs";
 import { useFileSystem } from "../hooks/useFileSystem";
 import { useWindowManager } from "../hooks/useWindowManager";
+import { GLOBAL_CONTEXT_MENU_EVENT, announceContextMenuOpen } from "../ui/contextMenu";
 import {
   ETCHED_SEPARATOR_STYLE,
   INSET_BORDER,
@@ -138,6 +139,19 @@ export default function RecycleBinApp() {
       setSelectedItemId(null);
     }
   }, [selectedItemId, sortedItems]);
+
+  useEffect(() => {
+    const handleForeignContextMenu = (event) => {
+      if (event.detail?.source === "recycle-bin") {
+        return;
+      }
+
+      setContextMenu(null);
+    };
+
+    window.addEventListener(GLOBAL_CONTEXT_MENU_EVENT, handleForeignContextMenu);
+    return () => window.removeEventListener(GLOBAL_CONTEXT_MENU_EVENT, handleForeignContextMenu);
+  }, []);
 
   const handleRestore = (id) => {
     const restored = restoreRecycleBinItem(id);
@@ -317,6 +331,7 @@ export default function RecycleBinApp() {
                       onContextMenu={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
+                        announceContextMenuOpen("recycle-bin");
                         setSelectedItemId(entry.item.id);
                         setContextMenu({
                           x: event.clientX,

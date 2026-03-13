@@ -152,6 +152,58 @@ export const STATUS_BAR_FIELD_STYLE = {
   fontSize: 11,
 };
 
+export const APP_BODY_STYLE = {
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+  background: WIN95_COLORS.surface,
+  color: WIN95_COLORS.text,
+  fontFamily: WIN95_FONT_FAMILY,
+  overflow: "hidden",
+};
+
+export const APP_CONTENT_STYLE = {
+  ...INSET_BORDER,
+  flex: 1,
+  minHeight: 0,
+  margin: 6,
+  padding: "10px 12px",
+  background: WIN95_COLORS.field,
+  boxSizing: "border-box",
+  overflow: "auto",
+};
+
+export const APP_PANEL_STYLE = {
+  ...RAISED_BORDER,
+  background: WIN95_COLORS.surfaceRaised,
+  padding: "8px 10px",
+  boxSizing: "border-box",
+};
+
+export const APP_FIELD_STYLE = {
+  ...INSET_BORDER,
+  background: WIN95_COLORS.field,
+  padding: "8px 10px",
+  boxSizing: "border-box",
+};
+
+export const APP_SECTION_HEADER_STYLE = {
+  fontSize: 10,
+  fontWeight: 700,
+  color: WIN95_COLORS.titleStart,
+  textTransform: "uppercase",
+  letterSpacing: 1,
+  paddingBottom: 4,
+  marginBottom: 8,
+  borderBottom: `1px solid ${WIN95_COLORS.borderDark}`,
+};
+
+export const APP_META_TEXT_STYLE = {
+  fontSize: 11,
+  color: WIN95_COLORS.textMuted,
+  lineHeight: 1.5,
+};
+
 export function getDialogIconStyles(variant = "info") {
   const variantMap = {
     info: { background: "#e9f1ff", border: "#000080", accent: "#1084d0", label: "i" },

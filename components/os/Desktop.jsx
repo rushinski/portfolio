@@ -14,6 +14,7 @@ import { useFileSystem } from "./hooks/useFileSystem";
 import { useSettings } from "./hooks/useSettings";
 import { useWindowManager } from "./hooks/useWindowManager";
 import { WIN95_FONT_FAMILY, WIN95_SCROLLBAR_CSS } from "./ui/retro";
+import { GLOBAL_CONTEXT_MENU_EVENT, announceContextMenuOpen } from "./ui/contextMenu";
 import AboutApp from "./apps/About";
 import ContactApp from "./apps/Contact";
 import ExperienceApp from "./apps/Experience";
@@ -448,6 +449,7 @@ export default function Desktop() {
   }, []);
 
   const openIconMenuAt = useCallback((id, clientX, clientY) => {
+    announceContextMenuOpen("desktop");
     rememberDesktopCursor(clientX, clientY);
     const rect = desktopRef.current?.getBoundingClientRect();
     const view = ICON_VIEW_MODES[iconSizeMode] || ICON_VIEW_MODES.medium;
@@ -478,6 +480,7 @@ export default function Desktop() {
   }, [rememberDesktopCursor, iconPositions, iconSizeMode, toDesktopPoint]);
 
   const openDesktopMenuAt = useCallback((clientX, clientY) => {
+    announceContextMenuOpen("desktop");
     rememberDesktopCursor(clientX, clientY);
     const point = toDesktopPoint(clientX, clientY);
     setDesktopMenu({ x: point.x, y: point.y });
@@ -612,6 +615,21 @@ export default function Desktop() {
     textdoc: <TextDocumentApp />,
     resume: <ResumeApp />,
   };
+
+  useEffect(() => {
+    const handleForeignContextMenu = (event) => {
+      if (event.detail?.source === "desktop") {
+        return;
+      }
+
+      setIconMenu(null);
+      setDesktopMenu(null);
+      setDesktopViewMenuOpen(false);
+    };
+
+    window.addEventListener(GLOBAL_CONTEXT_MENU_EVENT, handleForeignContextMenu);
+    return () => window.removeEventListener(GLOBAL_CONTEXT_MENU_EVENT, handleForeignContextMenu);
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event) => {

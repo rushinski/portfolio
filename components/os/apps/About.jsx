@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { PERSONAL } from "../data";
 import { useWindowManager } from "../hooks/useWindowManager";
+import { APP_PANEL_STYLE, APP_SECTION_HEADER_STYLE, WIN95_COLORS, getWin95ButtonStyle } from "../ui/retro";
 
 const LANG_COLORS = {
   JavaScript: "#f1e05a",
@@ -48,7 +49,7 @@ function DonutChart({ langs, size = 84 }) {
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: "block", flexShrink: 0 }}>
       {paths.map((path, index) => (
-        <path key={`${path.color}-${index}`} d={path.d} fill={path.color} stroke="#f0f4f8" strokeWidth={1} />
+        <path key={`${path.color}-${index}`} d={path.d} fill={path.color} stroke={WIN95_COLORS.surface} strokeWidth={1} />
       ))}
     </svg>
   );
@@ -83,7 +84,7 @@ export default function AboutApp() {
       <div style={{ display: "flex", gap: 24, marginBottom: 16, alignItems: "flex-start" }}>
         <div style={{ flex: "0 0 270px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-            <div style={{ width: 56, height: 56, background: "linear-gradient(135deg, #000080, #0000c0)", display: "grid", placeItems: "center", color: "#fff", fontSize: 22, fontWeight: 800, flexShrink: 0, border: "2px solid #808080" }}>
+            <div style={{ width: 56, height: 56, background: "#000080", display: "grid", placeItems: "center", color: "#fff", fontSize: 22, fontWeight: 800, flexShrink: 0, border: "2px solid #808080" }}>
               JR
             </div>
             <div>
@@ -112,18 +113,8 @@ export default function AboutApp() {
             <button
               onClick={() => openWindow("resume")}
               style={{
-                background: "#000080",
-                color: "#fff",
-                border: "none",
-                borderTop: "2px solid #3366cc",
-                borderLeft: "2px solid #3366cc",
-                borderRight: "2px solid #000040",
-                borderBottom: "2px solid #000040",
-                padding: "5px 14px",
-                fontSize: 11,
+                ...getWin95ButtonStyle({ padding: "5px 14px" }),
                 fontWeight: 700,
-                cursor: "pointer",
-                fontFamily: "inherit",
               }}
             >
               View Resume
@@ -131,18 +122,8 @@ export default function AboutApp() {
             <button
               onClick={() => openWindow("contact")}
               style={{
-                background: "#c0c0c0",
-                color: "#111",
-                border: "none",
-                borderTop: "2px solid #fff",
-                borderLeft: "2px solid #fff",
-                borderRight: "2px solid #404040",
-                borderBottom: "2px solid #404040",
-                padding: "5px 14px",
-                fontSize: 11,
+                ...getWin95ButtonStyle({ padding: "5px 14px" }),
                 fontWeight: 600,
-                cursor: "pointer",
-                fontFamily: "inherit",
               }}
             >
               Contact Me
@@ -151,9 +132,9 @@ export default function AboutApp() {
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>About Me</div>
+          <div style={{ ...APP_SECTION_HEADER_STYLE, marginBottom: 6 }}>About Me</div>
           <div style={{ fontSize: 12, color: "#333", lineHeight: 1.75 }}>
-            Hi, I'm Jacob Rushinski!<br /><br />I'm currently attending Thaddeus Stevens College of Technology, graduating with an Associate's in Computer Software Engineering Technology in May 2026. I'm looking for Backend, Full-Stack, or related roles near Philadelphia, PA (≤50mi) or nationwide remote.<br /><br />Right now I'm rebuilding a{" "}
+            Hi, I'm Jacob Rushinski!<br /><br />I'm currently attending Thaddeus Stevens College of Technology, graduating with an Associate's in Computer Software Engineering Technology in May 2026. I'm looking for Backend, Full-Stack, or related roles near Philadelphia, PA (within 50mi) or nationwide remote.<br /><br />Right now I'm rebuilding a{" "}
             <button onClick={() => openWindow("projects")} style={{ background: "none", border: "none", padding: 0, color: "#000080", fontWeight: 700, cursor: "pointer", fontFamily: "inherit", fontSize: 12, textDecoration: "underline" }}>
               multi-tenant sneaker marketplace
             </button>
@@ -188,12 +169,12 @@ export default function AboutApp() {
 
         return (
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, borderBottom: "2px solid #000080", paddingBottom: 4, marginBottom: 10 }}>
+            <div style={APP_SECTION_HEADER_STYLE}>
               Coding Stats
             </div>
             <div style={{ overflowX: "auto" }}>
               <div style={{ display: "flex", gap: 12, alignItems: "stretch", width: "max-content" }}>
-                <div style={{ flexShrink: 0, background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px", display: "flex", flexDirection: "column" }}>
+                <div style={{ ...APP_PANEL_STYLE, flexShrink: 0, padding: "10px 12px", display: "flex", flexDirection: "column" }}>
                   <div style={{ fontSize: 11, color: "#555", marginBottom: 8 }}>{total.toLocaleString()} contributions in the last year</div>
                   <div style={{ position: "relative", marginLeft: 24, height: 14, marginBottom: 3 }}>
                     {monthMarkers.map(({ weekIndex, label }) => (
@@ -223,7 +204,7 @@ export default function AboutApp() {
                   </div>
                   <div style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                     <div style={{ fontSize: 10, color: "#555", minHeight: 13 }}>
-                      {ghHovered ? `${ghHovered.date} — ${ghHovered.contributionCount} contribution${ghHovered.contributionCount !== 1 ? "s" : ""}` : "\u00A0"}
+                      {ghHovered ? `${ghHovered.date} - ${ghHovered.contributionCount} contribution${ghHovered.contributionCount !== 1 ? "s" : ""}` : "\u00A0"}
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, color: "#777", flexShrink: 0 }}>
                       <span>Less</span>
@@ -236,7 +217,7 @@ export default function AboutApp() {
                 </div>
 
                 {langs.length > 0 && (
-                  <div style={{ flexShrink: 0, background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px" }}>
+                  <div style={{ ...APP_PANEL_STYLE, flexShrink: 0, padding: "10px 12px" }}>
                     <div style={{ fontSize: 11, color: "#555", marginBottom: 2 }}>Repo Languages</div>
                     <div style={{ fontSize: 9, color: "#888", marginBottom: 8 }}>by number of repos</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -254,7 +235,7 @@ export default function AboutApp() {
                   </div>
                 )}
 
-                <div style={{ flexShrink: 0, background: "#f0f4f8", border: "2px inset #c0c0c0", padding: "10px 12px" }}>
+                <div style={{ ...APP_PANEL_STYLE, flexShrink: 0, padding: "10px 12px" }}>
                   <div style={{ fontSize: 11, color: "#555", marginBottom: 2 }}>Top Skills</div>
                   <div style={{ fontSize: 9, color: "#888", marginBottom: 8 }}>my strongest technologies</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>

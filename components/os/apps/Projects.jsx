@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { PROJECTS, VIDEO_LIBRARY_BY_ID } from "../data";
 import { useWindowManager } from "../hooks/useWindowManager";
+import { APP_BODY_STYLE, APP_CONTENT_STYLE } from "../ui/retro";
 
 function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
   const ghRepo = project.links?.github ? repoData[project.links.github] : null;
@@ -26,7 +27,7 @@ function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
 
   const bullet = (text, key) => (
     <div key={key} style={{ fontSize: 11, color: "#222", padding: "1px 0 2px 13px", position: "relative", lineHeight: 1.6 }}>
-      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>{">"}</span>
       {text}
     </div>
   );
@@ -36,7 +37,7 @@ function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
     const hasPrefix = colonIndex > 0 && colonIndex < 55;
     return (
       <div key={key} style={{ fontSize: 11, color: "#222", padding: "1px 0 3px 13px", position: "relative", lineHeight: 1.6 }}>
-        <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+        <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>{">"}</span>
         {hasPrefix
           ? <><strong style={{ color: "#111" }}>{text.slice(0, colonIndex)}:</strong>{" "}{text.slice(colonIndex + 2)}</>
           : text}
@@ -45,11 +46,11 @@ function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
   };
 
   return (
-    <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "10px 12px 14px", background: "#fff" }}>
+    <div style={{ ...APP_CONTENT_STYLE, padding: "10px 12px 14px" }}>
       {onBackToList && (
         <div style={{ marginBottom: 8 }}>
           <button onClick={onBackToList} style={{ padding: "2px 10px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer" }}>
-            ◄ Back to Projects
+            Back to Projects
           </button>
         </div>
       )}
@@ -97,12 +98,12 @@ function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
                 )}
                 {project.links?.live && (
                   <button onClick={() => window.open(project.links.live, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
-                    🌐 Live Site
+                    Live Site
                   </button>
                 )}
                 {project.links?.landing && (
                   <button onClick={() => window.open(project.links.landing, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
-                    📄 Landing Page
+                    Landing Page
                   </button>
                 )}
               </div>
@@ -122,7 +123,7 @@ function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
                       </div>
                       <div style={{ flex: 1, padding: "5px 8px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3 }}>
                         <div style={{ fontSize: 10, fontWeight: 700, color: "#111" }}>{mappedVideo.label}</div>
-                        <div style={{ fontSize: 9, color: "#000080", fontWeight: 700 }}>▶ Open in Videos</div>
+                        <div style={{ fontSize: 9, color: "#000080", fontWeight: 700 }}>Open in Videos</div>
                       </div>
                     </button>
                   );
@@ -198,13 +199,13 @@ export default function ProjectsApp() {
   }, []);
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#fff", fontFamily: "inherit", overflow: "hidden" }}>
+    <div style={APP_BODY_STYLE}>
       {currentView.type === "list" ? (
-        <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "10px 12px", background: "#fff" }}>
+        <div style={{ ...APP_CONTENT_STYLE, padding: "10px 12px" }}>
           {PROJECTS.map((project, index) => {
             const isInProgress = project.status === "IN_PROGRESS";
             return (
-              <div key={`${project.title}-${index}`} onClick={() => openProjectDetail(index)} style={{ marginBottom: 10, cursor: "pointer", userSelect: "none", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8" }}>
+              <div key={`${project.title}-${index}`} onClick={() => openProjectDetail(index)} style={{ marginBottom: 10, cursor: "pointer", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8" }}>
                 <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "5px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                   <div style={{ fontWeight: 700, fontSize: 12, color: "#111", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.title}</div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
@@ -218,7 +219,7 @@ export default function ProjectsApp() {
                   <div style={{ fontSize: 11, color: "#444", marginBottom: 6, lineHeight: 1.5, fontStyle: "italic" }}>{project.desc}</div>
                   {project.impact.slice(0, 2).map((item, impactIndex) => (
                     <div key={`${project.title}-impact-${impactIndex}`} style={{ fontSize: 11, color: "#222", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.5 }}>
-                      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>›</span>
+                      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>{">"}</span>
                       {item}
                     </div>
                   ))}
@@ -230,7 +231,7 @@ export default function ProjectsApp() {
                         </span>
                       ))}
                     </div>
-                    <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>click to open →</span>
+                    <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>Open</span>
                   </div>
                 </div>
               </div>
@@ -240,7 +241,7 @@ export default function ProjectsApp() {
       ) : currentProject ? (
         <ProjectDetailView project={currentProject} repoData={repoData} onOpenVideo={openVideoApp} onBackToList={() => navigate({ type: "list" })} />
       ) : (
-        <div style={{ padding: "16px 20px", fontSize: 11, color: "#666" }}>
+        <div style={{ ...APP_CONTENT_STYLE, padding: "16px 20px", fontSize: 11, color: "#666" }}>
           Unable to load project details.
         </div>
       )}

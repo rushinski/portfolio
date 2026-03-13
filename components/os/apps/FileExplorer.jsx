@@ -6,6 +6,8 @@ import { useDialogs } from "../hooks/useDialogs";
 import { useFileSystem } from "../hooks/useFileSystem";
 import { useWindowManager } from "../hooks/useWindowManager";
 import { DRAG_ITEM_MIME } from "../constants";
+import Tooltip from "../ui/Tooltip";
+import { GLOBAL_CONTEXT_MENU_EVENT, announceContextMenuOpen } from "../ui/contextMenu";
 import {
   ETCHED_SEPARATOR_STYLE,
   INSET_BORDER,
@@ -188,26 +190,27 @@ function ToolbarButton({ title, disabled = false, active = false, onClick, child
   const [pressed, setPressed] = useState(false);
 
   return (
-    <button
-      type="button"
-      title={title}
-      disabled={disabled}
-      onPointerDown={() => { if (!disabled) setPressed(true); }}
-      onPointerUp={() => setPressed(false)}
-      onPointerLeave={() => setPressed(false)}
-      onClick={onClick}
-      style={{
-        ...getWin95ButtonStyle({ pressed: pressed || active, disabled, padding: 0 }),
-        width: 26,
-        height: 24,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: disabled ? "#c0c0c0" : active ? "#b7b7b7" : "#c0c0c0",
-      }}
-    >
-      {children}
-    </button>
+    <Tooltip label={title} disabled={disabled}>
+      <button
+        type="button"
+        disabled={disabled}
+        onPointerDown={() => { if (!disabled) setPressed(true); }}
+        onPointerUp={() => setPressed(false)}
+        onPointerLeave={() => setPressed(false)}
+        onClick={onClick}
+        style={{
+          ...getWin95ButtonStyle({ pressed: pressed || active, disabled, padding: 0 }),
+          width: 26,
+          height: 24,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: disabled ? "#c0c0c0" : active ? "#b7b7b7" : "#c0c0c0",
+        }}
+      >
+        {children}
+      </button>
+    </Tooltip>
   );
 }
 
@@ -617,6 +620,19 @@ export default function FileExplorerApp() {
     return () => window.removeEventListener("click", handleWindowClick);
   }, []);
 
+  useEffect(() => {
+    const handleForeignContextMenu = (event) => {
+      if (event.detail?.source === "explorer") {
+        return;
+      }
+
+      setContextMenu(null);
+    };
+
+    window.addEventListener(GLOBAL_CONTEXT_MENU_EVENT, handleForeignContextMenu);
+    return () => window.removeEventListener(GLOBAL_CONTEXT_MENU_EVENT, handleForeignContextMenu);
+  }, []);
+
   const startRename = (item) => {
     if (!item || !canRenameItem(item)) return;
     setExplorerSelectedItemId(item.id);
@@ -675,6 +691,7 @@ export default function FileExplorerApp() {
   const openContextMenu = (event, scope, item = null) => {
     event.preventDefault();
     event.stopPropagation();
+    announceContextMenuOpen("explorer");
 
     if (item) {
       setExplorerSelectedItemId(item.id);

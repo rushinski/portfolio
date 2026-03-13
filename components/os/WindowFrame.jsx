@@ -188,10 +188,6 @@ export default function WindowFrame({
           onFocus();
         }
       }}
-      onContextMenu={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-      }}
     >
       <div
         style={{

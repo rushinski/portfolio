@@ -1,6 +1,13 @@
 "use client";
 
 import { useWindowManager } from "../hooks/useWindowManager";
+import {
+  APP_BODY_STYLE,
+  APP_CONTENT_STYLE,
+  APP_META_TEXT_STYLE,
+  APP_PANEL_STYLE,
+  APP_SECTION_HEADER_STYLE,
+} from "../ui/retro";
 
 export default function WelcomeApp() {
   const { openWindow } = useWindowManager();
@@ -14,41 +21,43 @@ export default function WelcomeApp() {
   ];
 
   return (
-    <div style={{ padding: "16px 20px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-        <div style={{ fontSize: 18, fontWeight: 800, color: "#000080" }}>Welcome to JacobOS</div>
-      </div>
-      <div style={{ fontSize: 13, color: "#333", marginBottom: 14, lineHeight: 1.7 }}>
-        This is the portfolio of <strong>Jacob Rushinski</strong> - a backend/full-stack developer.
-        Navigate this retro desktop to explore my work, skills, projects, and more! You navigate this desktop just like any other desktop.
-      </div>
-      <div style={{ fontSize: 12, color: "#444", marginBottom: 10, fontWeight: 700 }}>Start here:</div>
-      <div style={{ fontSize: 12, color: "#444", lineHeight: 1.8, paddingLeft: 8 }}>
-        {startHereItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => openWindow(item.id)}
-            style={{
-              width: "100%",
-              textAlign: "left",
-              background: "transparent",
-              border: "none",
-              padding: "0",
-              fontSize: 12,
-              color: "#444",
-              lineHeight: 1.8,
-              fontFamily: "inherit",
-              cursor: "pointer",
-            }}
-          >
-            <span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>
-            <strong style={{ color: "#000080", textDecoration: "underline", textDecorationColor: "#000080" }}>{item.title}</strong> {item.description}
-          </button>
-        ))}
-        <div><span style={{ color: "#000080", marginRight: 6 }}>{">"}</span>Explore the other apps too see more cool features of JacobOS.</div>
-      </div>
-      <div style={{ marginTop: 16, padding: "10px 12px", background: "#ffffcc", border: "1px solid #e0d080", fontSize: 12, color: "#555" }}>
-        <strong>Tip:</strong> Try the Terminal app for a command-line experience. Type &quot;help&quot; to see available commands!
+    <div style={APP_BODY_STYLE}>
+      <div style={{ ...APP_CONTENT_STYLE, display: "flex", flexDirection: "column", gap: 12 }}>
+        <div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#000080", marginBottom: 6 }}>Welcome to JacobOS</div>
+          <div style={APP_META_TEXT_STYLE}>
+            This desktop is Jacob Rushinski&apos;s portfolio. Explore it like a late-90s machine and open each app to see projects, experience, skills, and contact details.
+          </div>
+        </div>
+
+        <div>
+          <div style={{ ...APP_SECTION_HEADER_STYLE, marginBottom: 6 }}>Start Here</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            {startHereItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => openWindow(item.id)}
+                style={{
+                  ...APP_PANEL_STYLE,
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "7px 9px",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
+              >
+                <span style={{ color: "#000080", marginRight: 6, fontWeight: 700 }}>{">"}</span>
+                <strong style={{ color: "#111" }}>{item.title}</strong> {item.description}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ ...APP_PANEL_STYLE, padding: "8px 10px", background: "#efe7b0" }}>
+          <div style={{ fontSize: 11, color: "#444", lineHeight: 1.5 }}>
+            <strong>Tip:</strong> Open Terminal for a command-line view of the same filesystem. Type &quot;help&quot; to see the supported commands.
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -248,7 +248,7 @@ export default function Taskbar() {
         {startOpen && (
           <div onClick={(event) => event.stopPropagation()} style={{ position: "absolute", left: 6, bottom: "100%", marginBottom: 2, width: 220, background: "#c0c0c0", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #404040", borderBottom: "2px solid #404040", boxShadow: "3px 3px 10px rgba(0,0,0,0.4)", zIndex: 9000 }}>
             <div style={{ display: "flex" }}>
-              <div style={{ width: 28, background: "linear-gradient(180deg, #0b3b8f, #1a56c9)", display: "flex", alignItems: "flex-end", padding: "8px 2px" }}>
+              <div style={{ width: 28, background: "#000080", display: "flex", alignItems: "flex-end", padding: "8px 2px" }}>
                 <span style={{ color: "#fff", fontWeight: 800, fontSize: 10, writingMode: "vertical-rl", transform: "rotate(180deg)", letterSpacing: 1 }}>
                   JacobOS
                 </span>

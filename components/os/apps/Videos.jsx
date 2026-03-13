@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { clamp } from "../constants";
 import { VIDEO_LIBRARY, VIDEO_LIBRARY_BY_ID } from "../data";
 import { useWindowManager } from "../hooks/useWindowManager";
+import Tooltip from "../ui/Tooltip";
+import { APP_BODY_STYLE, APP_CONTENT_STYLE } from "../ui/retro";
 
 const formatVideoTime = (seconds) => {
   if (!Number.isFinite(seconds) || seconds < 0) return "00:00";
@@ -13,6 +15,101 @@ const formatVideoTime = (seconds) => {
   const secs = totalSeconds % 60;
   return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 };
+
+function TransportGlyph({ kind, active = false }) {
+  if (kind === "prev") {
+    return (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <rect x="1" y="2" width="1.5" height="8" fill="#111" />
+        <path d="M9.5 2.2 L4.2 6 L9.5 9.8 Z" fill="#111" />
+      </svg>
+    );
+  }
+
+  if (kind === "rewind") {
+    return (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M6.1 2.2 L1.8 6 L6.1 9.8 Z" fill="#111" />
+        <path d="M10.2 2.2 L5.9 6 L10.2 9.8 Z" fill="#111" />
+      </svg>
+    );
+  }
+
+  if (kind === "play") {
+    return (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M3 2 L10 6 L3 10 Z" fill="#111" />
+      </svg>
+    );
+  }
+
+  if (kind === "pause") {
+    return (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <rect x="2.5" y="2" width="2.5" height="8" fill="#111" />
+        <rect x="7" y="2" width="2.5" height="8" fill="#111" />
+      </svg>
+    );
+  }
+
+  if (kind === "stop") {
+    return (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <rect x="2" y="2" width="8" height="8" fill="#111" />
+      </svg>
+    );
+  }
+
+  if (kind === "next") {
+    return (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M2.5 2.2 L7.8 6 L2.5 9.8 Z" fill="#111" />
+        <rect x="9.5" y="2" width="1.5" height="8" fill="#111" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+      <path d="M2 7.5 H4 V4.5 H2 Z" fill="#111" />
+      <path d="M4 4.5 L6.6 2.6 V9.4 L4 7.5 Z" fill="#111" />
+      {active ? (
+        <>
+          <path d="M8.2 4.2 C9.2 4.8 9.2 7.2 8.2 7.8" fill="none" stroke="#111" strokeWidth="1" />
+          <path d="M9.7 3.2 C11 4.2 11 7.8 9.7 8.8" fill="none" stroke="#111" strokeWidth="1" />
+        </>
+      ) : (
+        <path d="M8 4 L10.5 8" fill="none" stroke="#111" strokeWidth="1.1" />
+      )}
+    </svg>
+  );
+}
+
+function ControlButton({ label, onClick, style, children }) {
+  const buttonStyle = {
+    width: 22,
+    height: 18,
+    padding: 0,
+    fontSize: 9,
+    background: "#c0c0c0",
+    fontFamily: "inherit",
+    border: "1px solid",
+    borderColor: "#ffffff #808080 #808080 #ffffff",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    ...style,
+  };
+
+  return (
+    <Tooltip label={label}>
+      <button onClick={onClick} style={buttonStyle}>
+        {children}
+      </button>
+    </Tooltip>
+  );
+}
 
 export default function VideosApp() {
   const { selectedVideoId, setSelectedVideoId } = useWindowManager();
@@ -89,39 +186,26 @@ export default function VideosApp() {
     video.currentTime = Math.max(0, video.currentTime - 10);
   };
 
-  const controlButtonStyle = {
-    width: 22,
-    height: 18,
-    padding: 0,
-    fontSize: 9,
-    background: "#c0c0c0",
-    fontFamily: "inherit",
-    border: "1px solid",
-    borderColor: "#ffffff #808080 #808080 #ffffff",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  };
-
   if (!VIDEO_LIBRARY.length) {
     return (
-      <div style={{ height: "100%", display: "grid", placeItems: "center", padding: 20, background: "#fff" }}>
-        <div style={{ maxWidth: 420, fontSize: 11, lineHeight: 1.6, color: "#333" }}>
-          No local videos configured yet.
-          <br />
-          Add files to <strong>/public/videos</strong> and map them in <strong>PROJECTS[].links.videos</strong>.
+      <div style={APP_BODY_STYLE}>
+        <div style={{ ...APP_CONTENT_STYLE, display: "grid", placeItems: "center", padding: 20 }}>
+          <div style={{ maxWidth: 420, fontSize: 11, lineHeight: 1.6, color: "#333" }}>
+            No local videos configured yet.
+            <br />
+            Add files to <strong>/public/videos</strong> and map them in <strong>PROJECTS[].links.videos</strong>.
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#fff", minHeight: 0 }}>
+    <div style={APP_BODY_STYLE}>
       <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, padding: "7px 10px 5px", borderBottom: "1px solid #808080" }}>
         Videos
       </div>
-      <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: "220px 1fr", gap: 6, padding: 6 }}>
+      <div style={{ ...APP_CONTENT_STYLE, display: "grid", gridTemplateColumns: "220px 1fr", gap: 6, padding: 6 }}>
         <div style={{ border: "2px inset #c0c0c0", background: "#fff", overflowY: "auto", minHeight: 0 }}>
           {VIDEO_LIBRARY.map((video) => {
             const selected = video.id === currentVideoId;
@@ -196,17 +280,27 @@ export default function VideosApp() {
               style={{ width: "100%", marginBottom: 4 }}
             />
             <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <button onClick={() => stepToVideo(-1)} style={controlButtonStyle} title="Previous clip">⏮</button>
-              <button onClick={rewindTenSeconds} style={controlButtonStyle} title="Rewind 10 seconds">⏪</button>
-              <button onClick={togglePlayPause} style={controlButtonStyle} title={isPlaying ? "Pause" : "Play"}>{isPlaying ? "⏸" : "▶"}</button>
-              <button onClick={stopPlayback} style={controlButtonStyle} title="Stop">⏹</button>
-              <button onClick={() => stepToVideo(1)} style={controlButtonStyle} title="Next clip">⏭</button>
+              <ControlButton label="Previous clip" onClick={() => stepToVideo(-1)}>
+                <TransportGlyph kind="prev" />
+              </ControlButton>
+              <ControlButton label="Rewind 10 seconds" onClick={rewindTenSeconds}>
+                <TransportGlyph kind="rewind" />
+              </ControlButton>
+              <ControlButton label={isPlaying ? "Pause" : "Play"} onClick={togglePlayPause}>
+                <TransportGlyph kind={isPlaying ? "pause" : "play"} />
+              </ControlButton>
+              <ControlButton label="Stop" onClick={stopPlayback}>
+                <TransportGlyph kind="stop" />
+              </ControlButton>
+              <ControlButton label="Next clip" onClick={() => stepToVideo(1)}>
+                <TransportGlyph kind="next" />
+              </ControlButton>
               <span style={{ marginLeft: 6, fontSize: 10, color: "#222", minWidth: 80 }}>
                 {formatVideoTime(currentTime)} / {formatVideoTime(duration)}
               </span>
-              <button onClick={() => setIsMuted((prev) => !prev)} style={{ ...controlButtonStyle, marginLeft: "auto", width: 24 }} title={isMuted ? "Unmute" : "Mute"}>
-                {isMuted ? "🔇" : "🔊"}
-              </button>
+              <ControlButton label={isMuted ? "Unmute" : "Mute"} onClick={() => setIsMuted((prev) => !prev)} style={{ marginLeft: "auto", width: 24 }}>
+                <TransportGlyph kind="volume" active={!isMuted} />
+              </ControlButton>
               <input type="range" min={0} max={1} step={0.01} value={volume} onChange={(event) => setVolume(Number(event.target.value))} style={{ width: 90 }} />
             </div>
             <div style={{ fontSize: 9, color: videoError ? "#8b0000" : "#1f4a1f", marginTop: 3, minHeight: 12 }}>
