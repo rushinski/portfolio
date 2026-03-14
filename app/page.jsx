@@ -20,7 +20,7 @@ export default async function Home() {
           <Desktop initialGitHubData={initialGitHubData} />
         </OSProvider>
       </div>
-      {/* Mobile card view — shown only on mobile */}
+      {/* Mobile OS — shown only on mobile */}
       <div className="block md:hidden">
         <MobileView />
       </div>
