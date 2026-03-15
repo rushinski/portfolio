@@ -161,8 +161,8 @@ export function OSProvider({ children }) {
   }, []);
 
   const systemDesktopIcons = useMemo(
-    () => buildSystemDesktopIcons(renamedSystemIcons, { recycleBinHasItems: recycleBinItems.length > 0 }),
-    [renamedSystemIcons, recycleBinItems.length],
+    () => buildSystemDesktopIcons(renamedSystemIcons),
+    [renamedSystemIcons],
   );
   const explorerSystemItems = useMemo(
     () => buildExplorerSystemItems(),

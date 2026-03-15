@@ -133,7 +133,7 @@ export const INITIAL_WINDOWS = {
   explorer: { id: "explorer", title: "File Explorer", x: 148, y: 66, w: 860, h: 540, isOpen: false, isMinimized: false, isMaximized: false, z: 2 },
   settings: { id: "settings", title: "Settings", x: 214, y: 88, w: 700, h: 520, isOpen: false, isMinimized: false, isMaximized: false, z: 1 },
   textdoc: { id: "textdoc", title: "Text Document", x: 248, y: 100, w: 560, h: 380, isOpen: false, isMinimized: false, isMaximized: false, z: 12 },
-  resume: { id: "resume", title: "Resume.pdf", x: 112, y: 44, w: 900, h: 620, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
+  resume: { id: "resume", title: "Resume", x: 112, y: 44, w: 900, h: 620, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
   minesweeper: { id: "minesweeper", title: "Minesweeper", x: 200, y: 80, w: 248, h: 330, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
   help: { id: "help", title: "JacobOS Help", x: 160, y: 60, w: 600, h: 470, isOpen: false, isMinimized: false, isMaximized: false, z: 0 },
 };
@@ -160,18 +160,18 @@ const SYSTEM_DESKTOP_ICON_DEFS = [
   { id: "contact", title: "Contact", glyph: Icons.contact, windowId: "contact", itemType: "app", system: true, parentId: null },
   { id: "location", title: "Where's Jacob", glyph: Icons.location, windowId: "location", itemType: "app", system: true, parentId: null },
   { id: "terminal", title: "Terminal", glyph: Icons.terminal, windowId: "terminal", itemType: "app", system: true, parentId: null },
-  { id: "explorer", title: "File Explorer", glyph: Icons.folder, windowId: "explorer", itemType: "app", system: true, parentId: null },
+  { id: "explorer", title: "File Explorer", glyph: Icons.fileExplorer, windowId: "explorer", itemType: "app", system: true, parentId: null },
   { id: "settings", title: "Settings", glyph: Icons.settings, windowId: "settings", itemType: "app", system: true, parentId: null },
-  { id: "trash", title: "Recycle Bin", glyph: Icons.trashEmpty, windowId: "trash", itemType: "app", system: true, parentId: null },
-  { id: "resume", title: "Resume.pdf", glyph: Icons.resume, windowId: "resume", itemType: "app", system: true, parentId: null },
+  { id: "trash", title: "Recycle Bin", glyph: Icons.trash, windowId: "trash", itemType: "app", system: true, parentId: null },
+  { id: "resume", title: "Resume", glyph: Icons.resume, windowId: "resume", itemType: "app", system: true, parentId: null },
   { id: "minesweeper", title: "Minesweeper", glyph: Icons.minesweeper, windowId: "minesweeper", itemType: "app", system: true, parentId: null },
   { id: "help", title: "Help", glyph: Icons.help, windowId: "help", itemType: "app", system: true, parentId: null },
 ];
 
-export const buildSystemDesktopIcons = (renamedSystemIcons = {}, options = {}) =>
+export const buildSystemDesktopIcons = (renamedSystemIcons = {}) =>
   SYSTEM_DESKTOP_ICON_DEFS.map((item) => ({
     ...item,
-    glyph: item.id === "trash" ? (options.recycleBinHasItems ? Icons.trashFull : Icons.trashEmpty) : item.glyph,
+    glyph: item.glyph,
     title: renamedSystemIcons[item.id] || item.title,
     sizeLabel: FILE_SIZE_LABELS[item.itemType] || "0 bytes",
     typeLabel: FILE_TYPE_LABELS[item.itemType] || "Item",
