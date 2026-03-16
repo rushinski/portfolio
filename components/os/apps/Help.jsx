@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { WIN95_FONT_FAMILY } from "../ui/retro";
+
 const TOPICS = [
   {
     id: "getting-started",
@@ -136,7 +138,7 @@ const TOPICS = [
   },
 ];
 
-const BODY_STYLE = { fontFamily: "'Courier New', monospace", fontSize: 12, lineHeight: 1.7, color: "#111" };
+const BODY_STYLE = { fontFamily: WIN95_FONT_FAMILY, fontSize: 12, lineHeight: 1.7, color: "#111" };
 const HEADING_STYLE = { fontWeight: 700, fontSize: 13, marginTop: 14, marginBottom: 4, fontFamily: "inherit", borderBottom: "1px solid #c0c0c0", paddingBottom: 3, color: "#000080" };
 const TEXT_STYLE = { marginBottom: 8 };
 const LIST_STYLE = { paddingLeft: 20, marginBottom: 8 };
@@ -146,7 +148,7 @@ export default function HelpApp() {
   const topic = TOPICS.find((t) => t.id === topicId) || TOPICS[0];
 
   return (
-    <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
+    <div style={{ display: "flex", height: "100%", overflow: "hidden", fontFamily: WIN95_FONT_FAMILY, background: "#c0c0c0", color: "#111" }}>
       {/* Sidebar */}
       <div style={{ width: 170, flexShrink: 0, borderRight: "2px solid #808080", background: "#c0c0c0", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ background: "#000080", color: "#fff", fontWeight: 700, padding: "5px 10px", fontSize: 11, flexShrink: 0 }}>
@@ -169,7 +171,7 @@ export default function HelpApp() {
 
       {/* Content pane */}
       <div style={{ flex: 1, overflowY: "auto", padding: "12px 18px", background: "#fff", ...BODY_STYLE }}>
-        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 10, fontFamily: "'Courier New', monospace", borderBottom: "2px solid #000080", paddingBottom: 6, color: "#000080" }}>
+        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 10, fontFamily: WIN95_FONT_FAMILY, borderBottom: "2px solid #000080", paddingBottom: 6, color: "#000080" }}>
           {topic.title}
         </div>
         {topic.content.map((block, i) => {

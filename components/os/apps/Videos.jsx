@@ -6,7 +6,7 @@ import { clamp } from "../constants";
 import { VIDEO_LIBRARY, VIDEO_LIBRARY_BY_ID } from "../data";
 import { useWindowManager } from "../hooks/useWindowManager";
 import Tooltip from "../ui/Tooltip";
-import { APP_BODY_STYLE, APP_CONTENT_STYLE } from "../ui/retro";
+import { APP_BODY_STYLE, APP_CONTENT_STYLE, INSET_BORDER } from "../ui/retro";
 
 const formatVideoTime = (seconds) => {
   if (!Number.isFinite(seconds) || seconds < 0) return "00:00";
@@ -202,11 +202,8 @@ export default function VideosApp() {
 
   return (
     <div style={APP_BODY_STYLE}>
-      <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", textTransform: "uppercase", letterSpacing: 1, padding: "7px 10px 5px", borderBottom: "1px solid #808080" }}>
-        Videos
-      </div>
       <div style={{ ...APP_CONTENT_STYLE, display: "grid", gridTemplateColumns: "220px 1fr", gap: 6, padding: 6 }}>
-        <div style={{ border: "2px inset #c0c0c0", background: "#fff", overflowY: "auto", minHeight: 0 }}>
+        <div style={{ ...INSET_BORDER, background: "#fff", overflowY: "auto", minHeight: 0 }}>
           {VIDEO_LIBRARY.map((video) => {
             const selected = video.id === currentVideoId;
             return (
@@ -235,7 +232,7 @@ export default function VideosApp() {
           })}
         </div>
 
-        <div style={{ border: "2px inset #c0c0c0", background: "#d4d0c8", minHeight: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ ...INSET_BORDER, background: "#d4d0c8", minHeight: 0, display: "flex", flexDirection: "column" }}>
           <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", color: "#111", fontSize: 10, fontWeight: 700, padding: "3px 6px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             {currentVideo?.label || "No Video Selected"}
           </div>
@@ -295,13 +292,13 @@ export default function VideosApp() {
               <ControlButton label="Next clip" onClick={() => stepToVideo(1)}>
                 <TransportGlyph kind="next" />
               </ControlButton>
-              <span style={{ marginLeft: 6, fontSize: 10, color: "#222", minWidth: 80 }}>
+              <span style={{ marginLeft: 6, fontSize: 10, color: "#222", flex: 1 }}>
                 {formatVideoTime(currentTime)} / {formatVideoTime(duration)}
               </span>
-              <ControlButton label={isMuted ? "Unmute" : "Mute"} onClick={() => setIsMuted((prev) => !prev)} style={{ marginLeft: "auto", width: 24 }}>
+              <ControlButton label={isMuted ? "Unmute" : "Mute"} onClick={() => setIsMuted((prev) => !prev)} style={{ width: 24 }}>
                 <TransportGlyph kind="volume" active={!isMuted} />
               </ControlButton>
-              <input type="range" min={0} max={1} step={0.01} value={volume} onChange={(event) => setVolume(Number(event.target.value))} style={{ width: 90 }} />
+              <input type="range" min={0} max={1} step={0.01} value={volume} onChange={(event) => setVolume(Number(event.target.value))} style={{ width: 80 }} />
             </div>
             <div style={{ fontSize: 9, color: videoError ? "#8b0000" : "#1f4a1f", marginTop: 3, minHeight: 12 }}>
               {videoError || (currentVideo ? `Ready: ${currentVideo.projectTitle}` : "Ready")}

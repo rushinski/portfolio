@@ -920,8 +920,7 @@ export default function FileExplorerApp() {
     <>
       <div
         style={{
-          margin: "-4px -6px",
-          minHeight: "calc(100% + 8px)",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
           background: WIN95_COLORS.surface,
