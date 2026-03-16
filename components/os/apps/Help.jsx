@@ -2,12 +2,16 @@
 
 import { useState } from "react";
 
-import { WIN95_FONT_FAMILY } from "../ui/retro";
+import {
+  ETCHED_SEPARATOR_STYLE,
+  WIN95_COLORS,
+  getWin95TabStyle,
+} from "../ui/retro";
 
 const TOPICS = [
   {
     id: "getting-started",
-    title: "Getting Started",
+    title: "Overview",
     content: [
       { heading: "Welcome to JacobOS" },
       { text: "JacobOS is an interactive portfolio styled as a Windows 95-inspired operating system. Navigate around to learn about Jacob Rushinski — his skills, experience, and projects." },
@@ -18,14 +22,14 @@ const TOPICS = [
         "Resize windows by dragging any edge or corner",
         "Click taskbar buttons to switch between open windows",
         "Right-click the desktop or icons for options",
-        'Use the "OS Explore" button in the taskbar to open all apps',
+        "Use the \"OS Explore\" button in the taskbar to open all apps",
         "Click the clock to open a calendar popup",
       ]},
     ],
   },
   {
     id: "keyboard-shortcuts",
-    title: "Keyboard Shortcuts",
+    title: "Shortcuts",
     content: [
       { heading: "Window Management" },
       { table: [
@@ -57,7 +61,7 @@ const TOPICS = [
   },
   {
     id: "apps",
-    title: "Available Apps",
+    title: "Apps",
     content: [
       { heading: "Portfolio Apps" },
       { table: [
@@ -76,8 +80,7 @@ const TOPICS = [
         ["Terminal", "Command-line file navigation"],
         ["Settings", "Display, sound, and screensaver options"],
         ["Recycle Bin", "Restore or permanently delete items"],
-        ["Jacobs Time", "Live clock and date display"],
-        ["Calculator", "Standard arithmetic calculator"],
+        ["Where's Jacob", "Current location — Harrisburg, Lancaster, Philly"],
         ["Minesweeper", "Classic mine-sweeping game"],
         ["Help", "This help viewer"],
       ]},
@@ -85,7 +88,7 @@ const TOPICS = [
   },
   {
     id: "file-management",
-    title: "File Management",
+    title: "Files",
     content: [
       { heading: "The Virtual File System" },
       { text: "JacobOS includes a fully navigable virtual file system with drives, folders, and text documents." },
@@ -107,19 +110,19 @@ const TOPICS = [
       ]},
       { heading: "Terminal Commands" },
       { table: [
-        ["dir", "List files in current directory"],
+        ["dir / ls", "List files in current directory"],
         ["cd [folder]", "Change directory"],
         ["mkdir [name]", "Create a new folder"],
-        ["del [name]", "Delete a file"],
-        ["type [name]", "Display file contents"],
-        ["cls", "Clear the screen"],
+        ["rm [name]", "Delete a file"],
+        ["cat [name]", "Display file contents"],
+        ["clear", "Clear the screen"],
         ["help", "Show command reference"],
       ]},
     ],
   },
   {
     id: "tips",
-    title: "Tips & Tricks",
+    title: "Tips",
     content: [
       { heading: "Power User Tips" },
       { list: [
@@ -129,73 +132,83 @@ const TOPICS = [
         "Ctrl+A selects all desktop icons at once, then Delete moves them all to the Bin",
         "The About app pulls live data from GitHub — check back after new pushes",
         "Settings persist across page refreshes — your preferences are saved",
-        'Use "Cascade Windows" or "Tile Windows" from the View menu to arrange many windows at once',
+        "Use \"Cascade Windows\" or \"Tile Windows\" from the View menu to arrange many windows at once",
         "The screensaver activates after the timeout you set in Settings",
-        "Calculator memory: MS stores, MR recalls, MC clears, M+ adds to memory",
         "In Minesweeper, right-click cells to place flags on suspected mines",
       ]},
     ],
   },
 ];
 
-const BODY_STYLE = { fontFamily: WIN95_FONT_FAMILY, fontSize: 12, lineHeight: 1.7, color: "#111" };
-const HEADING_STYLE = { fontWeight: 700, fontSize: 13, marginTop: 14, marginBottom: 4, fontFamily: "inherit", borderBottom: "1px solid #c0c0c0", paddingBottom: 3, color: "#000080" };
-const TEXT_STYLE = { marginBottom: 8 };
-const LIST_STYLE = { paddingLeft: 20, marginBottom: 8 };
-
 export default function HelpApp() {
-  const [topicId, setTopicId] = useState(TOPICS[0].id);
-  const topic = TOPICS.find((t) => t.id === topicId) || TOPICS[0];
+  const [activeTab, setActiveTab] = useState(TOPICS[0].id);
+  const topic = TOPICS.find((t) => t.id === activeTab) || TOPICS[0];
 
   return (
-    <div style={{ display: "flex", height: "100%", overflow: "hidden", fontFamily: WIN95_FONT_FAMILY, background: "#c0c0c0", color: "#111" }}>
-      {/* Sidebar */}
-      <div style={{ width: 170, flexShrink: 0, borderRight: "2px solid #808080", background: "#c0c0c0", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ background: "#000080", color: "#fff", fontWeight: 700, padding: "5px 10px", fontSize: 11, flexShrink: 0 }}>
-          Contents
-        </div>
-        <div style={{ overflowY: "auto", flex: 1 }}>
+    <div
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        background: WIN95_COLORS.surface,
+        color: WIN95_COLORS.text,
+        overflow: "hidden",
+      }}
+    >
+      <div style={{ padding: "8px 10px 0", background: WIN95_COLORS.surface }}>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 2 }}>
           {TOPICS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTopicId(t.id)}
-              style={{ display: "block", width: "100%", padding: "6px 12px", border: "none", background: topicId === t.id ? "#000080" : "transparent", color: topicId === t.id ? "#fff" : "#111", textAlign: "left", fontSize: 12, fontFamily: "inherit", cursor: "pointer", borderBottom: "1px solid #b0b0b0" }}
-              onMouseEnter={(e) => { if (topicId !== t.id) { e.currentTarget.style.background = "#d0d0e8"; } }}
-              onMouseLeave={(e) => { if (topicId !== t.id) { e.currentTarget.style.background = "transparent"; } }}
-            >
+            <button key={t.id} type="button" onClick={() => setActiveTab(t.id)} style={getWin95TabStyle(activeTab === t.id)}>
               {t.title}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Content pane */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "12px 18px", background: "#fff", ...BODY_STYLE }}>
-        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 10, fontFamily: WIN95_FONT_FAMILY, borderBottom: "2px solid #000080", paddingBottom: 6, color: "#000080" }}>
-          {topic.title}
-        </div>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          margin: "0 10px 10px",
+          padding: 12,
+          background: WIN95_COLORS.surface,
+          borderTop: "2px solid #ffffff",
+          borderLeft: "2px solid #ffffff",
+          borderRight: "2px solid #808080",
+          borderBottom: "2px solid #808080",
+          overflow: "auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+        }}
+      >
         {topic.content.map((block, i) => {
           if (block.heading) {
-            return <div key={i} style={HEADING_STYLE}>{block.heading}</div>;
+            return (
+              <div key={i} style={{ marginBottom: 6, marginTop: i === 0 ? 0 : 10 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: WIN95_COLORS.text, marginBottom: 6 }}>{block.heading}</div>
+                <div style={{ ...ETCHED_SEPARATOR_STYLE, marginBottom: 8 }} />
+              </div>
+            );
           }
           if (block.text) {
-            return <div key={i} style={TEXT_STYLE}>{block.text}</div>;
+            return <div key={i} style={{ fontSize: 12, lineHeight: 1.6, marginBottom: 6 }}>{block.text}</div>;
           }
           if (block.list) {
             return (
-              <ul key={i} style={LIST_STYLE}>
-                {block.list.map((item, j) => <li key={j} style={{ marginBottom: 3 }}>{item}</li>)}
+              <ul key={i} style={{ paddingLeft: 20, marginBottom: 8, fontSize: 12, lineHeight: 1.7 }}>
+                {block.list.map((item, j) => <li key={j} style={{ marginBottom: 2 }}>{item}</li>)}
               </ul>
             );
           }
           if (block.table) {
             return (
-              <table key={i} style={{ borderCollapse: "collapse", marginBottom: 10, width: "100%" }}>
+              <table key={i} style={{ borderCollapse: "collapse", marginBottom: 10, width: "100%", fontSize: 12 }}>
                 <tbody>
                   {block.table.map(([left, right], j) => (
                     <tr key={j}>
-                      <td style={{ padding: "2px 12px 2px 0", fontWeight: 700, whiteSpace: "nowrap", verticalAlign: "top", color: "#333", minWidth: 130 }}>{left}</td>
-                      <td style={{ padding: "2px 0", verticalAlign: "top", color: "#444" }}>{right}</td>
+                      <td style={{ padding: "3px 14px 3px 0", fontWeight: 700, whiteSpace: "nowrap", verticalAlign: "top", color: WIN95_COLORS.text, minWidth: 130 }}>{left}</td>
+                      <td style={{ padding: "3px 0", verticalAlign: "top", color: WIN95_COLORS.textMuted }}>{right}</td>
                     </tr>
                   ))}
                 </tbody>
