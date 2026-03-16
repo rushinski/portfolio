@@ -930,12 +930,6 @@ export default function FileExplorerApp() {
         }}
         onClick={() => setContextMenu(null)}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 2, padding: "1px 4px 0", minHeight: 22, background: WIN95_COLORS.surface, borderBottom: "1px solid #9a9a9a", flexShrink: 0 }}>
-          {["File", "Edit", "View", "Tools", "Help"].map((label) => (
-            <ExplorerMenuButton key={label} label={label} />
-          ))}
-        </div>
-
         <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px", background: WIN95_COLORS.surface, borderTop: "1px solid #ffffff", borderBottom: "1px solid #808080", flexShrink: 0 }}>
           <ToolbarButton title="Back" disabled={explorerState.navStack.length === 0} onClick={explorerGoBack}>
             <ToolbarGlyph kind="back" viewMode={explorerState.viewMode} />
@@ -994,7 +988,7 @@ export default function FileExplorerApp() {
           />
         </div>
 
-        <div ref={splitPaneRef} style={{ display: "flex", flex: 1, minHeight: 0, background: WIN95_COLORS.surface, padding: "4px", gap: 0 }}>
+        <div ref={splitPaneRef} style={{ display: "flex", flex: 1, minHeight: 0, background: WIN95_COLORS.surface, padding: "6px", gap: 0 }}>
           <div style={{ width: explorerState.sidebarWidth, minWidth: 120, display: "flex", flexDirection: "column", minHeight: 0, flexShrink: 0 }}>
             <div style={{ ...getWin95ButtonStyle({ padding: "2px 6px" }), borderBottom: "none", fontWeight: 700, fontSize: 11, minHeight: 22, display: "flex", alignItems: "center" }}>
               All Folders
@@ -1038,7 +1032,7 @@ export default function FileExplorerApp() {
 
           <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", minHeight: 0 }}>
             <div style={{ ...getWin95ButtonStyle({ padding: "2px 6px" }), borderBottom: "none", fontWeight: 700, fontSize: 11, minHeight: 22, display: "flex", alignItems: "center" }}>
-              {`Contents of "${currentFolderLabel}"`}
+              File Explorer
             </div>
             <div style={{ ...INSET_BORDER, background: "#ffffff", flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
               {explorerState.viewMode === "list" && (

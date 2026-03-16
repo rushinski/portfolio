@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { APP_BODY_STYLE, APP_CONTENT_STYLE } from "../ui/retro";
+
 const BOARD_SIZE = 9;
 const MINE_COUNT = 10;
 const CELL_SIZE = 24;
@@ -158,7 +160,8 @@ export default function MinesweeperApp() {
   const face = gameState === "won" ? "B)" : gameState === "lost" ? ":(" : faceDown ? ":O" : ":)";
 
   return (
-    <div style={{ padding: 8, display: "flex", flexDirection: "column", gap: 6, alignItems: "center", background: "#c0c0c0", height: "100%", boxSizing: "border-box" }}>
+    <div style={APP_BODY_STYLE}>
+      <div style={{ ...APP_CONTENT_STYLE, display: "flex", flexDirection: "column", gap: 6, alignItems: "center", justifyContent: "center" }}>
       {/* Header */}
       <div style={{ borderTop: "2px solid #404040", borderLeft: "2px solid #404040", borderRight: "2px solid #fff", borderBottom: "2px solid #fff", padding: "4px 8px", display: "flex", alignItems: "center", justifyContent: "space-between", width: BOARD_SIZE * CELL_SIZE + 4, background: "#c0c0c0" }}>
         <div style={{ background: "#000", color: "#f00", fontFamily: "'Courier New', monospace", fontSize: 22, fontWeight: 700, padding: "2px 4px", minWidth: 50, textAlign: "right", letterSpacing: 2, lineHeight: 1 }}>
@@ -224,6 +227,7 @@ export default function MinesweeperApp() {
         {gameState === "lost" && "Game over. Click the face to try again."}
         {gameState === "idle" && "Click a cell to start. Right-click to flag mines."}
         {gameState === "playing" && `${minesLeft} mines remaining`}
+      </div>
       </div>
     </div>
   );

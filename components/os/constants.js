@@ -336,7 +336,7 @@ export const INITIAL_WINDOWS = {
     x: 200,
     y: 80,
     w: 260,
-    h: 350,
+    h: 360,
     isOpen: false,
     isMinimized: false,
     isMaximized: false,

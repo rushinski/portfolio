@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { PERSONAL } from "../data";
 import { useWindowManager } from "../hooks/useWindowManager";
-import { APP_PANEL_STYLE, APP_SECTION_HEADER_STYLE, WIN95_COLORS, getWin95ButtonStyle } from "../ui/retro";
+import { APP_BODY_STYLE, APP_CONTENT_STYLE, APP_PANEL_STYLE, APP_SECTION_HEADER_STYLE, WIN95_COLORS, getWin95ButtonStyle } from "../ui/retro";
 
 const LANG_COLORS = {
   JavaScript: "#f1e05a",
@@ -96,7 +96,8 @@ export default function AboutApp({ initialGitHubData = null }) {
   ];
 
   return (
-    <div style={{ padding: "16px 24px" }}>
+    <div style={APP_BODY_STYLE}>
+      <div style={APP_CONTENT_STYLE}>
       <div style={{ display: "flex", gap: 24, marginBottom: 16, alignItems: "flex-start" }}>
         <div style={{ flex: "0 0 270px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
@@ -296,6 +297,7 @@ export default function AboutApp({ initialGitHubData = null }) {
           </div>
         );
       })()}
+      </div>
     </div>
   );
 }
