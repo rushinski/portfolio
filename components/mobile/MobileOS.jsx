@@ -18,6 +18,7 @@ import SettingsMobile from "./apps/Settings";
 import MinesweeperMobile from "./apps/Minesweeper";
 
 import { APP_TITLES, MOBILE_APP_MAP } from "./mobileConstants";
+import MobileBootSequence from "./MobileBootSequence";
 
 const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
 
@@ -177,6 +178,7 @@ function SideButton({ side, top, height }) {
 }
 
 export default function MobileOS() {
+  const [booting, setBooting] = useState(true);
   const [openApp, setOpenApp] = useState(null);
   const [shakeMode, setShakeMode] = useState(false);
   const [deleteAlert, setDeleteAlert] = useState(null);
@@ -290,6 +292,8 @@ export default function MobileOS() {
             position: "relative",
           }}
         >
+          {booting && <MobileBootSequence onComplete={() => setBooting(false)} />}
+
           <StatusBar />
 
           <HomeScreen
