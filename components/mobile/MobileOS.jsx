@@ -35,57 +35,6 @@ const APP_COMPONENTS = {
   minesweeper: MinesweeperMobile,
 };
 
-// Win95 grip pattern for the home indicator
-function RetroHomeBar({ onSwipeUp, onClick }) {
-  const touchStartY = useRef(null);
-
-  const handleTouchStart = (e) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e) => {
-    if (touchStartY.current === null) return;
-    const dy = e.changedTouches[0].clientY - touchStartY.current;
-    touchStartY.current = null;
-    if (dy < -55) onSwipeUp?.(); // swipe UP
-  };
-
-  return (
-    <div
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onClick={onClick}
-      style={{
-        height: 30,
-        flexShrink: 0,
-        background: "#c0c0c0",
-        borderTop: "2px solid #ffffff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        cursor: "pointer",
-        userSelect: "none",
-        touchAction: "none",
-      }}
-    >
-      {/* Win95 resize-grip dot pattern */}
-      <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
-        {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-          <div
-            key={i}
-            style={{
-              width: 4,
-              height: 4,
-              background: "#808080",
-              boxShadow: "1px 1px 0 #ffffff",
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // Cannot-delete alert dialog
 function DeleteAlert({ appLabel, onClose }) {
   return (
@@ -146,7 +95,7 @@ function DeleteAlert({ appLabel, onClose }) {
   );
 }
 
-// Full-screen app view — no title bar, no X, swipe up from bottom to close
+// Full-screen app view — no title bar, no X; closed via D-pad hardware button
 function AppView({ appId, onClose, onOpenApp }) {
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -199,9 +148,6 @@ function AppView({ appId, onClose, onOpenApp }) {
           </div>
         )}
       </div>
-
-      {/* Retro home bar — swipe up to close */}
-      <RetroHomeBar onSwipeUp={handleClose} onClick={handleClose} />
     </div>
   );
 }
@@ -355,8 +301,6 @@ export default function MobileOS() {
             onBackgroundTap={handleBackgroundTap}
           />
 
-          {!openApp && <RetroHomeBar />}
-
           {openApp && <AppView appId={openApp} onClose={handleClose} onOpenApp={handleOpen} />}
 
           {deleteAlert && (
@@ -380,8 +324,9 @@ export default function MobileOS() {
             justifyContent: "center",
           }}
         >
-          {/* Center D-pad / OK button */}
+          {/* Center D-pad / home button — tap to close app or exit shake mode */}
           <div
+            onClick={() => { handleClose(); setShakeMode(false); }}
             style={{
               width: 38,
               height: 38,
@@ -393,6 +338,9 @@ export default function MobileOS() {
               alignItems: "center",
               justifyContent: "center",
               boxShadow: "inset 0 2px 4px rgba(0,0,0,0.4)",
+              cursor: "pointer",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
             }}
           >
             <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#888", border: "2px solid #505050" }} />
