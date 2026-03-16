@@ -61,13 +61,35 @@ function floodReveal(board, startR, startC) {
 
 const seg = (n) => String(Math.min(999, Math.max(-99, n))).padStart(3, "0");
 
+const SAVE_KEY = "jacobos_minesweeper";
+
+function loadSave() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function clearSave() {
+  try { localStorage.removeItem(SAVE_KEY); } catch {}
+}
+
 export default function MinesweeperMobile() {
-  const [board, setBoard]         = useState(createEmptyBoard);
-  const [gameState, setGameState] = useState("idle");
-  const [minesLeft, setMinesLeft] = useState(MINE_COUNT);
-  const [time, setTime]           = useState(0);
+  const saved = loadSave();
+  const [board, setBoard]         = useState(() => saved?.board ?? createEmptyBoard());
+  const [gameState, setGameState] = useState(() => saved?.gameState ?? "idle");
+  const [minesLeft, setMinesLeft] = useState(() => saved?.minesLeft ?? MINE_COUNT);
+  const [time, setTime]           = useState(() => saved?.time ?? 0);
   const [faceDown, setFaceDown]   = useState(false);
   const timerRef                  = useRef(null);
+
+  // Persist state to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({ board, gameState, minesLeft, time }));
+    } catch {}
+  }, [board, gameState, minesLeft, time]);
 
   useEffect(() => {
     if (gameState === "playing") {
@@ -79,6 +101,7 @@ export default function MinesweeperMobile() {
   }, [gameState]);
 
   const reset = () => {
+    clearSave();
     setBoard(createEmptyBoard());
     setGameState("idle");
     setMinesLeft(MINE_COUNT);
