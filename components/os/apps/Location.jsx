@@ -117,14 +117,14 @@ export default function LocationApp() {
           </div>
 
           {/* PA detail map — city markers */}
-          <div style={{ ...APP_PANEL_STYLE, flex: 1, padding: 0, overflow: "hidden", background: "#c8dff0" }}>
+          <div style={{ ...APP_PANEL_STYLE, flex: 1, padding: 0, background: "#c8dff0" }}>
             <div style={{ fontSize: 9, fontWeight: 700, color: "#404040", padding: "3px 6px", background: "#d4d0c8", borderBottom: "1px solid #808080" }}>Pennsylvania</div>
             {!mapError ? (
               <ComposableMap
                 projection="geoMercator"
-                projectionConfig={{ center: [-77.5, 41.0], scale: 6500 }}
-                height={440}
-                style={{ width: "100%", height: "auto", display: "block" }}
+                projectionConfig={{ center: [-77.5, 41.0], scale: 5500 }}
+                height={400}
+                style={{ width: "100%", height: "auto", display: "block", overflow: "visible" }}
               >
                 <Geographies geography={GEO_URL}>
                   {({ geographies }) =>
@@ -144,28 +144,36 @@ export default function LocationApp() {
                   }
                 </Geographies>
 
-                {LOCATIONS.map((loc) => (
-                  <Marker
-                    key={loc.id}
-                    coordinates={loc.coordinates}
-                    onClick={() => setActivePin(activePin === loc.id ? null : loc.id)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    {activePin === loc.id && (
-                      <circle r={18} fill="none" stroke={loc.color} strokeWidth={2} opacity={0.45} />
-                    )}
-                    <circle r={11} fill={loc.color} stroke="#fff" strokeWidth={2} />
-                    <circle r={4} fill="#fff" opacity={0.65} />
-                    <text
-                      textAnchor={loc.id === "philadelphia" ? "end" : "start"}
-                      x={loc.id === "philadelphia" ? -15 : 15}
-                      y={5}
-                      style={{ fontFamily: "sans-serif", fontSize: 16, fontWeight: 700, fill: loc.color, cursor: "pointer", userSelect: "none", paintOrder: "stroke", stroke: "#fff", strokeWidth: 4, strokeLinejoin: "round" }}
+                {LOCATIONS.map((loc) => {
+                  const labelProps =
+                    loc.id === "harrisburg"
+                      ? { textAnchor: "start", dx: 12, dy: 4 }
+                      : loc.id === "lancaster"
+                      ? { textAnchor: "middle", dx: 0, dy: -14 }
+                      : { textAnchor: "start", dx: 12, dy: 20 };
+                  return (
+                    <Marker
+                      key={loc.id}
+                      coordinates={loc.coordinates}
+                      onClick={() => setActivePin(activePin === loc.id ? null : loc.id)}
+                      style={{ cursor: "pointer" }}
                     >
-                      {loc.label.split(",")[0]}
-                    </text>
-                  </Marker>
-                ))}
+                      {activePin === loc.id && (
+                        <circle r={14} fill="none" stroke={loc.color} strokeWidth={2} opacity={0.45} />
+                      )}
+                      <circle r={8} fill={loc.color} stroke="#fff" strokeWidth={2} />
+                      <circle r={3} fill="#fff" opacity={0.65} />
+                      <text
+                        textAnchor={labelProps.textAnchor}
+                        x={labelProps.dx}
+                        y={labelProps.dy}
+                        style={{ fontFamily: "sans-serif", fontSize: 13, fontWeight: 700, fill: loc.color, cursor: "pointer", userSelect: "none", paintOrder: "stroke", stroke: "#fff", strokeWidth: 3, strokeLinejoin: "round" }}
+                      >
+                        {loc.label.split(",")[0]}
+                      </text>
+                    </Marker>
+                  );
+                })}
               </ComposableMap>
             ) : (
               <div style={{ padding: "12px 14px", fontSize: 11, color: "#555" }}>Map unavailable.</div>
