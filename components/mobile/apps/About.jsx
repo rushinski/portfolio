@@ -52,7 +52,6 @@ const TOP_SKILL_ICONS = {
 const TOP_SKILLS = ["JavaScript", "Python", "PostgreSQL", "Next.js"];
 
 const CHART_COLORS = ["#c0c0c0", "#cce8cc", "#7dbf7d", "#3a8a3a", "#1a5c1a"];
-const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 function getLevel(count) {
@@ -88,82 +87,37 @@ function DonutChart({ langs, size = 72 }) {
 
 function ContributionCalendar({ calendar }) {
   const allWeeks = calendar?.weeks || [];
-  const now = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
-  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const total = calendar?.totalContributions || 0;
+  const cell = 10, gap = 2, step = 12;
 
-  // Build list of available month/year combos from data
-  const availableMonths = [];
-  const seen = new Set();
-  allWeeks.forEach((week) => {
+  // Build month markers
+  const monthMarkers = [];
+  allWeeks.forEach((week, wi) => {
     if (!week.contributionDays?.length) return;
     const d = new Date(`${week.contributionDays[0].date}T12:00:00`);
-    const key = `${d.getFullYear()}-${d.getMonth()}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      availableMonths.push({ year: d.getFullYear(), month: d.getMonth() });
-    }
+    const month = d.getMonth();
+    const prevMonth = wi > 0 && allWeeks[wi - 1].contributionDays?.length
+      ? new Date(`${allWeeks[wi - 1].contributionDays[0].date}T12:00:00`).getMonth()
+      : -1;
+    if (month !== prevMonth) monthMarkers.push({ wi, label: MONTH_SHORT[month] });
   });
-
-  // Filter weeks to selected month — include week if its first day is in that month
-  const weeksInMonth = allWeeks.filter((week) => {
-    if (!week.contributionDays?.length) return false;
-    const d = new Date(`${week.contributionDays[0].date}T12:00:00`);
-    return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
-  });
-
-  // Count contributions in selected month (only days actually in that month)
-  const monthTotal = weeksInMonth.reduce((sum, week) => {
-    return sum + week.contributionDays.reduce((s, day) => {
-      const d = new Date(`${day.date}T12:00:00`);
-      return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear
-        ? s + day.contributionCount
-        : s;
-    }, 0);
-  }, 0);
-
-  const cell = 10, gap = 2;
 
   return (
     <div style={{ ...PANEL, padding: "10px 10px 8px" }}>
-      {/* Month picker */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-        <div style={{ fontSize: 11, color: "#555" }}>
-          {monthTotal.toLocaleString()} contributions
-        </div>
-        <select
-          value={`${selectedYear}-${selectedMonth}`}
-          onChange={(e) => {
-            const [y, m] = e.target.value.split("-").map(Number);
-            setSelectedYear(y);
-            setSelectedMonth(m);
-          }}
-          style={{
-            fontFamily: W95_FONT,
-            fontSize: 10,
-            background: "#c0c0c0",
-            color: "#111",
-            border: "2px solid",
-            borderColor: "#ffffff #808080 #808080 #ffffff",
-            padding: "1px 4px",
-            cursor: "pointer",
-            outline: "none",
-          }}
-        >
-          {availableMonths.map(({ year, month }) => (
-            <option key={`${year}-${month}`} value={`${year}-${month}`}>
-              {MONTH_SHORT[month]} {year}
-            </option>
-          ))}
-        </select>
+      <div style={{ fontSize: 11, color: "#555", marginBottom: 6 }}>
+        {total.toLocaleString()} contributions in the last year
       </div>
-
-      {weeksInMonth.length === 0 ? (
-        <div style={{ fontSize: 10, color: "#888", textAlign: "center", padding: "8px 0" }}>
-          No data for {MONTH_NAMES[selectedMonth]}
-        </div>
-      ) : (
-        <div>
+      {/* Horizontally scrollable grid */}
+      <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+        <div style={{ display: "inline-flex", flexDirection: "column" }}>
+          {/* Month labels */}
+          <div style={{ position: "relative", marginLeft: 20, height: 13, marginBottom: 2, minWidth: allWeeks.length * step }}>
+            {monthMarkers.map(({ wi, label }) => (
+              <span key={`${label}-${wi}`} style={{ position: "absolute", left: wi * step, fontSize: 9, color: "#000080", opacity: 0.8 }}>
+                {label}
+              </span>
+            ))}
+          </div>
           {/* Grid */}
           <div style={{ display: "flex" }}>
             <div style={{ display: "flex", flexDirection: "column", gap, width: 18, marginRight: 2, flexShrink: 0 }}>
@@ -174,23 +128,19 @@ function ContributionCalendar({ calendar }) {
               ))}
             </div>
             <div style={{ display: "flex", gap }}>
-              {weeksInMonth.map((week, wi) => (
+              {allWeeks.map((week, wi) => (
                 <div key={wi} style={{ display: "flex", flexDirection: "column", gap, flexShrink: 0 }}>
-                  {week.contributionDays.map((day, di) => {
-                    const d = new Date(`${day.date}T12:00:00`);
-                    const inMonth = d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
-                    return (
-                      <div
-                        key={`${day.date}-${di}`}
-                        style={{
-                          width: cell, height: cell,
-                          background: inMonth ? CHART_COLORS[getLevel(day.contributionCount)] : "transparent",
-                          border: inMonth ? "1px solid rgba(0,0,0,0.08)" : "none",
-                          flexShrink: 0,
-                        }}
-                      />
-                    );
-                  })}
+                  {week.contributionDays.map((day, di) => (
+                    <div
+                      key={`${day.date}-${di}`}
+                      style={{
+                        width: cell, height: cell,
+                        background: CHART_COLORS[getLevel(day.contributionCount)],
+                        border: "1px solid rgba(0,0,0,0.08)",
+                        flexShrink: 0,
+                      }}
+                    />
+                  ))}
                 </div>
               ))}
             </div>
@@ -204,7 +154,7 @@ function ContributionCalendar({ calendar }) {
             <span style={{ fontSize: 9, color: "#777" }}>More</span>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

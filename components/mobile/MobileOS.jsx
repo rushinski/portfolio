@@ -367,7 +367,7 @@ export default function MobileOS() {
           )}
         </div>
 
-        {/* BOTTOM BEZEL — nav buttons */}
+        {/* BOTTOM BEZEL — center D-pad only */}
         <div
           style={{
             height: 66,
@@ -378,34 +378,8 @@ export default function MobileOS() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 10,
-            padding: "0 16px",
           }}
         >
-          {/* Left soft-key */}
-          <button
-            onClick={handleClose}
-            style={{
-              flex: 1,
-              height: 28,
-              background: "#707070",
-              border: "2px solid",
-              borderColor: "#b0b0b0 #404040 #404040 #b0b0b0",
-              borderRadius: 3,
-              fontSize: 9,
-              fontFamily: W95_FONT,
-              fontWeight: 700,
-              color: "#fff",
-              cursor: "pointer",
-              letterSpacing: 0.5,
-              textTransform: "uppercase",
-              touchAction: "manipulation",
-              WebkitTapHighlightColor: "transparent",
-            }}
-          >
-            Back
-          </button>
-
           {/* Center D-pad / OK button */}
           <div
             style={{
@@ -418,36 +392,11 @@ export default function MobileOS() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              flexShrink: 0,
               boxShadow: "inset 0 2px 4px rgba(0,0,0,0.4)",
             }}
           >
             <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#888", border: "2px solid #505050" }} />
           </div>
-
-          {/* Right soft-key */}
-          <button
-            onClick={() => { handleClose(); setShakeMode(false); }}
-            style={{
-              flex: 1,
-              height: 28,
-              background: "#707070",
-              border: "2px solid",
-              borderColor: "#b0b0b0 #404040 #404040 #b0b0b0",
-              borderRadius: 3,
-              fontSize: 9,
-              fontFamily: W95_FONT,
-              fontWeight: 700,
-              color: "#fff",
-              cursor: "pointer",
-              letterSpacing: 0.5,
-              textTransform: "uppercase",
-              touchAction: "manipulation",
-              WebkitTapHighlightColor: "transparent",
-            }}
-          >
-            Home
-          </button>
         </div>
       </div>
     </div>
