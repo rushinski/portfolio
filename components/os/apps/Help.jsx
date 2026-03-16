@@ -94,7 +94,6 @@ const TOPICS = [
       { text: "JacobOS includes a fully navigable virtual file system with drives, folders, and text documents." },
       { heading: "Drives" },
       { table: [
-        ["A:", "3.5\" Floppy Disk (1.44 MB)"],
         ["C:", "JacobOS main drive (2.1 GB)"],
         ["D:", "Archive drive (824 MB)"],
       ]},

@@ -887,6 +887,14 @@ export function OSProvider({ children }) {
       return;
     }
 
+    if (item.itemType === "binary") {
+      showAlertDialog(
+        `"${item.title}" cannot be opened.\n\nJacobOS does not have a program associated with this file type.`,
+        { title: "Cannot Open File", variant: "warning" }
+      );
+      return;
+    }
+
     if (item.itemType === "text") {
       setActiveTextDocId(item.id);
       setWindows((prev) => ({
