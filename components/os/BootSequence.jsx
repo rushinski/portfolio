@@ -4,7 +4,8 @@ import { useEffect, useRef } from "react";
 
 import { useOSContext } from "./context/OSContext";
 
-const BOOT_DURATION_MS = 2450;
+const BOOT_MS = 2600;
+const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
 
 export default function BootSequence({ onComplete, embedded = false }) {
   const startedRef = useRef(false);
@@ -14,118 +15,36 @@ export default function BootSequence({ onComplete, embedded = false }) {
   } = useOSContext();
 
   useEffect(() => {
-    if (startedRef.current) {
-      return undefined;
-    }
-
+    if (startedRef.current) return undefined;
     startedRef.current = true;
     playStartupSound?.();
-
-    timeoutRef.current = window.setTimeout(() => {
-      onComplete?.();
-    }, BOOT_DURATION_MS);
-
-    return () => {
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
-      }
-    };
+    timeoutRef.current = window.setTimeout(() => onComplete?.(), BOOT_MS);
+    return () => { if (timeoutRef.current) window.clearTimeout(timeoutRef.current); };
   }, [onComplete, playStartupSound]);
 
   return (
     <>
       <style>{`
-        @keyframes crtBootOverlay {
-          0%, 90% { opacity: 1; }
+        @keyframes bsLogoIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes bsProgress {
+          from { width: 0%; }
+          to   { width: 100%; }
+        }
+        @keyframes bsFadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @keyframes bsFadeOut {
+          0%   { opacity: 1; }
+          80%  { opacity: 1; }
           100% { opacity: 0; }
         }
-
-        @keyframes crtBootLine {
-          0%, 14% {
-            opacity: 0;
-            transform: translateY(-50%) scaleX(0.008) scaleY(1);
-            filter: blur(0px);
-          }
-          22% {
-            opacity: 1;
-            transform: translateY(-50%) scaleX(0.08) scaleY(1.05);
-            filter: blur(0px);
-          }
-          38% {
-            opacity: 1;
-            transform: translateY(-50%) scaleX(1) scaleY(1.65);
-            filter: blur(0.35px);
-          }
-          56% {
-            opacity: 0.95;
-            transform: translateY(-50%) scaleX(1.02) scaleY(1.1);
-            filter: blur(0.8px);
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(-50%) scaleX(1.04) scaleY(0.8);
-            filter: blur(2px);
-          }
-        }
-
-        @keyframes crtBootTopShutter {
-          0%, 24% {
-            transform: translateY(0%);
-          }
-          72% {
-            transform: translateY(-101%);
-          }
-          100% {
-            transform: translateY(-101%);
-          }
-        }
-
-        @keyframes crtBootBottomShutter {
-          0%, 24% {
-            transform: translateY(0%);
-          }
-          72% {
-            transform: translateY(101%);
-          }
-          100% {
-            transform: translateY(101%);
-          }
-        }
-
-        @keyframes crtBootFlash {
-          0%, 20%, 42%, 100% {
-            opacity: 0;
-          }
-          26% {
-            opacity: 0.16;
-          }
-          34% {
-            opacity: 0.09;
-          }
-        }
-
-        @keyframes crtBootFlicker {
-          0%, 58%, 68%, 78%, 100% {
-            opacity: 0;
-          }
-          62% {
-            opacity: 0.08;
-          }
-          74% {
-            opacity: 0.06;
-          }
-        }
-
-        @keyframes crtBootScanlines {
-          0%, 26% {
-            opacity: 0;
-          }
-          36%, 72% {
-            opacity: 0.14;
-          }
-          100% {
-            opacity: 0;
-          }
+        @keyframes bsBlink {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0; }
         }
       `}</style>
 
@@ -135,99 +54,96 @@ export default function BootSequence({ onComplete, embedded = false }) {
           position: embedded ? "absolute" : "fixed",
           inset: 0,
           zIndex: embedded ? 20000 : 99999,
-          overflow: "hidden",
-          pointerEvents: "none",
-          background: "transparent",
-          animation: `crtBootOverlay ${BOOT_DURATION_MS}ms linear forwards`,
+          background: "#000",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: W95_FONT,
+          animation: `bsFadeOut ${BOOT_MS}ms linear forwards`,
         }}
       >
+        {/* Logo block */}
         <div
           style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 6,
-            background: "rgba(255,255,255,0.12)",
-            opacity: 0,
-            animation: "crtBootFlash 700ms linear 120ms forwards",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 10,
+            animation: "bsLogoIn 300ms ease-out 200ms both",
           }}
-        />
+        >
+          <div
+            style={{
+              background: "linear-gradient(90deg, #000080, #1084d0)",
+              padding: "5px 22px",
+              fontSize: 17,
+              fontWeight: 700,
+              color: "#fff",
+              letterSpacing: 1,
+              border: "2px solid",
+              borderColor: "#ffffff #404040 #404040 #ffffff",
+              boxShadow: "2px 2px 0 #000",
+            }}
+          >
+            JacobOS
+          </div>
+          <div style={{ fontSize: 9, color: "#808080", letterSpacing: 0.5 }}>
+            Version 1.0 — Desktop Edition
+          </div>
+        </div>
 
+        {/* Progress bar */}
         <div
           style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            top: 0,
-            height: "50.5%",
-            zIndex: 20,
-            background: "#000",
-            transformOrigin: "center bottom",
-            borderBottom: "1px solid rgba(255,255,255,0.55)",
-            animation: "crtBootTopShutter 1080ms cubic-bezier(0.16, 0.94, 0.14, 1) 170ms forwards",
+            marginTop: 36,
+            width: 180,
+            animation: "bsFadeIn 200ms ease-out 400ms both",
           }}
-        />
+        >
+          <div
+            style={{
+              width: "100%",
+              height: 14,
+              background: "#111",
+              border: "2px solid",
+              borderColor: "#404040 #ffffff #ffffff #404040",
+            }}
+          >
+            <div
+              style={{
+                height: "100%",
+                background: "#000080",
+                animation: `bsProgress ${BOOT_MS - 800}ms linear 500ms both`,
+              }}
+            />
+          </div>
+          <div
+            style={{
+              fontSize: 9,
+              color: "#404040",
+              textAlign: "center",
+              marginTop: 4,
+              animation: "bsBlink 1s step-end infinite",
+            }}
+          >
+            Loading...
+          </div>
+        </div>
 
+        {/* Copyright footer */}
         <div
           style={{
             position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: "50.5%",
-            zIndex: 20,
-            background: "#000",
-            transformOrigin: "center top",
-            borderTop: "1px solid rgba(255,255,255,0.55)",
-            animation: "crtBootBottomShutter 1080ms cubic-bezier(0.16, 0.94, 0.14, 1) 170ms forwards",
+            bottom: 20,
+            fontSize: 8,
+            color: "#333",
+            letterSpacing: 0.3,
+            animation: "bsFadeIn 300ms ease-out 600ms both",
           }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            top: "50%",
-            height: 1,
-            zIndex: 24,
-            background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.92) 12%, #ffffff 50%, rgba(255,255,255,0.92) 88%, transparent 100%)",
-            boxShadow: "0 0 6px rgba(255,255,255,0.9)",
-            transformOrigin: "center center",
-            animation: "crtBootLine 520ms cubic-bezier(0.18, 0.94, 0.2, 1) 120ms forwards",
-          }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 10,
-            background: "rgba(255,255,255,0.12)",
-            opacity: 0,
-            animation: "crtBootFlicker 1500ms linear 980ms forwards",
-          }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 8,
-            background: "repeating-linear-gradient(180deg, rgba(255,255,255,0.2) 0px, rgba(255,255,255,0.2) 1px, transparent 1px, transparent 4px)",
-            mixBlendMode: "screen",
-            opacity: 0,
-            animation: `crtBootScanlines ${BOOT_DURATION_MS}ms linear forwards`,
-          }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 9,
-            background: "radial-gradient(circle at center, transparent 58%, rgba(0,0,0,0.22) 100%)",
-          }}
-        />
+        >
+          © 2025 Jacob Rushinski. All rights reserved.
+        </div>
       </div>
     </>
   );
