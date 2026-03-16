@@ -44,11 +44,11 @@ export default function ContactApp() {
   const [status, setStatus] = useState(null);
 
   const contacts = [
-    { label: "Email", value: PERSONAL.email, href: `mailto:${PERSONAL.email}`, icon: "/socials/email.png" },
-    { label: "GitHub", value: PERSONAL.github.replace("https://", ""), href: PERSONAL.github, icon: "/socials/github.png" },
-    { label: "LinkedIn", value: PERSONAL.linkedin.replace("https://", ""), href: PERSONAL.linkedin, icon: "/socials/linkedin.png" },
-    { label: "Phone", value: PERSONAL.phone || "(717) 216-9005", href: "tel:+17172169005", icon: "/socials/phone.png" },
-    { label: "Location", value: PERSONAL.location, href: null, icon: null },
+    { label: "Email", value: PERSONAL.email, href: `mailto:${PERSONAL.email}` },
+    { label: "GitHub", value: PERSONAL.github.replace("https://", ""), href: PERSONAL.github },
+    { label: "LinkedIn", value: PERSONAL.linkedin.replace("https://", ""), href: PERSONAL.linkedin },
+    { label: "Phone", value: PERSONAL.phone || "(717) 216-9005", href: "tel:+17172169005" },
+    { label: "Location", value: PERSONAL.location, href: null },
   ];
 
   const canSubmit = form.name.trim() && form.email.trim() && form.message.trim();
@@ -124,13 +124,8 @@ export default function ContactApp() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {contacts.map((contact) => (
-              <div key={contact.label} style={{ ...APP_PANEL_STYLE, display: "grid", gridTemplateColumns: "20px 56px minmax(0, 1fr)", alignItems: "start", columnGap: 8, padding: "6px 8px" }}>
-                <div style={{ width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  {contact.icon
-                    ? <img src={contact.icon} alt={contact.label} width={16} height={16} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
-                    : <span style={{ fontSize: 11, color: "#000080", fontWeight: 700 }}>LOC</span>}
-                </div>
-                <div style={{ minWidth: 0, fontSize: 10, fontWeight: 700, color: "#444", paddingTop: 4 }}>{contact.label}</div>
+              <div key={contact.label} style={{ ...APP_PANEL_STYLE, display: "grid", gridTemplateColumns: "70px minmax(0, 1fr)", alignItems: "center", columnGap: 8, padding: "5px 8px" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", letterSpacing: 0.5 }}>{contact.label.toUpperCase()}</div>
                 <div style={{ ...APP_FIELD_STYLE, minWidth: 0, padding: "3px 6px", minHeight: 22, lineHeight: 1.35 }}>
                   {contact.href ? (
                     <a
