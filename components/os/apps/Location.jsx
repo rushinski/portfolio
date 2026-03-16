@@ -3,11 +3,15 @@
 import { useEffect, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 
-import { APP_BODY_STYLE, APP_PANEL_STYLE } from "../ui/retro";
+import { APP_BODY_STYLE, APP_CONTENT_STYLE, APP_PANEL_STYLE } from "../ui/retro";
 
-const GEO_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json";
+// US states atlas (for PA highlight + state borders)
+const US_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json";
+// World atlas for Canada/Mexico background
+const WORLD_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 const PA_FIPS = "42";
+const USA_ID = "840"; // ISO numeric for USA — exclude from world layer so US states show through
 
 const LOCATIONS = [
   {
@@ -17,10 +21,9 @@ const LOCATIONS = [
     noteLines: ["Home base. Work at", "Giant Food Stores."],
     coordinates: [-76.8867, 40.2732],
     color: "#008000",
-    // callout box offset from pin
-    bx: -215,
-    by: -110,
-    bw: 150,
+    bx: -220,
+    by: -105,
+    bw: 152,
     bh: 72,
   },
   {
@@ -30,9 +33,9 @@ const LOCATIONS = [
     noteLines: ["Thaddeus Stevens College", "of Technology. Weekdays."],
     coordinates: [-76.3055, 40.0379],
     color: "#000080",
-    bx: -215,
-    by: 20,
-    bw: 150,
+    bx: -220,
+    by: 22,
+    bw: 152,
     bh: 72,
   },
   {
@@ -42,41 +45,45 @@ const LOCATIONS = [
     noteLines: ["In Philly most weekends.", "Plans to move here."],
     coordinates: [-75.1652, 39.9526],
     color: "#800000",
-    bx: 18,
-    by: -50,
+    bx: 30,
+    by: -82,
     bw: 158,
     bh: 72,
   },
 ];
 
-// Win95-style callout box rendered inside SVG
 function Callout({ loc }) {
   const { bx, by, bw, bh, color, label, role, noteLines } = loc;
+
+  // Connector: right edge of box when box is left of pin, left edge when box is right
+  const lineX1 = bx < 0 ? bx + bw : bx;
+  const lineY1 = by + bh / 2;
+
   return (
     <g>
-      {/* connector line from callout to pin */}
+      {/* dashed connector line from callout edge to pin */}
       <line
-        x1={bx < 0 ? bx + bw : bx}
-        y1={by + bh / 2}
+        x1={lineX1}
+        y1={lineY1}
         x2={0}
         y2={0}
         stroke={color}
-        strokeWidth={1.2}
-        opacity={0.5}
-        strokeDasharray="4 3"
+        strokeWidth={1.3}
+        opacity={0.6}
+        strokeDasharray="5 3"
       />
-      {/* box shadow */}
+      {/* drop shadow */}
       <rect x={bx + 2} y={by + 2} width={bw} height={bh} fill="#808080" />
-      {/* box face */}
+      {/* panel face */}
       <rect x={bx} y={by} width={bw} height={bh} fill="#d4d0c8" stroke="#404040" strokeWidth={1} />
-      {/* top-left highlight */}
-      <line x1={bx} y1={by} x2={bx + bw} y2={by} stroke="#fff" strokeWidth={1.2} />
-      <line x1={bx} y1={by} x2={bx} y2={by + bh} stroke="#fff" strokeWidth={1.2} />
+      {/* Win95 highlight edges */}
+      <line x1={bx} y1={by} x2={bx + bw} y2={by} stroke="#ffffff" strokeWidth={1.5} />
+      <line x1={bx} y1={by} x2={bx} y2={by + bh} stroke="#ffffff" strokeWidth={1.5} />
       {/* title bar */}
       <rect x={bx + 1} y={by + 1} width={bw - 2} height={16} fill={color} />
       <text
         x={bx + 5}
-        y={by + 12}
+        y={by + 13}
         style={{ fontSize: 11, fontWeight: 700, fill: "#fff", fontFamily: "Arial, sans-serif", userSelect: "none" }}
       >
         {label}
@@ -128,17 +135,40 @@ export default function LocationApp() {
 
   return (
     <div style={APP_BODY_STYLE}>
-      {/* Full-bleed map container */}
-      <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden", background: "#c8dff0" }}>
+      {/* Full-bleed map container — APP_CONTENT_STYLE provides the margin:6 grey outline */}
+      <div style={{ ...APP_CONTENT_STYLE, padding: 0, position: "relative", overflow: "hidden", background: "#c8dff0" }}>
         {!mapError ? (
           <ComposableMap
             projection="geoMercator"
-            projectionConfig={{ center: [-77.2, 40.4], scale: 2200 }}
+            projectionConfig={{ center: [-77.2, 40.4], scale: 3000 }}
             width={800}
             height={500}
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
           >
-            <Geographies geography={GEO_URL} onError={() => setMapError(true)}>
+            {/* World background: Canada, Mexico, etc. — US filtered out so state layer shows through */}
+            <Geographies geography={WORLD_URL} onError={() => setMapError(true)}>
+              {({ geographies }) =>
+                geographies
+                  .filter((geo) => String(geo.id) !== USA_ID)
+                  .map((geo) => (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      fill="#dcdcdc"
+                      stroke="#b8b8b8"
+                      strokeWidth={0.4}
+                      style={{
+                        default: { outline: "none" },
+                        hover: { outline: "none" },
+                        pressed: { outline: "none" },
+                      }}
+                    />
+                  ))
+              }
+            </Geographies>
+
+            {/* US states layer */}
+            <Geographies geography={US_URL}>
               {({ geographies }) =>
                 geographies.map((geo) => {
                   const isPA = geo.id === PA_FIPS;
@@ -146,7 +176,7 @@ export default function LocationApp() {
                     <Geography
                       key={geo.rsmKey}
                       geography={geo}
-                      fill={isPA ? "#d4e8c2" : "#e4e4e4"}
+                      fill={isPA ? "#d4e8c2" : "#ebebeb"}
                       stroke={isPA ? "#5a8a3a" : "#c0c0c0"}
                       strokeWidth={isPA ? 1.5 : 0.4}
                       style={{
@@ -160,6 +190,7 @@ export default function LocationApp() {
               }
             </Geographies>
 
+            {/* City markers with callout boxes */}
             {LOCATIONS.map((loc) => (
               <Marker key={loc.id} coordinates={loc.coordinates}>
                 <Callout loc={loc} />
