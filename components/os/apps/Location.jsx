@@ -3,17 +3,10 @@
 import { useEffect, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 
-import {
-  APP_BODY_STYLE,
-  APP_CONTENT_STYLE,
-  APP_META_TEXT_STYLE,
-  APP_PANEL_STYLE,
-  APP_SECTION_HEADER_STYLE,
-} from "../ui/retro";
+import { APP_BODY_STYLE, APP_PANEL_STYLE } from "../ui/retro";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json";
 
-// Pennsylvania FIPS code
 const PA_FIPS = "42";
 
 const LOCATIONS = [
@@ -21,42 +14,98 @@ const LOCATIONS = [
     id: "harrisburg",
     label: "Harrisburg, PA",
     role: "Home + Work",
-    note: "Home base. Work at Giant Food Stores in the area.",
+    noteLines: ["Home base. Work at", "Giant Food Stores."],
     coordinates: [-76.8867, 40.2732],
     color: "#008000",
+    // callout box offset from pin
+    bx: -215,
+    by: -110,
+    bw: 150,
+    bh: 72,
   },
   {
     id: "lancaster",
     label: "Lancaster, PA",
     role: "School",
-    note: "Attending Thaddeus Stevens College of Technology. Most weekdays here during the semester.",
+    noteLines: ["Thaddeus Stevens College", "of Technology. Weekdays."],
     coordinates: [-76.3055, 40.0379],
     color: "#000080",
+    bx: -215,
+    by: 20,
+    bw: 150,
+    bh: 72,
   },
   {
     id: "philadelphia",
     label: "Philadelphia, PA",
     role: "Weekends + Future",
-    note: "In Philly most weekends. Looking to move up here eventually.",
+    noteLines: ["In Philly most weekends.", "Plans to move here."],
     coordinates: [-75.1652, 39.9526],
     color: "#800000",
+    bx: 18,
+    by: -50,
+    bw: 158,
+    bh: 72,
   },
 ];
 
-function PinIcon({ color }) {
+// Win95-style callout box rendered inside SVG
+function Callout({ loc }) {
+  const { bx, by, bw, bh, color, label, role, noteLines } = loc;
   return (
-    <svg width="14" height="18" viewBox="0 0 14 18" shapeRendering="crispEdges">
-      <ellipse cx="7" cy="7" rx="5" ry="5" fill={color} />
-      <ellipse cx="7" cy="7" rx="3" ry="3" fill="#fff" opacity="0.45" />
-      <rect x="6" y="11" width="2" height="6" fill={color} />
-      <rect x="5" y="16" width="4" height="1" fill={color} opacity="0.5" />
-    </svg>
+    <g>
+      {/* connector line from callout to pin */}
+      <line
+        x1={bx < 0 ? bx + bw : bx}
+        y1={by + bh / 2}
+        x2={0}
+        y2={0}
+        stroke={color}
+        strokeWidth={1.2}
+        opacity={0.5}
+        strokeDasharray="4 3"
+      />
+      {/* box shadow */}
+      <rect x={bx + 2} y={by + 2} width={bw} height={bh} fill="#808080" />
+      {/* box face */}
+      <rect x={bx} y={by} width={bw} height={bh} fill="#d4d0c8" stroke="#404040" strokeWidth={1} />
+      {/* top-left highlight */}
+      <line x1={bx} y1={by} x2={bx + bw} y2={by} stroke="#fff" strokeWidth={1.2} />
+      <line x1={bx} y1={by} x2={bx} y2={by + bh} stroke="#fff" strokeWidth={1.2} />
+      {/* title bar */}
+      <rect x={bx + 1} y={by + 1} width={bw - 2} height={16} fill={color} />
+      <text
+        x={bx + 5}
+        y={by + 12}
+        style={{ fontSize: 11, fontWeight: 700, fill: "#fff", fontFamily: "Arial, sans-serif", userSelect: "none" }}
+      >
+        {label}
+      </text>
+      {/* role */}
+      <text
+        x={bx + 5}
+        y={by + 30}
+        style={{ fontSize: 10, fill: "#444", fontFamily: "Arial, sans-serif", fontStyle: "italic", userSelect: "none" }}
+      >
+        {role}
+      </text>
+      {/* note lines */}
+      {noteLines.map((line, i) => (
+        <text
+          key={i}
+          x={bx + 5}
+          y={by + 45 + i * 13}
+          style={{ fontSize: 9.5, fill: "#222", fontFamily: "Arial, sans-serif", userSelect: "none" }}
+        >
+          {line}
+        </text>
+      ))}
+    </g>
   );
 }
 
 export default function LocationApp() {
   const [now, setNow] = useState(() => new Date());
-  const [activePin, setActivePin] = useState(null);
   const [mapError, setMapError] = useState(false);
 
   useEffect(() => {
@@ -64,178 +113,83 @@ export default function LocationApp() {
     return () => window.clearInterval(id);
   }, []);
 
-  const estTime = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "America/New_York" });
-  const estDate = now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric", timeZone: "America/New_York" });
-  const gmtTime = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "UTC", hour12: false });
-  const gmtDate = now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
-  const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
-  const localTime = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const estTime = now.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZone: "America/New_York",
+  });
+  const estDate = now.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    timeZone: "America/New_York",
+  });
 
   return (
     <div style={APP_BODY_STYLE}>
-      <div style={{ ...APP_CONTENT_STYLE, display: "flex", flexDirection: "column", gap: 10 }}>
-
-        {/* Header */}
-        <div>
-          <div style={{ ...APP_SECTION_HEADER_STYLE, marginBottom: 4 }}>Jacob&apos;s Pennsylvania Circuit</div>
-          <div style={APP_META_TEXT_STYLE}>
-            Jacob travels between three PA cities regularly — school in Lancaster, home &amp; work in Harrisburg, and weekends in Philadelphia (with plans to move there).
-          </div>
-        </div>
-
-        {/* Maps — US overview (left) + PA detail (right) */}
-        <div style={{ display: "flex", gap: 8 }}>
-          {/* US map — PA highlighted */}
-          <div style={{ ...APP_PANEL_STYLE, flex: 1, padding: 0, overflow: "hidden", background: "#c8dff0" }}>
-            <div style={{ fontSize: 9, fontWeight: 700, color: "#404040", padding: "3px 6px", background: "#d4d0c8", borderBottom: "1px solid #808080" }}>United States</div>
-            {!mapError ? (
-              <ComposableMap
-                projection="geoAlbersUsa"
-                style={{ width: "100%", height: "auto", display: "block" }}
-              >
-                <Geographies geography={GEO_URL} onError={() => setMapError(true)}>
-                  {({ geographies }) =>
-                    geographies.map((geo) => {
-                      const isPA = geo.id === PA_FIPS;
-                      return (
-                        <Geography
-                          key={geo.rsmKey}
-                          geography={geo}
-                          fill={isPA ? "#d4e8c2" : "#e8e8e8"}
-                          stroke={isPA ? "#5a8a3a" : "#b0b0b0"}
-                          strokeWidth={isPA ? 1.5 : 0.5}
-                          style={{ default: { outline: "none" }, hover: { outline: "none" }, pressed: { outline: "none" } }}
-                        />
-                      );
-                    })
-                  }
-                </Geographies>
-              </ComposableMap>
-            ) : (
-              <div style={{ padding: "12px 14px", fontSize: 11, color: "#555" }}>Map unavailable.</div>
-            )}
-          </div>
-
-          {/* PA detail map — city markers */}
-          <div style={{ ...APP_PANEL_STYLE, flex: 1, padding: 0, background: "#c8dff0" }}>
-            <div style={{ fontSize: 9, fontWeight: 700, color: "#404040", padding: "3px 6px", background: "#d4d0c8", borderBottom: "1px solid #808080" }}>Pennsylvania</div>
-            {!mapError ? (
-              <ComposableMap
-                projection="geoMercator"
-                projectionConfig={{ center: [-77.5, 41.0], scale: 5500 }}
-                height={400}
-                style={{ width: "100%", height: "auto", display: "block", overflow: "visible" }}
-              >
-                <Geographies geography={GEO_URL}>
-                  {({ geographies }) =>
-                    geographies.map((geo) => {
-                      const isPA = geo.id === PA_FIPS;
-                      return (
-                        <Geography
-                          key={geo.rsmKey}
-                          geography={geo}
-                          fill={isPA ? "#d4e8c2" : "#eeeeee"}
-                          stroke={isPA ? "#5a8a3a" : "#cccccc"}
-                          strokeWidth={isPA ? 1.5 : 0.5}
-                          style={{ default: { outline: "none" }, hover: { outline: "none" }, pressed: { outline: "none" } }}
-                        />
-                      );
-                    })
-                  }
-                </Geographies>
-
-                {LOCATIONS.map((loc) => {
-                  const labelProps =
-                    loc.id === "harrisburg"
-                      ? { textAnchor: "start", dx: 12, dy: 4 }
-                      : loc.id === "lancaster"
-                      ? { textAnchor: "middle", dx: 0, dy: -14 }
-                      : { textAnchor: "start", dx: 12, dy: 20 };
+      {/* Full-bleed map container */}
+      <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden", background: "#c8dff0" }}>
+        {!mapError ? (
+          <ComposableMap
+            projection="geoMercator"
+            projectionConfig={{ center: [-77.2, 40.4], scale: 2200 }}
+            width={800}
+            height={500}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+          >
+            <Geographies geography={GEO_URL} onError={() => setMapError(true)}>
+              {({ geographies }) =>
+                geographies.map((geo) => {
+                  const isPA = geo.id === PA_FIPS;
                   return (
-                    <Marker
-                      key={loc.id}
-                      coordinates={loc.coordinates}
-                      onClick={() => setActivePin(activePin === loc.id ? null : loc.id)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {activePin === loc.id && (
-                        <circle r={14} fill="none" stroke={loc.color} strokeWidth={2} opacity={0.45} />
-                      )}
-                      <circle r={8} fill={loc.color} stroke="#fff" strokeWidth={2} />
-                      <circle r={3} fill="#fff" opacity={0.65} />
-                      <text
-                        textAnchor={labelProps.textAnchor}
-                        x={labelProps.dx}
-                        y={labelProps.dy}
-                        style={{ fontFamily: "sans-serif", fontSize: 13, fontWeight: 700, fill: loc.color, cursor: "pointer", userSelect: "none", paintOrder: "stroke", stroke: "#fff", strokeWidth: 3, strokeLinejoin: "round" }}
-                      >
-                        {loc.label.split(",")[0]}
-                      </text>
-                    </Marker>
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      fill={isPA ? "#d4e8c2" : "#e4e4e4"}
+                      stroke={isPA ? "#5a8a3a" : "#c0c0c0"}
+                      strokeWidth={isPA ? 1.5 : 0.4}
+                      style={{
+                        default: { outline: "none" },
+                        hover: { outline: "none" },
+                        pressed: { outline: "none" },
+                      }}
+                    />
                   );
-                })}
-              </ComposableMap>
-            ) : (
-              <div style={{ padding: "12px 14px", fontSize: 11, color: "#555" }}>Map unavailable.</div>
-            )}
-          </div>
-        </div>
+                })
+              }
+            </Geographies>
 
-        {/* Active pin detail */}
-        {activePin && (() => {
-          const loc = LOCATIONS.find((l) => l.id === activePin);
-          return (
-            <div style={{ ...APP_PANEL_STYLE, borderLeft: `3px solid ${loc.color}`, padding: "7px 10px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
-                <PinIcon color={loc.color} />
-                <strong style={{ fontSize: 12, color: loc.color }}>{loc.label}</strong>
-                <span style={{ fontSize: 11, color: "#555", marginLeft: 4 }}>— {loc.role}</span>
-              </div>
-              <div style={{ fontSize: 11, color: "#333", lineHeight: 1.5 }}>{loc.note}</div>
-            </div>
-          );
-        })()}
-
-        {/* Location cards */}
-        <div>
-          <div style={{ ...APP_SECTION_HEADER_STYLE, marginBottom: 6 }}>Locations</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             {LOCATIONS.map((loc) => (
-              <button
-                key={loc.id}
-                onClick={() => setActivePin(activePin === loc.id ? null : loc.id)}
-                style={{ ...APP_PANEL_STYLE, width: "100%", textAlign: "left", padding: "6px 10px", cursor: "pointer", fontFamily: "inherit", borderLeft: `3px solid ${loc.color}`, background: activePin === loc.id ? "#e8e8f8" : undefined }}
-              >
-                <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                  <strong style={{ fontSize: 12, color: loc.color }}>{loc.label}</strong>
-                  <span style={{ fontSize: 10, color: "#666" }}>{loc.role}</span>
-                </div>
-                <div style={{ fontSize: 11, color: "#444", marginTop: 2 }}>{loc.note}</div>
-              </button>
+              <Marker key={loc.id} coordinates={loc.coordinates}>
+                <Callout loc={loc} />
+                <circle r={7} fill={loc.color} stroke="#fff" strokeWidth={2} />
+                <circle r={2.5} fill="#fff" opacity={0.65} />
+              </Marker>
             ))}
+          </ComposableMap>
+        ) : (
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#555" }}>
+            Map unavailable.
+          </div>
+        )}
+
+        {/* Overlay: title + time */}
+        <div style={{ position: "absolute", top: 8, left: 8, right: 8, display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
+          <div style={{ ...APP_PANEL_STYLE, padding: "5px 9px", background: "rgba(212,208,200,0.92)" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", letterSpacing: 1, marginBottom: 1 }}>
+              WHERE&apos;S JACOB
+            </div>
+            <div style={{ fontSize: 10, color: "#444" }}>
+              Harrisburg · Lancaster · Philadelphia, PA
+            </div>
+          </div>
+          <div style={{ ...APP_PANEL_STYLE, padding: "5px 9px", textAlign: "right", background: "rgba(212,208,200,0.92)" }}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", marginBottom: 1 }}>Jacob&apos;s Time (EST)</div>
+            <div style={{ fontFamily: "'Courier New', monospace", fontSize: 13, fontWeight: 700, color: "#111" }}>{estTime}</div>
+            <div style={{ fontSize: 9, color: "#555", marginTop: 1 }}>{estDate}</div>
           </div>
         </div>
-
-        {/* Time display */}
-        <div>
-          <div style={{ ...APP_SECTION_HEADER_STYLE, marginBottom: 6 }}>Time</div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <div style={{ ...APP_PANEL_STYLE, flex: 1 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "#000080", marginBottom: 3 }}>Eastern (EST/EDT)</div>
-              <div style={{ fontFamily: "'Courier New', monospace", fontSize: 15, fontWeight: 700, color: "#111" }}>{estTime}</div>
-              <div style={{ fontSize: 10, color: "#555", marginTop: 2 }}>{estDate}</div>
-            </div>
-            <div style={{ ...APP_PANEL_STYLE, flex: 1 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "#555", marginBottom: 3 }}>UTC / GMT+0</div>
-              <div style={{ fontFamily: "'Courier New', monospace", fontSize: 15, color: "#333" }}>{gmtTime}</div>
-              <div style={{ fontSize: 10, color: "#777", marginTop: 2 }}>{gmtDate}</div>
-            </div>
-          </div>
-          {localTimezone !== "America/New_York" && (
-            <div style={{ fontSize: 10, color: "#888", marginTop: 4 }}>Your browser: {localTimezone} — {localTime}</div>
-          )}
-        </div>
-
       </div>
     </div>
   );
