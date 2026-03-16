@@ -5,6 +5,18 @@ import { useCallback, useEffect, useState } from "react";
 import { PROJECTS, VIDEO_LIBRARY_BY_ID } from "../data";
 import { useWindowManager } from "../hooks/useWindowManager";
 import { APP_BODY_STYLE, APP_CONTENT_STYLE } from "../ui/retro";
+import { getSkillIconSrc } from "../ui/skillIcon";
+
+function SkillTag({ tech, size = "normal" }) {
+  const icon = getSkillIconSrc(tech);
+  const isSmall = size === "small";
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: isSmall ? 3 : 4, padding: isSmall ? "0 5px 0 3px" : "1px 6px 1px 4px", fontSize: isSmall ? 9 : 10, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff" }}>
+      {icon && <img src={icon} alt="" width={isSmall ? 11 : 12} height={isSmall ? 11 : 12} style={{ objectFit: "contain", display: "block", flexShrink: 0 }} />}
+      {tech}
+    </span>
+  );
+}
 
 function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
   const ghRepo = project.links?.github ? repoData[project.links.github] : null;
@@ -80,9 +92,7 @@ function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
           <div style={sectionLabel}>Stack</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
             {project.stack.map((tech) => (
-              <span key={tech} style={{ padding: "1px 6px", fontSize: 10, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff" }}>
-                {tech}
-              </span>
+              <SkillTag key={tech} tech={tech} size="normal" />
             ))}
           </div>
 
@@ -226,9 +236,7 @@ export default function ProjectsApp() {
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8, gap: 8, flexWrap: "wrap" }}>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
                       {project.stack.slice(0, 5).map((tech) => (
-                        <span key={tech} style={{ padding: "0 5px", fontSize: 9, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff" }}>
-                          {tech}
-                        </span>
+                        <SkillTag key={tech} tech={tech} size="small" />
                       ))}
                     </div>
                     <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>Open</span>

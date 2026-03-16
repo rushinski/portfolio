@@ -13,38 +13,7 @@ import {
   WIN95_COLORS,
 } from "../ui/retro";
 
-const SKILL_ICON_FILES = {
-  TypeScript: "typescript.png",
-  JavaScript: "javascript.png",
-  Python: "Python.png",
-  Go: "Go.png",
-  Java: "Java.png",
-  "C++": "CPlusPlus.png",
-  PHP: "PHP.png",
-  HTML: "HTML5.png",
-  CSS: "CSS3.png",
-  "Node.js": "Nodejs.png",
-  "Next.js": "Nextjs.png",
-  Flask: "Flask.png",
-  React: "React.png",
-  PostgreSQL: "PostgresSQL.png",
-  MySQL: "MySQL.png",
-  MongoDB: "MongoDB.png",
-  Redis: "Redis.png",
-  "Tailwind CSS": "TailwindCSS.png",
-  Stripe: "stripe.webp",
-  Supabase: "supabase.webp",
-  "Discord.js": "Discordjs.png",
-  ADBKit: "Android.png",
-  "AWS SES": "AWS.png",
-  Docker: "Docker.png",
-  Git: "Git.png",
-  GitHub: "GitHub.png",
-  "GitHub Actions": "GitHubActions.png",
-  Vercel: "Vercel.png",
-  "Upstash Redis": "Redis.png",
-  "GitHub Gist API": "GitHub.png",
-};
+import { SKILL_ICON_FILES } from "../ui/skillIcon";
 
 const PROFICIENCY_LABELS = {
   1: "Foundational",

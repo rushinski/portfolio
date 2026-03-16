@@ -71,25 +71,8 @@ function AppIconTile({ app, onOpen, onLongPress }) {
         transition: "transform 80ms ease",
       }}
     >
-      {/* Win95 raised icon tile */}
-      <div
-        style={{
-          width: 56,
-          height: 56,
-          background: "#c0c0c0",
-          borderTop: "2px solid #ffffff",
-          borderLeft: "2px solid #ffffff",
-          borderRight: "2px solid #808080",
-          borderBottom: "2px solid #808080",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}
-      >
-        <div style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {app.icon}
-        </div>
+      <div style={{ width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        {app.icon}
       </div>
 
       {/* Label */}

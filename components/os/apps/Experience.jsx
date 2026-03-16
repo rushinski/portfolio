@@ -2,6 +2,7 @@
 
 import { EXPERIENCE } from "../data";
 import { APP_BODY_STYLE, APP_CONTENT_STYLE } from "../ui/retro";
+import { getSkillIconSrc } from "../ui/skillIcon";
 
 export default function ExperienceApp() {
   return (
@@ -29,11 +30,15 @@ export default function ExperienceApp() {
               ))}
               {experience.stack.length > 0 && (
                 <div style={{ display: "flex", gap: 3, flexWrap: "wrap", marginTop: 7 }}>
-                  {experience.stack.map((tech) => (
-                    <span key={tech} style={{ padding: "0 5px", fontSize: 9, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff" }}>
-                      {tech}
-                    </span>
-                  ))}
+                  {experience.stack.map((tech) => {
+                    const icon = getSkillIconSrc(tech);
+                    return (
+                      <span key={tech} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "0 5px 0 3px", fontSize: 9, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff" }}>
+                        {icon && <img src={icon} alt="" width={11} height={11} style={{ objectFit: "contain", display: "block", flexShrink: 0 }} />}
+                        {tech}
+                      </span>
+                    );
+                  })}
                 </div>
               )}
             </div>
