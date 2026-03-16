@@ -242,13 +242,13 @@ export default function RecycleBinApp() {
     <>
       <div
         style={{
-          margin: "-4px -6px",
-          minHeight: "calc(100% + 8px)",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
           background: WIN95_COLORS.surface,
           color: WIN95_COLORS.text,
           overflow: "hidden",
+          boxSizing: "border-box",
         }}
         onClick={() => setContextMenu(null)}
       >
