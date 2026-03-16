@@ -85,31 +85,34 @@ function DonutChart({ langs, size = 72 }) {
 }
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+// Show only the most recent N weeks so it fits without horizontal scroll
+const RECENT_WEEKS = 16;
 
 function ContributionCalendar({ calendar }) {
   const allWeeks = calendar?.weeks || [];
+  const recentWeeks = allWeeks.slice(-RECENT_WEEKS);
   const total = calendar?.totalContributions || 0;
-  const cell = 9, gap = 2, step = 11;
+  const cell = 10, gap = 2, step = 12;
 
   const monthMarkers = [];
-  allWeeks.forEach((week, wi) => {
+  recentWeeks.forEach((week, wi) => {
     if (!week.contributionDays?.length) return;
     const day = new Date(`${week.contributionDays[0].date}T12:00:00`);
     const month = day.getMonth();
-    const prevMonth = wi > 0 && allWeeks[wi - 1].contributionDays?.length
-      ? new Date(`${allWeeks[wi - 1].contributionDays[0].date}T12:00:00`).getMonth()
+    const prevMonth = wi > 0 && recentWeeks[wi - 1].contributionDays?.length
+      ? new Date(`${recentWeeks[wi - 1].contributionDays[0].date}T12:00:00`).getMonth()
       : -1;
     if (month !== prevMonth) monthMarkers.push({ wi, label: MONTHS[month] });
   });
 
   return (
-    <div style={{ ...PANEL, padding: "10px 10px 8px", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+    <div style={{ ...PANEL, padding: "10px 10px 8px" }}>
       <div style={{ fontSize: 11, color: "#555", marginBottom: 6 }}>
         {total.toLocaleString()} contributions in the last year
       </div>
-      <div style={{ width: "max-content" }}>
+      <div>
         {/* Month labels */}
-        <div style={{ position: "relative", marginLeft: 18, height: 13, marginBottom: 2 }}>
+        <div style={{ position: "relative", marginLeft: 20, height: 13, marginBottom: 2 }}>
           {monthMarkers.map(({ wi, label }) => (
             <span key={`${label}-${wi}`} style={{ position: "absolute", left: wi * step, fontSize: 9, color: "#000080", opacity: 0.8 }}>
               {label}
@@ -125,8 +128,8 @@ function ContributionCalendar({ calendar }) {
               </div>
             ))}
           </div>
-          <div style={{ display: "flex", gap }}>
-            {allWeeks.map((week, wi) => (
+          <div style={{ display: "flex", gap, flex: 1, justifyContent: "space-between" }}>
+            {recentWeeks.map((week, wi) => (
               <div key={wi} style={{ display: "flex", flexDirection: "column", gap, flexShrink: 0 }}>
                 {week.contributionDays.map((day, di) => (
                   <div
@@ -163,7 +166,7 @@ const socials = [
   { label: "GitHub",   value: "github.com/rushinski",             href: PERSONAL.github },
 ];
 
-export default function AboutMobile() {
+export default function AboutMobile({ onOpenApp }) {
   const [photoFailed, setPhotoFailed] = useState(false);
   const [ghData, setGhData] = useState(null);
 
@@ -237,53 +240,32 @@ export default function AboutMobile() {
         ))}
       </div>
 
-      {/* GitHub coding stats */}
-      {ghData && (
+      {/* Contribution calendar — no GitHub summary, just the graph */}
+      {ghData?.contributionCalendar && (
         <>
-          <div style={SECTION}>GitHub</div>
+          <div style={SECTION}>Contributions</div>
+          <ContributionCalendar calendar={ghData.contributionCalendar} />
+        </>
+      )}
 
-          {/* Summary numbers */}
-          <div style={{ ...PANEL, display: "flex", gap: 0, justifyContent: "space-around" }}>
-            {[
-              { label: "Repos",     value: ghData.publicRepos ?? "—" },
-              { label: "Followers", value: ghData.followers   ?? "—" },
-              { label: "Stars",     value: ghData.totalStars  ?? "—" },
-            ].map(({ label, value }) => (
-              <div key={label} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: "#000080" }}>{value}</div>
-                <div style={{ fontSize: 9, color: "#666", marginTop: 2 }}>{label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Contribution calendar */}
-          {ghData.contributionCalendar && (
-            <>
-              <div style={SECTION}>Contributions</div>
-              <ContributionCalendar calendar={ghData.contributionCalendar} />
-            </>
-          )}
-
-          {/* Repo languages */}
-          {langs.length > 0 && (
-            <>
-              <div style={SECTION}>Repo Languages</div>
-              <div style={{ ...PANEL, display: "flex", gap: 12, alignItems: "center" }}>
-                <DonutChart langs={langs} size={80} />
-                <div>
-                  {langs.slice(0, 6).map((l) => (
-                    <div key={l.lang} style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 5 }}>
-                      <div style={{ width: 8, height: 8, background: LANG_COLORS[l.lang] || "#999", flexShrink: 0, border: "1px solid rgba(0,0,0,0.15)" }} />
-                      <div style={{ fontSize: 10, color: "#333", whiteSpace: "nowrap" }}>{l.lang}</div>
-                      <div style={{ fontSize: 10, color: "#777", marginLeft: 4 }}>
-                        {Math.round((l.count / totalLangCount) * 100)}%
-                      </div>
-                    </div>
-                  ))}
+      {/* Repo languages */}
+      {langs.length > 0 && (
+        <>
+          <div style={SECTION}>Repo Languages</div>
+          <div style={{ ...PANEL, display: "flex", gap: 12, alignItems: "center" }}>
+            <DonutChart langs={langs} size={80} />
+            <div>
+              {langs.slice(0, 6).map((l) => (
+                <div key={l.lang} style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 5 }}>
+                  <div style={{ width: 8, height: 8, background: LANG_COLORS[l.lang] || "#999", flexShrink: 0, border: "1px solid rgba(0,0,0,0.15)" }} />
+                  <div style={{ fontSize: 10, color: "#333", whiteSpace: "nowrap" }}>{l.lang}</div>
+                  <div style={{ fontSize: 10, color: "#777", marginLeft: 4 }}>
+                    {Math.round((l.count / totalLangCount) * 100)}%
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
+              ))}
+            </div>
+          </div>
         </>
       )}
 
@@ -303,6 +285,20 @@ export default function AboutMobile() {
             <span style={{ fontSize: 12, color: "#333", fontWeight: 600 }}>{skill}</span>
           </div>
         ))}
+        {onOpenApp && (
+          <button
+            onClick={() => onOpenApp("skills")}
+            style={{
+              background: "none", border: "none", padding: 0,
+              fontSize: 11, color: "#000080", fontWeight: 700,
+              cursor: "pointer", fontFamily: W95_FONT,
+              textDecoration: "underline", marginTop: 4,
+              touchAction: "manipulation",
+            }}
+          >
+            See all skills →
+          </button>
+        )}
       </div>
 
     </div>

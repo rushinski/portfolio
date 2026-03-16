@@ -1,6 +1,7 @@
 "use client";
 
 import { EXPERIENCE } from "@/components/os/data";
+import { getSkillIconSrc } from "@/components/os/ui/skillIcon";
 
 const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
 
@@ -42,11 +43,15 @@ export default function ExperienceMobile() {
             ))}
             {exp.stack.length > 0 && (
               <div style={{ display: "flex", gap: 3, flexWrap: "wrap", marginTop: 8 }}>
-                {exp.stack.map((tech) => (
-                  <span key={tech} style={{ fontSize: 9, background: "#c0c0c0", border: "1px solid #808080", padding: "1px 6px", fontFamily: W95_FONT }}>
-                    {tech}
-                  </span>
-                ))}
+                {exp.stack.map((tech) => {
+                  const icon = getSkillIconSrc(tech);
+                  return (
+                    <span key={tech} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "0 5px 0 3px", fontSize: 9, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", fontFamily: W95_FONT }}>
+                      {icon && <img src={icon} alt="" width={11} height={11} style={{ objectFit: "contain", display: "block", flexShrink: 0 }} />}
+                      {tech}
+                    </span>
+                  );
+                })}
               </div>
             )}
           </div>

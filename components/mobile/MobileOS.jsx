@@ -193,7 +193,7 @@ function AppView({ appId, onClose, onOpenApp }) {
     >
       {/* Scrollable app content — no header, no X */}
       <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", WebkitOverflowScrolling: "touch" }}>
-        {AppComponent ? <AppComponent /> : (
+        {AppComponent ? <AppComponent onOpenApp={onOpenApp} /> : (
           <div style={{ padding: 20, fontFamily: W95_FONT, fontSize: 12, color: "#555" }}>
             App not found: {appId}
           </div>
@@ -206,21 +206,24 @@ function AppView({ appId, onClose, onOpenApp }) {
   );
 }
 
-// Side button (volume / power)
+// Retro side bump button (volume / power)
 function SideButton({ side, top, height }) {
   return (
     <div
       style={{
         position: "absolute",
-        [side]: -3,
+        [side]: -5,
         top,
-        width: 3,
+        width: 5,
         height,
-        background: "#2c2c2c",
-        borderRadius: side === "left" ? "3px 0 0 3px" : "0 3px 3px 0",
+        background: "#888",
+        borderRadius: side === "left" ? "4px 0 0 4px" : "0 4px 4px 0",
+        border: "1px solid #555",
+        borderRight: side === "left" ? "none" : undefined,
+        borderLeft: side === "right" ? "none" : undefined,
         boxShadow: side === "left"
-          ? "inset 1px 0 0 #444, inset 0 1px 0 #444, inset 0 -1px 0 #1a1a1a"
-          : "inset -1px 0 0 #444, inset 0 1px 0 #444, inset 0 -1px 0 #1a1a1a",
+          ? "inset 1px 1px 0 #aaa, inset 0 -1px 0 #666"
+          : "inset -1px 1px 0 #aaa, inset 0 -1px 0 #666",
         pointerEvents: "none",
       }}
     />
@@ -263,96 +266,86 @@ export default function MobileOS() {
   }, [shakeMode]);
 
   return (
-    // Page background — visible around phone body on larger screens
+    // Page bg — visible around phone on larger screens
     <div
       style={{
         height: "100dvh",
         width: "100%",
-        background: "#111",
+        background: "#6a6a6a",
+        backgroundImage: "repeating-linear-gradient(0deg,rgba(0,0,0,0.08) 0px,rgba(0,0,0,0.08) 1px,transparent 1px,transparent 3px), repeating-linear-gradient(90deg,rgba(0,0,0,0.08) 0px,rgba(0,0,0,0.08) 1px,transparent 1px,transparent 3px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
       }}
     >
-      {/* Phone body */}
+      {/* Retro phone body — chunky plastic, Win95 bevel */}
       <div
         style={{
           position: "relative",
           width: "100%",
-          maxWidth: 430,
+          maxWidth: 400,
           height: "100%",
-          maxHeight: 932,
-          background: "#141414",
-          borderRadius: 44,
-          overflow: "hidden",
+          maxHeight: 900,
+          background: "#909090",
+          borderRadius: 16,
           display: "flex",
           flexDirection: "column",
-          boxShadow: [
-            "inset 0 0 0 1px #2e2e2e",
-            "inset 1px 0 0 #3a3a3a",
-            "inset -1px 0 0 #3a3a3a",
-            "0 0 0 1px #000",
-            "0 8px 40px rgba(0,0,0,0.85)",
-          ].join(", "),
+          /* Win95 raised bevel */
+          border: "3px solid",
+          borderColor: "#c8c8c8 #484848 #484848 #c8c8c8",
+          boxShadow: "0 0 0 1px #000, 4px 4px 0 #000, inset 1px 1px 0 #e0e0e0",
+          overflow: "visible",
         }}
       >
-        {/* Volume up */}
-        <SideButton side="left" top={110} height={26} />
-        {/* Volume down */}
-        <SideButton side="left" top={148} height={26} />
-        {/* Power / sleep */}
-        <SideButton side="right" top={130} height={58} />
+        {/* Side volume buttons */}
+        <SideButton side="left" top={100} height={28} />
+        <SideButton side="left" top={140} height={28} />
+        {/* Power button */}
+        <SideButton side="right" top={120} height={52} />
 
-        {/* Camera island */}
+        {/* TOP BEZEL — speaker slits + lens */}
         <div
           style={{
-            height: 52,
+            height: 58,
             flexShrink: 0,
-            background: "#0d0d0d",
+            background: "#828282",
+            borderBottom: "2px solid #484848",
+            borderRadius: "12px 12px 0 0",
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            borderBottom: "1px solid #222",
+            gap: 6,
+            overflow: "hidden",
           }}
         >
-          {/* Dynamic island pill */}
-          <div
-            style={{
-              width: 108,
-              height: 30,
-              background: "#080808",
-              borderRadius: 16,
-              border: "1px solid #1e1e1e",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              paddingRight: 10,
-              gap: 5,
-              boxShadow: "0 2px 6px rgba(0,0,0,0.8)",
-            }}
-          >
-            {/* Front camera dot */}
-            <div style={{ width: 9, height: 9, borderRadius: "50%", background: "#0d1a28", border: "1px solid #1a2e3e", boxShadow: "0 0 3px rgba(0,80,160,0.3)" }} />
-            {/* Microphone dot */}
-            <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#0a0f14" }} />
+          {/* Speaker slits */}
+          <div style={{ display: "flex", gap: 3 }}>
+            {[...Array(9)].map((_, i) => (
+              <div key={i} style={{ width: 3, height: 9, background: "#555", borderRadius: 1, boxShadow: "inset 0 1px 0 #444, 0 1px 0 #aaa" }} />
+            ))}
           </div>
+          {/* Camera lens */}
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#1a1a2e", border: "2px solid #555", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.8), 0 0 0 1px #3a3a3a" }} />
         </div>
 
-        {/* Screen content */}
+        {/* SCREEN — inset Win95 sunken border */}
         <div
           style={{
             flex: 1,
+            margin: "0 8px",
+            border: "3px solid",
+            borderColor: "#484848 #c8c8c8 #c8c8c8 #484848",
+            background: "#000",
+            overflow: "hidden",
             display: "flex",
             flexDirection: "column",
-            background: "linear-gradient(180deg, #0b4aa6 0%, #0a3f90 100%)",
-            overflow: "hidden",
             position: "relative",
           }}
         >
           <StatusBar />
 
-          {/* Home screen (always rendered beneath open apps) */}
           <HomeScreen
             onOpen={handleOpen}
             onLongPress={handleLongPress}
@@ -362,15 +355,10 @@ export default function MobileOS() {
             onBackgroundTap={handleBackgroundTap}
           />
 
-          {/* Home indicator on home screen */}
-          {!openApp && (
-            <RetroHomeBar />
-          )}
+          {!openApp && <RetroHomeBar />}
 
-          {/* Full-screen app slides in over home screen */}
-          {openApp && <AppView appId={openApp} onClose={handleClose} />}
+          {openApp && <AppView appId={openApp} onClose={handleClose} onOpenApp={handleOpen} />}
 
-          {/* Cannot-delete alert */}
           {deleteAlert && (
             <DeleteAlert
               appLabel={MOBILE_APP_MAP[deleteAlert]?.label ?? deleteAlert}
@@ -379,8 +367,88 @@ export default function MobileOS() {
           )}
         </div>
 
-        {/* Phone chin (small dark strip at bottom) */}
-        <div style={{ height: 10, flexShrink: 0, background: "#0d0d0d", borderTop: "1px solid #222" }} />
+        {/* BOTTOM BEZEL — nav buttons */}
+        <div
+          style={{
+            height: 66,
+            flexShrink: 0,
+            background: "#828282",
+            borderTop: "2px solid #c8c8c8",
+            borderRadius: "0 0 12px 12px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            padding: "0 16px",
+          }}
+        >
+          {/* Left soft-key */}
+          <button
+            onClick={handleClose}
+            style={{
+              flex: 1,
+              height: 28,
+              background: "#707070",
+              border: "2px solid",
+              borderColor: "#b0b0b0 #404040 #404040 #b0b0b0",
+              borderRadius: 3,
+              fontSize: 9,
+              fontFamily: W95_FONT,
+              fontWeight: 700,
+              color: "#fff",
+              cursor: "pointer",
+              letterSpacing: 0.5,
+              textTransform: "uppercase",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            Back
+          </button>
+
+          {/* Center D-pad / OK button */}
+          <div
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: "50%",
+              background: "#606060",
+              border: "3px solid",
+              borderColor: "#b0b0b0 #404040 #404040 #b0b0b0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              boxShadow: "inset 0 2px 4px rgba(0,0,0,0.4)",
+            }}
+          >
+            <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#888", border: "2px solid #505050" }} />
+          </div>
+
+          {/* Right soft-key */}
+          <button
+            onClick={() => { handleClose(); setShakeMode(false); }}
+            style={{
+              flex: 1,
+              height: 28,
+              background: "#707070",
+              border: "2px solid",
+              borderColor: "#b0b0b0 #404040 #404040 #b0b0b0",
+              borderRadius: 3,
+              fontSize: 9,
+              fontFamily: W95_FONT,
+              fontWeight: 700,
+              color: "#fff",
+              cursor: "pointer",
+              letterSpacing: 0.5,
+              textTransform: "uppercase",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            Home
+          </button>
+        </div>
       </div>
     </div>
   );
