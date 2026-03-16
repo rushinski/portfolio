@@ -11,7 +11,7 @@ const PA_FIPS = "42";
 const USA_ID = "840";
 
 const PANEL = {
-  background: "#d4d0c8",
+  background: "rgba(212,208,200,0.92)",
   border: "2px solid",
   borderColor: "#ffffff #808080 #808080 #ffffff",
   padding: "5px 9px",
@@ -62,32 +62,15 @@ export default function WhereIsJacobMobile() {
 
   return (
     <div style={{ background: "#f4f4f0", minHeight: "100%", fontFamily: W95_FONT, display: "flex", flexDirection: "column" }}>
-      {/* Title + clock overlay row */}
-      <div style={{ display: "flex", gap: 8, padding: "10px 12px 6px", flexShrink: 0 }}>
-        <div style={{ ...PANEL, flex: 1 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", letterSpacing: 1, marginBottom: 1 }}>
-            WHERE&apos;S JACOB
-          </div>
-          <div style={{ fontSize: 10, color: "#444" }}>
-            Harrisburg · Lancaster · Philadelphia
-          </div>
-        </div>
-        <div style={{ ...PANEL, textAlign: "right" }}>
-          <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", marginBottom: 1 }}>EST</div>
-          <div style={{ fontFamily: "'Courier New', monospace", fontSize: 12, fontWeight: 700, color: "#111" }}>{estTime}</div>
-          <div style={{ fontSize: 9, color: "#555" }}>{estDate}</div>
-        </div>
-      </div>
-
-      {/* Map */}
-      <div style={{ flex: 1, margin: "0 12px 12px", border: "2px solid", borderColor: "#808080 #ffffff #ffffff #808080", background: "#c8dff0", overflow: "hidden", position: "relative", minHeight: 280 }}>
+      {/* Full-bleed map — matches desktop layout */}
+      <div style={{ position: "relative", background: "#c8dff0", overflow: "hidden", height: 320, flexShrink: 0 }}>
         {!mapError ? (
           <ComposableMap
             projection="geoMercator"
             projectionConfig={{ center: [-77.2, 40.4], scale: 3000 }}
             width={800}
             height={500}
-            style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
           >
             <Geographies geography={WORLD_URL} onError={() => setMapError(true)}>
               {({ geographies }) =>
@@ -128,10 +111,27 @@ export default function WhereIsJacobMobile() {
             Map unavailable.
           </div>
         )}
+
+        {/* Overlaid title + clock — matches desktop */}
+        <div style={{ position: "absolute", top: 8, left: 8, right: 8, display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
+          <div style={PANEL}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#000080", letterSpacing: 1, marginBottom: 1 }}>
+              WHERE&apos;S JACOB
+            </div>
+            <div style={{ fontSize: 10, color: "#444" }}>
+              Harrisburg · Lancaster · Philadelphia, PA
+            </div>
+          </div>
+          <div style={{ ...PANEL, textAlign: "right" }}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: "#000080", marginBottom: 1 }}>Jacob&apos;s Time (EST)</div>
+            <div style={{ fontFamily: "'Courier New', monospace", fontSize: 12, fontWeight: 700, color: "#111" }}>{estTime}</div>
+            <div style={{ fontSize: 9, color: "#555", marginTop: 1 }}>{estDate}</div>
+          </div>
+        </div>
       </div>
 
-      {/* Location cards */}
-      <div style={{ padding: "0 12px 12px" }}>
+      {/* Location cards below map */}
+      <div style={{ padding: "10px 12px 12px" }}>
         {LOCATIONS.map((loc) => (
           <div key={loc.id} style={{ background: "#f0f0ea", borderTop: "2px solid #ffffff", borderLeft: "2px solid #ffffff", borderRight: "2px solid #808080", borderBottom: "2px solid #808080", marginBottom: 8, display: "flex" }}>
             <div style={{ width: 5, background: loc.color, flexShrink: 0 }} />

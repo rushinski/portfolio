@@ -9,7 +9,7 @@ const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
 function SkillTag({ tech }) {
   const icon = getSkillIconSrc(tech);
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "0 5px 0 3px", fontSize: 9, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", fontFamily: W95_FONT }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "0 5px 0 3px", fontSize: 9, color: "#111", background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", fontFamily: W95_FONT }}>
       {icon && <img src={icon} alt="" width={11} height={11} style={{ objectFit: "contain", display: "block", flexShrink: 0 }} />}
       {tech}
     </span>
@@ -53,7 +53,7 @@ function ProjectDetail({ project, repoData, onBack }) {
   return (
     <div style={{ padding: "12px 14px", background: "#f4f4f0", minHeight: "100%", fontFamily: W95_FONT }}>
       <div style={{ marginBottom: 10 }}>
-        <button onClick={onBack} style={{ padding: "3px 12px", fontSize: 10, background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", touchAction: "manipulation" }}>
+        <button onClick={onBack} style={{ padding: "3px 12px", fontSize: 10, color: "#111", background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", touchAction: "manipulation" }}>
           Back
         </button>
       </div>
@@ -86,18 +86,18 @@ function ProjectDetail({ project, repoData, onBack }) {
               <div style={SL}>Links</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {project.links?.github && (
-                  <button onClick={() => window.open(project.links.github, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5, touchAction: "manipulation" }}>
+                  <button onClick={() => window.open(project.links.github, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, color: "#111", background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5, touchAction: "manipulation" }}>
                     <img src="/skills/github.png" alt="" width={11} height={11} style={{ objectFit: "contain" }} />
                     {ghRepo?.name || project.links.github.split("/").pop()}
                   </button>
                 )}
                 {project.links?.live && (
-                  <button onClick={() => window.open(project.links.live, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", touchAction: "manipulation" }}>
+                  <button onClick={() => window.open(project.links.live, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, color: "#111", background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", touchAction: "manipulation" }}>
                     Live Site
                   </button>
                 )}
                 {project.links?.landing && (
-                  <button onClick={() => window.open(project.links.landing, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", touchAction: "manipulation" }}>
+                  <button onClick={() => window.open(project.links.landing, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, color: "#111", background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", touchAction: "manipulation" }}>
                     Landing Page
                   </button>
                 )}

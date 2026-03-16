@@ -52,6 +52,8 @@ const TOP_SKILL_ICONS = {
 const TOP_SKILLS = ["JavaScript", "Python", "PostgreSQL", "Next.js"];
 
 const CHART_COLORS = ["#c0c0c0", "#cce8cc", "#7dbf7d", "#3a8a3a", "#1a5c1a"];
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 function getLevel(count) {
   return count === 0 ? 0 : count <= 2 ? 1 : count <= 5 ? 2 : count <= 9 ? 3 : 4;
@@ -84,77 +86,125 @@ function DonutChart({ langs, size = 72 }) {
   );
 }
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-// Show only the most recent N weeks so it fits without horizontal scroll
-const RECENT_WEEKS = 16;
-
 function ContributionCalendar({ calendar }) {
   const allWeeks = calendar?.weeks || [];
-  const recentWeeks = allWeeks.slice(-RECENT_WEEKS);
-  const total = calendar?.totalContributions || 0;
-  const cell = 10, gap = 2, step = 12;
+  const now = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
 
-  const monthMarkers = [];
-  recentWeeks.forEach((week, wi) => {
+  // Build list of available month/year combos from data
+  const availableMonths = [];
+  const seen = new Set();
+  allWeeks.forEach((week) => {
     if (!week.contributionDays?.length) return;
-    const day = new Date(`${week.contributionDays[0].date}T12:00:00`);
-    const month = day.getMonth();
-    const prevMonth = wi > 0 && recentWeeks[wi - 1].contributionDays?.length
-      ? new Date(`${recentWeeks[wi - 1].contributionDays[0].date}T12:00:00`).getMonth()
-      : -1;
-    if (month !== prevMonth) monthMarkers.push({ wi, label: MONTHS[month] });
+    const d = new Date(`${week.contributionDays[0].date}T12:00:00`);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      availableMonths.push({ year: d.getFullYear(), month: d.getMonth() });
+    }
   });
+
+  // Filter weeks to selected month — include week if its first day is in that month
+  const weeksInMonth = allWeeks.filter((week) => {
+    if (!week.contributionDays?.length) return false;
+    const d = new Date(`${week.contributionDays[0].date}T12:00:00`);
+    return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+  });
+
+  // Count contributions in selected month (only days actually in that month)
+  const monthTotal = weeksInMonth.reduce((sum, week) => {
+    return sum + week.contributionDays.reduce((s, day) => {
+      const d = new Date(`${day.date}T12:00:00`);
+      return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear
+        ? s + day.contributionCount
+        : s;
+    }, 0);
+  }, 0);
+
+  const cell = 10, gap = 2;
 
   return (
     <div style={{ ...PANEL, padding: "10px 10px 8px" }}>
-      <div style={{ fontSize: 11, color: "#555", marginBottom: 6 }}>
-        {total.toLocaleString()} contributions in the last year
-      </div>
-      <div>
-        {/* Month labels */}
-        <div style={{ position: "relative", marginLeft: 20, height: 13, marginBottom: 2 }}>
-          {monthMarkers.map(({ wi, label }) => (
-            <span key={`${label}-${wi}`} style={{ position: "absolute", left: wi * step, fontSize: 9, color: "#000080", opacity: 0.8 }}>
-              {label}
-            </span>
+      {/* Month picker */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+        <div style={{ fontSize: 11, color: "#555" }}>
+          {monthTotal.toLocaleString()} contributions
+        </div>
+        <select
+          value={`${selectedYear}-${selectedMonth}`}
+          onChange={(e) => {
+            const [y, m] = e.target.value.split("-").map(Number);
+            setSelectedYear(y);
+            setSelectedMonth(m);
+          }}
+          style={{
+            fontFamily: W95_FONT,
+            fontSize: 10,
+            background: "#c0c0c0",
+            color: "#111",
+            border: "2px solid",
+            borderColor: "#ffffff #808080 #808080 #ffffff",
+            padding: "1px 4px",
+            cursor: "pointer",
+            outline: "none",
+          }}
+        >
+          {availableMonths.map(({ year, month }) => (
+            <option key={`${year}-${month}`} value={`${year}-${month}`}>
+              {MONTH_SHORT[month]} {year}
+            </option>
           ))}
-        </div>
-        {/* Grid */}
-        <div style={{ display: "flex" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap, width: 18, marginRight: 2, flexShrink: 0 }}>
-            {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-              <div key={i} style={{ height: cell, fontSize: 8, color: i % 2 === 1 ? "#000080" : "transparent", lineHeight: `${cell}px`, textAlign: "right", opacity: 0.7 }}>
-                {d}
-              </div>
-            ))}
-          </div>
-          <div style={{ display: "flex", gap, flex: 1, justifyContent: "space-between" }}>
-            {recentWeeks.map((week, wi) => (
-              <div key={wi} style={{ display: "flex", flexDirection: "column", gap, flexShrink: 0 }}>
-                {week.contributionDays.map((day, di) => (
-                  <div
-                    key={`${day.date}-${di}`}
-                    style={{
-                      width: cell, height: cell,
-                      background: CHART_COLORS[getLevel(day.contributionCount)],
-                      border: "1px solid rgba(0,0,0,0.08)",
-                      flexShrink: 0,
-                    }}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* Legend */}
-        <div style={{ display: "flex", alignItems: "center", gap: 3, marginTop: 6, justifyContent: "flex-end" }}>
-          <span style={{ fontSize: 9, color: "#777" }}>Less</span>
-          {CHART_COLORS.map((color, i) => (
-            <div key={i} style={{ width: 8, height: 8, background: color, border: "1px solid rgba(0,0,0,0.12)" }} />
-          ))}
-          <span style={{ fontSize: 9, color: "#777" }}>More</span>
-        </div>
+        </select>
       </div>
+
+      {weeksInMonth.length === 0 ? (
+        <div style={{ fontSize: 10, color: "#888", textAlign: "center", padding: "8px 0" }}>
+          No data for {MONTH_NAMES[selectedMonth]}
+        </div>
+      ) : (
+        <div>
+          {/* Grid */}
+          <div style={{ display: "flex" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap, width: 18, marginRight: 2, flexShrink: 0 }}>
+              {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+                <div key={i} style={{ height: cell, fontSize: 8, color: i % 2 === 1 ? "#000080" : "transparent", lineHeight: `${cell}px`, textAlign: "right", opacity: 0.7 }}>
+                  {d}
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap }}>
+              {weeksInMonth.map((week, wi) => (
+                <div key={wi} style={{ display: "flex", flexDirection: "column", gap, flexShrink: 0 }}>
+                  {week.contributionDays.map((day, di) => {
+                    const d = new Date(`${day.date}T12:00:00`);
+                    const inMonth = d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+                    return (
+                      <div
+                        key={`${day.date}-${di}`}
+                        style={{
+                          width: cell, height: cell,
+                          background: inMonth ? CHART_COLORS[getLevel(day.contributionCount)] : "transparent",
+                          border: inMonth ? "1px solid rgba(0,0,0,0.08)" : "none",
+                          flexShrink: 0,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Legend */}
+          <div style={{ display: "flex", alignItems: "center", gap: 3, marginTop: 6, justifyContent: "flex-end" }}>
+            <span style={{ fontSize: 9, color: "#777" }}>Less</span>
+            {CHART_COLORS.map((color, i) => (
+              <div key={i} style={{ width: 8, height: 8, background: color, border: "1px solid rgba(0,0,0,0.12)" }} />
+            ))}
+            <span style={{ fontSize: 9, color: "#777" }}>More</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -183,38 +233,41 @@ export default function AboutMobile({ onOpenApp }) {
   return (
     <div style={{ padding: "12px 14px", background: "#f4f4f0", minHeight: "100%", fontFamily: W95_FONT }}>
 
-      {/* Header card */}
+      {/* Header card — matches desktop exactly: photo, name, title, location */}
       <div style={PANEL}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-          <div style={{ width: 64, height: 64, background: "#c0c0c0", flexShrink: 0, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", overflow: "hidden" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 60, height: 60, background: "#c0c0c0", flexShrink: 0, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", overflow: "hidden" }}>
             {photoFailed ? (
               <div style={{ width: "100%", height: "100%", background: "#000080", display: "grid", placeItems: "center", color: "#fff", fontSize: 20, fontWeight: 800 }}>
                 JR
               </div>
             ) : (
-              <img src="/professional_photo.jpeg" alt="Jacob Rushinski" width={64} height={64} onError={() => setPhotoFailed(true)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <img src="/professional_photo.jpeg" alt="Jacob Rushinski" width={60} height={60} onError={() => setPhotoFailed(true)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             )}
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: "#000080" }}>{PERSONAL.name}</div>
-            <div style={{ fontSize: 11, color: "#444", marginTop: 2 }}>{PERSONAL.title}</div>
-            <div style={{ fontSize: 10, color: "#666", marginTop: 4 }}>{PERSONAL.school}</div>
-            <div style={{ fontSize: 10, color: "#666" }}>GPA {PERSONAL.gpa} · {PERSONAL.gradDate}</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#111" }}>{PERSONAL.name}</div>
+            <div style={{ fontSize: 12, color: "#000080", fontWeight: 600, marginTop: 2 }}>{PERSONAL.title}</div>
+            <div style={{ fontSize: 11, color: "#777", marginTop: 2 }}>{PERSONAL.location}</div>
           </div>
-        </div>
-        <div style={{ fontSize: 11, color: "#333", lineHeight: 1.6 }}>
-          {PERSONAL.tagline}
         </div>
       </div>
 
-      {/* About Me bio */}
+      {/* About Me bio — matches desktop hardcoded text exactly */}
       <div style={SECTION}>About Me</div>
       <div style={PANEL}>
         <div style={{ fontSize: 11, color: "#222", lineHeight: 1.75 }}>
-          Hi, I&apos;m Jacob Rushinski!
-          {PERSONAL.bio.split("\n\n").map((para, i) => (
-            <span key={i}><br /><br />{para}</span>
-          ))}
+          Hi, I&apos;m Jacob Rushinski!<br /><br />
+          I&apos;m currently attending Thaddeus Stevens College of Technology, graduating with an Associate&apos;s in Computer Software Engineering Technology in May 2026. I&apos;m looking for Backend, Full-Stack, or related roles near Philadelphia, PA (within 50mi) or nationwide remote.<br /><br />
+          Right now I&apos;m rebuilding a{" "}
+          {onOpenApp ? (
+            <button onClick={() => onOpenApp("projects")} style={{ background: "none", border: "none", padding: 0, color: "#000080", fontWeight: 700, cursor: "pointer", fontFamily: W95_FONT, fontSize: 11, textDecoration: "underline", touchAction: "manipulation" }}>
+              multi-tenant sneaker marketplace
+            </button>
+          ) : (
+            <strong>multi-tenant sneaker marketplace</strong>
+          )}
+          {" "}from the ground up. I enjoy working on production-grade systems and the level of detail required to build software that is reliable and maintainable. I take pride in writing clean code and designing systems that perform well under real-world usage. If you&apos;d like to connect or learn more about my work, feel free to reach out.
         </div>
       </div>
 
@@ -240,7 +293,7 @@ export default function AboutMobile({ onOpenApp }) {
         ))}
       </div>
 
-      {/* Contribution calendar — no GitHub summary, just the graph */}
+      {/* Contribution calendar with month picker */}
       {ghData?.contributionCalendar && (
         <>
           <div style={SECTION}>Contributions</div>
