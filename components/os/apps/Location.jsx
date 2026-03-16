@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 
+import { LOCATIONS } from "../data";
 import { APP_BODY_STYLE, APP_CONTENT_STYLE, APP_PANEL_STYLE } from "../ui/retro";
 
 // US states atlas (for PA highlight + state borders)
@@ -13,44 +14,6 @@ const WORLD_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.jso
 const PA_FIPS = "42";
 const USA_ID = "840"; // ISO numeric for USA — exclude from world layer so US states show through
 
-const LOCATIONS = [
-  {
-    id: "harrisburg",
-    label: "Harrisburg, PA",
-    role: "Home + Work",
-    noteLines: ["Home base. Work at", "Giant Food Stores."],
-    coordinates: [-76.8867, 40.2732],
-    color: "#008000",
-    bx: -220,
-    by: -105,
-    bw: 152,
-    bh: 72,
-  },
-  {
-    id: "lancaster",
-    label: "Lancaster, PA",
-    role: "School",
-    noteLines: ["Thaddeus Stevens College", "of Technology. Weekdays."],
-    coordinates: [-76.3055, 40.0379],
-    color: "#000080",
-    bx: -220,
-    by: 22,
-    bw: 152,
-    bh: 72,
-  },
-  {
-    id: "philadelphia",
-    label: "Philadelphia, PA",
-    role: "Weekends + Future",
-    noteLines: ["In Philly most weekends.", "Plans to move here."],
-    coordinates: [-75.1652, 39.9526],
-    color: "#800000",
-    bx: 30,
-    by: -82,
-    bw: 158,
-    bh: 72,
-  },
-];
 
 function Callout({ loc }) {
   const { bx, by, bw, bh, color, label, role, noteLines } = loc;

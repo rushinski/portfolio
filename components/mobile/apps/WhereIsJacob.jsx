@@ -1,27 +1,8 @@
 "use client";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { LOCATIONS } from "@/components/os/data";
 
-const LOCATIONS = [
-  {
-    label: "Harrisburg, PA",
-    role: "Home + Work",
-    color: "#008000",
-    note: "Home base. Currently working at Giant Food Stores in the area.",
-  },
-  {
-    label: "Lancaster, PA",
-    role: "School",
-    color: "#000080",
-    note: "Attending Thaddeus Stevens College of Technology. Most weekdays here during the semester.",
-  },
-  {
-    label: "Philadelphia, PA",
-    role: "Weekends + Future",
-    color: "#800000",
-    note: "In Philly most weekends. Looking to move here after graduation in May 2026.",
-  },
-];
+const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
 
 function DotPin({ color }) {
   return (

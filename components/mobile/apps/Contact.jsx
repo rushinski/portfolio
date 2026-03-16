@@ -23,6 +23,7 @@ const CONTACTS = [
   { label: "Phone",    value: "(717) 216-9005", href: "tel:+17172169005" },
   { label: "GitHub",   value: "github.com/rushinski", href: PERSONAL.github },
   { label: "LinkedIn", value: "linkedin.com/in/jacobrushinski", href: PERSONAL.linkedin },
+  { label: "Location", value: PERSONAL.location, href: null },
 ];
 
 const EMPTY = { name: "", email: "", subject: "", message: "" };
@@ -63,8 +64,8 @@ export default function ContactMobile() {
           <a
             key={label}
             href={href}
-            target={href.startsWith("http") ? "_blank" : undefined}
-            rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+            target={href?.startsWith("http") ? "_blank" : undefined}
+            rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
             style={{
               display: "flex", alignItems: "center", gap: 8,
               padding: "10px 12px", borderBottom: "1px solid #d4d0c8",

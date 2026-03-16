@@ -2,28 +2,18 @@
 
 import { useState } from "react";
 import { SKILLS, SKILL_PROFICIENCY } from "@/components/os/data";
+import { getSkillIconSrc } from "@/components/os/ui/skillIcon";
 
 const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
 
 const PROFICIENCY_LABELS = { 1: "Foundational", 2: "Working", 3: "Proficient", 4: "Advanced", 5: "Expert" };
 const PROFICIENCY_COLORS = { 1: "#c8e0ff", 2: "#8fb8ee", 3: "#5f92da", 4: "#2f67bf", 5: "#0b2f87" };
 
-const SKILL_ICONS = {
-  TypeScript: "typescript.png", JavaScript: "javascript.png", Python: "Python.png",
-  Go: "Go.png", Java: "Java.png", "C++": "CPlusPlus.png", PHP: "PHP.png",
-  HTML: "HTML5.png", CSS: "CSS3.png", "Node.js": "Nodejs.png", "Next.js": "Nextjs.png",
-  Flask: "Flask.png", React: "React.png", PostgreSQL: "PostgresSQL.png", MySQL: "MySQL.png",
-  MongoDB: "MongoDB.png", Redis: "Redis.png", "Tailwind CSS": "TailwindCSS.png",
-  Stripe: "stripe.webp", Supabase: "supabase.webp", "Discord.js": "Discordjs.png",
-  ADBKit: "Android.png", "AWS SES": "AWS.png", Docker: "Docker.png",
-  Git: "Git.png", GitHub: "GitHub.png", "GitHub Actions": "GitHubActions.png", Vercel: "Vercel.png",
-};
-
 function SkillPill({ name }) {
   const level = SKILL_PROFICIENCY[name] ?? 1;
   const color = PROFICIENCY_COLORS[level];
   const [imgFailed, setImgFailed] = useState(false);
-  const file = SKILL_ICONS[name];
+  const src = getSkillIconSrc(name);
 
   return (
     <div
@@ -40,8 +30,8 @@ function SkillPill({ name }) {
         fontFamily: W95_FONT,
       }}
     >
-      {file && !imgFailed ? (
-        <img src={`/skills/${file}`} alt={name} width={20} height={20} onError={() => setImgFailed(true)} style={{ width: 20, height: 20, objectFit: "contain", flexShrink: 0 }} />
+      {src && !imgFailed ? (
+        <img src={src} alt={name} width={20} height={20} onError={() => setImgFailed(true)} style={{ width: 20, height: 20, objectFit: "contain", flexShrink: 0 }} />
       ) : (
         <div style={{ width: 20, height: 20, background: "#c0c0c0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 700, color: "#333", flexShrink: 0 }}>
           {name.slice(0, 3).toUpperCase()}

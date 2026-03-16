@@ -4,6 +4,7 @@ export const PERSONAL = {
   name: "Jacob Rushinski",
   title: "Backend / Full-Stack Developer",
   tagline: "I build production-grade systems: APIs, data modeling, auth, payments, automation.",
+  bio: "I'm currently attending Thaddeus Stevens College of Technology, graduating with an Associate's in Computer Software Engineering Technology in May 2026. I'm looking for Backend, Full-Stack, or related roles near Philadelphia, PA (within 50mi) or nationwide remote.\n\nRight now I'm rebuilding a multi-tenant sneaker marketplace from the ground up. I enjoy working on production-grade systems and the level of detail required to build software that is reliable and maintainable. I take pride in writing clean code and designing systems that perform well under real-world usage. If you'd like to connect or learn more about my work, feel free to reach out.",
   email: "jacobrushinski@gmail.com",
   location: "United States",
   github: "https://github.com/rushinski",
@@ -168,6 +169,39 @@ export const PROJECTS = [
       github: "https://github.com/rushinski/Discord-Bot-Unity",
       landing: "https://rushinski.github.io/Unity-Landing-Page/",
     },
+  },
+];
+
+export const LOCATIONS = [
+  {
+    id: "harrisburg",
+    label: "Harrisburg, PA",
+    role: "Home + Work",
+    note: "Home base. Currently working at Giant Food Stores in the area.",
+    color: "#008000",
+    coordinates: [-76.8867, 40.2732],
+    bx: -220, by: -105, bw: 152, bh: 72,
+    noteLines: ["Home base. Work at", "Giant Food Stores."],
+  },
+  {
+    id: "lancaster",
+    label: "Lancaster, PA",
+    role: "School",
+    note: "Attending Thaddeus Stevens College of Technology. Most weekdays here during the semester.",
+    color: "#000080",
+    coordinates: [-76.3055, 40.0379],
+    bx: -220, by: 22, bw: 152, bh: 72,
+    noteLines: ["Thaddeus Stevens College", "of Technology. Weekdays."],
+  },
+  {
+    id: "philadelphia",
+    label: "Philadelphia, PA",
+    role: "Weekends + Future",
+    note: "In Philly most weekends. Looking to move here after graduation in May 2026.",
+    color: "#800000",
+    coordinates: [-75.1652, 39.9526],
+    bx: 30, by: -82, bw: 158, bh: 72,
+    noteLines: ["In Philly most weekends.", "Plans to move here."],
   },
 ];
 

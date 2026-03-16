@@ -368,3 +368,15 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Mobile icon shake animation (iOS-style jiggle) */
+@keyframes iconShake {
+  0%   { transform: rotate(0deg); }
+  15%  { transform: rotate(-3deg); }
+  30%  { transform: rotate(3deg); }
+  45%  { transform: rotate(-3deg); }
+  60%  { transform: rotate(3deg); }
+  75%  { transform: rotate(-2deg); }
+  90%  { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
