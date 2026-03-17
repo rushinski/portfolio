@@ -11,7 +11,7 @@ export const metadata = {
   keywords: ["Jacob Rushinski", "Full Stack Developer", "Backend Developer", "Next.js", "TypeScript", "Supabase"],
   openGraph: {
     title: "Jacob Rushinski - Developer",
-    description: "Backend / Full-Stack Developer based in Lancaster, PA.",
+    description: "Backend / Full-Stack Developer.",
     type: "website",
   },
 };
