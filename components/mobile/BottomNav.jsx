@@ -2,7 +2,7 @@
 
 import { MOBILE_APP_MAP } from "./mobileConstants";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
 const BTN_STYLE = {
   background: "#c0c0c0",

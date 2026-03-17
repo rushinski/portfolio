@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { SKILLS, SKILL_PROFICIENCY } from "@/components/os/data";
+import { SKILLS, SKILL_PROFICIENCY } from "@/components/shared/data";
 import { getSkillIconSrc } from "@/components/os/ui/skillIcon";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
-const PROFICIENCY_LABELS = { 1: "Foundational", 2: "Working", 3: "Proficient", 4: "Advanced", 5: "Expert" };
+const PROFICIENCY_LABELS = { 1: "Foundational", 2: "Working Knowledge", 3: "Proficient", 4: "Advanced", 5: "Expert" };
 const PROFICIENCY_COLORS = { 1: "#c8e0ff", 2: "#8fb8ee", 3: "#5f92da", 4: "#2f67bf", 5: "#0b2f87" };
 
 function SkillPill({ name }) {

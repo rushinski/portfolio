@@ -47,7 +47,7 @@ export default function ContactApp() {
     { label: "Email", value: PERSONAL.email, href: `mailto:${PERSONAL.email}` },
     { label: "GitHub", value: PERSONAL.github.replace("https://", ""), href: PERSONAL.github },
     { label: "LinkedIn", value: PERSONAL.linkedin.replace("https://", ""), href: PERSONAL.linkedin },
-    { label: "Phone", value: PERSONAL.phone || "(717) 216-9005", href: "tel:+17172169005" },
+    { label: "Phone", value: PERSONAL.phone, href: PERSONAL.phoneHref },
     { label: "Location", value: PERSONAL.location, href: null },
   ];
 

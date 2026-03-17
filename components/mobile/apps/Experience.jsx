@@ -1,9 +1,9 @@
 "use client";
 
-import { EXPERIENCE } from "@/components/os/data";
+import { EXPERIENCE } from "@/components/shared/data";
 import { getSkillIconSrc } from "@/components/os/ui/skillIcon";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
 export default function ExperienceMobile() {
   return (

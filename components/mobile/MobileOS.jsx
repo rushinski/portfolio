@@ -20,7 +20,7 @@ import MinesweeperMobile from "./apps/Minesweeper";
 import { APP_TITLES, MOBILE_APP_MAP } from "./mobileConstants";
 import MobileBootSequence from "./MobileBootSequence";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
 const APP_COMPONENTS = {
   about:       AboutMobile,

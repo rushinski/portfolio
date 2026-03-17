@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { PERSONAL } from "@/components/os/data";
+import { PERSONAL } from "@/components/shared/data";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
 const SECTION = {
   fontSize: 10, fontWeight: 700, background: "#000080", color: "#ffffff",
@@ -20,36 +20,60 @@ const FIELD_STYLE = {
 
 const CONTACTS = [
   { label: "Email",    value: PERSONAL.email, href: `mailto:${PERSONAL.email}` },
-  { label: "Phone",    value: "(717) 216-9005", href: "tel:+17172169005" },
-  { label: "GitHub",   value: "github.com/rushinski", href: PERSONAL.github },
-  { label: "LinkedIn", value: "linkedin.com/in/jacobrushinski", href: PERSONAL.linkedin },
+  { label: "Phone",    value: PERSONAL.phone, href: PERSONAL.phoneHref },
+  { label: "GitHub",   value: PERSONAL.github.replace("https://", ""), href: PERSONAL.github },
+  { label: "LinkedIn", value: PERSONAL.linkedin.replace("https://", ""), href: PERSONAL.linkedin },
   { label: "Location", value: PERSONAL.location, href: null },
 ];
 
 const EMPTY = { name: "", email: "", subject: "", message: "" };
 
+const STATUS_STYLES = {
+  success: { background: "#dbeed4", borderColor: "#4d7a39", color: "#244216" },
+  info:    { background: "#e0ebff", borderColor: "#2d4b84", color: "#19345f" },
+  error:   { background: "#ffe0e0", borderColor: "#8b2b2b", color: "#651818" },
+};
+
+function buildMailtoHref(form) {
+  const subject = form.subject.trim() || `Portfolio inquiry from ${form.name.trim() || "website visitor"}`;
+  const body = [`Name: ${form.name.trim()}`, `Email: ${form.email.trim()}`, "", form.message.trim()].join("\n");
+  return `mailto:${PERSONAL.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 export default function ContactMobile() {
   const [form, setForm] = useState(EMPTY);
-  const [status, setStatus] = useState(null); // "success" | "error" | null
+  const [status, setStatus] = useState(null); // { type, text } | null
   const [sending, setSending] = useState(false);
 
   const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
   const canSend = form.name.trim() && form.email.trim() && form.message.trim();
 
+  const openMailClient = () => { window.location.href = buildMailtoHref(form); };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!canSend || sending) return;
     setSending(true);
+    setStatus(null);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      setStatus(res.ok ? "success" : "error");
-      if (res.ok) setForm(EMPTY);
+      const payload = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setForm(EMPTY);
+        setStatus({ type: "success", text: "Message sent successfully." });
+      } else if (res.status === 503) {
+        openMailClient();
+        setStatus({ type: "info", text: payload.error || "Email service unavailable. Your mail client was opened instead." });
+      } else {
+        setStatus({ type: "error", text: payload.error || "Unable to send message right now." });
+      }
     } catch {
-      setStatus("error");
+      openMailClient();
+      setStatus({ type: "info", text: "Contact service unreachable. Your mail client was opened instead." });
     }
     setSending(false);
   };
@@ -100,31 +124,41 @@ export default function ContactMobile() {
           </div>
         </div>
 
-        {status === "success" && (
-          <div style={{ background: "#dbeed4", border: "1px solid #4d7a39", color: "#244216", padding: "6px 10px", fontSize: 11, marginBottom: 8 }}>
-            Message sent!
-          </div>
-        )}
-        {status === "error" && (
-          <div style={{ background: "#ffe0e0", border: "1px solid #8b2b2b", color: "#651818", padding: "6px 10px", fontSize: 11, marginBottom: 8 }}>
-            Something went wrong. Try emailing directly.
+        {status && (
+          <div style={{ ...STATUS_STYLES[status.type], border: `1px solid ${STATUS_STYLES[status.type].borderColor}`, padding: "6px 10px", fontSize: 11, marginBottom: 8 }}>
+            {status.text}
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={!canSend || sending}
-          style={{
-            width: "100%", padding: "10px", fontFamily: W95_FONT, fontSize: 12, fontWeight: 700,
-            background: "#c0c0c0", cursor: canSend && !sending ? "pointer" : "default",
-            borderTop: "2px solid #ffffff", borderLeft: "2px solid #ffffff",
-            borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
-            color: canSend && !sending ? "#111" : "#808080",
-            touchAction: "manipulation",
-          }}
-        >
-          {sending ? "Sending..." : "Send Message"}
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            type="button"
+            onClick={openMailClient}
+            style={{
+              flex: 1, padding: "10px", fontFamily: W95_FONT, fontSize: 11, fontWeight: 600,
+              background: "#c0c0c0", cursor: "pointer",
+              borderTop: "2px solid #ffffff", borderLeft: "2px solid #ffffff",
+              borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
+              color: "#111", touchAction: "manipulation",
+            }}
+          >
+            Use Mail Client
+          </button>
+          <button
+            type="submit"
+            disabled={!canSend || sending}
+            style={{
+              flex: 2, padding: "10px", fontFamily: W95_FONT, fontSize: 12, fontWeight: 700,
+              background: "#c0c0c0", cursor: canSend && !sending ? "pointer" : "default",
+              borderTop: "2px solid #ffffff", borderLeft: "2px solid #ffffff",
+              borderRight: "2px solid #404040", borderBottom: "2px solid #404040",
+              color: canSend && !sending ? "#111" : "#808080",
+              touchAction: "manipulation",
+            }}
+          >
+            {sending ? "Sending..." : "Send Message"}
+          </button>
+        </div>
       </form>
     </div>
   );

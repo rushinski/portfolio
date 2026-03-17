@@ -4,70 +4,15 @@ import { useEffect, useState } from "react";
 
 import { PERSONAL } from "../data";
 import { useWindowManager } from "../hooks/useWindowManager";
-import { APP_BODY_STYLE, APP_CONTENT_STYLE, APP_PANEL_STYLE, APP_SECTION_HEADER_STYLE, WIN95_COLORS, getWin95ButtonStyle } from "../ui/retro";
-
-const LANG_COLORS = {
-  JavaScript: "#f1e05a",
-  TypeScript: "#3178c6",
-  Python: "#3572A5",
-  Go: "#00ADD8",
-  Java: "#b07219",
-  PHP: "#4F5D95",
-  "C++": "#f34b7d",
-  HTML: "#e34c26",
-  CSS: "#563d7c",
-  Shell: "#89e051",
-  Dockerfile: "#384d54",
-  "Node.js": "#68a063",
-};
-
-const TOP_SKILL_ICONS = {
-  JavaScript: "/skills/javascript.png",
-  Python: "/skills/Python.png",
-  PostgreSQL: "/skills/PostgresSQL.png",
-  "Next.js": "/skills/Nextjs.png",
-};
-
-function DonutChart({ langs, size = 84 }) {
-  if (!langs?.length) return null;
-  const totalCount = langs.reduce((sum, language) => sum + language.count, 0);
-  if (totalCount === 0) return null;
-
-  const cx = size / 2;
-  const cy = size / 2;
-  const radius = size / 2 - 2;
-  const innerRadius = radius * 0.52;
-  let angle = -Math.PI / 2;
-
-  const paths = langs.map((language) => {
-    const sweep = Math.min((language.count / totalCount) * 2 * Math.PI, 2 * Math.PI * 0.9999);
-    const start = angle;
-    const end = angle + sweep;
-    angle += (language.count / totalCount) * 2 * Math.PI;
-
-    const large = sweep > Math.PI ? 1 : 0;
-    const format = (value) => value.toFixed(2);
-    return {
-      d: `M ${format(cx + radius * Math.cos(start))} ${format(cy + radius * Math.sin(start))} A ${radius} ${radius} 0 ${large} 1 ${format(cx + radius * Math.cos(end))} ${format(cy + radius * Math.sin(end))} L ${format(cx + innerRadius * Math.cos(end))} ${format(cy + innerRadius * Math.sin(end))} A ${innerRadius} ${innerRadius} 0 ${large} 0 ${format(cx + innerRadius * Math.cos(start))} ${format(cy + innerRadius * Math.sin(start))} Z`,
-      color: LANG_COLORS[language.lang] || "#999",
-    };
-  });
-
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: "block", flexShrink: 0 }}>
-      {paths.map((path, index) => (
-        <path key={`${path.color}-${index}`} d={path.d} fill={path.color} stroke={WIN95_COLORS.surface} strokeWidth={1} />
-      ))}
-    </svg>
-  );
-}
+import { APP_BODY_STYLE, APP_CONTENT_STYLE, APP_PANEL_STYLE, APP_SECTION_HEADER_STYLE, getWin95ButtonStyle } from "../ui/retro";
+import { DonutChart, LANG_COLORS, TOP_SKILL_ICONS, TOP_SKILLS } from "@/components/shared/GitHubStats";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
 
 export default function AboutApp({ initialGitHubData = null }) {
   const { openWindow } = useWindowManager();
   const [ghData, setGhData] = useState(initialGitHubData);
   const [ghHovered, setGhHovered] = useState(null);
   const [photoFailed, setPhotoFailed] = useState(false);
-  const topSkills = ["JavaScript", "Python", "PostgreSQL", "Next.js"];
 
   useEffect(() => {
     if (ghData) return;
@@ -89,10 +34,10 @@ export default function AboutApp({ initialGitHubData = null }) {
   }, [ghData]);
 
   const socials = [
-    { label: "Email", value: "jacobrushinski@gmail.com", href: "mailto:jacobrushinski@gmail.com", icon: "email.png" },
-    { label: "Phone", value: "(717) 216-9005", href: "tel:+17172169005", icon: "phone.png" },
-    { label: "LinkedIn", value: "linkedin.com/in/jacobrushinski", href: "https://linkedin.com/in/jacobrushinski", icon: "linkedin.png" },
-    { label: "GitHub", value: "github.com/rushinski", href: "https://github.com/rushinski", icon: "github.png" },
+    { label: "Email", value: PERSONAL.email, href: `mailto:${PERSONAL.email}`, icon: "email.png" },
+    { label: "Phone", value: PERSONAL.phone, href: PERSONAL.phoneHref, icon: "phone.png" },
+    { label: "LinkedIn", value: PERSONAL.linkedin.replace("https://", ""), href: PERSONAL.linkedin, icon: "linkedin.png" },
+    { label: "GitHub", value: PERSONAL.github.replace("https://", ""), href: PERSONAL.github, icon: "github.png" },
   ];
 
   return (
@@ -179,6 +124,7 @@ export default function AboutApp({ initialGitHubData = null }) {
         </div>
       </div>
 
+      <ErrorBoundary fallback={null}>
       {ghData && (() => {
         const cell = 10;
         const gap = 2;
@@ -275,7 +221,7 @@ export default function AboutApp({ initialGitHubData = null }) {
                   <div style={{ fontSize: 11, color: "#555", marginBottom: 2 }}>Top Skills</div>
                   <div style={{ fontSize: 9, color: "#888", marginBottom: 8 }}>my strongest technologies</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    {topSkills.map((skill) => (
+                    {TOP_SKILLS.map((skill) => (
                       <div key={skill} style={{ display: "flex", alignItems: "center", gap: 7 }}>
                         <img
                           src={TOP_SKILL_ICONS[skill]}
@@ -297,6 +243,7 @@ export default function AboutApp({ initialGitHubData = null }) {
           </div>
         );
       })()}
+      </ErrorBoundary>
       </div>
     </div>
   );

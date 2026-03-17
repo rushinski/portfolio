@@ -1,6 +1,6 @@
 "use client";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
 const SECTION = { fontSize: 10, fontWeight: 700, background: "#000080", color: "#fff", padding: "2px 8px", marginBottom: 4 };
 const PANEL = { background: "#f0f0ea", borderTop: "2px solid #fff", borderLeft: "2px solid #fff", borderRight: "2px solid #808080", borderBottom: "2px solid #808080", padding: "10px 12px", marginBottom: 12 };

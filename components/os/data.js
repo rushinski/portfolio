@@ -6,6 +6,8 @@ export const PERSONAL = {
   tagline: "I build production-grade systems: APIs, data modeling, auth, payments, automation.",
   bio: "I'm currently attending Thaddeus Stevens College of Technology, graduating with an Associate's in Computer Software Engineering Technology in May 2026. I'm looking for Backend, Full-Stack, or related roles near Philadelphia, PA (within 50mi) or nationwide remote.\n\nRight now I'm rebuilding a multi-tenant sneaker marketplace from the ground up. I enjoy working on production-grade systems and the level of detail required to build software that is reliable and maintainable. I take pride in writing clean code and designing systems that perform well under real-world usage. If you'd like to connect or learn more about my work, feel free to reach out.",
   email: "jacobrushinski@gmail.com",
+  phone: "(717) 216-9005",
+  phoneHref: "tel:+17172169005",
   location: "United States",
   github: "https://github.com/rushinski",
   linkedin: "https://linkedin.com/in/jacobrushinski",

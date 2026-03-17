@@ -1,8 +1,8 @@
 "use client";
 
-import { PERSONAL } from "@/components/os/data";
+import { PERSONAL } from "@/components/shared/data";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
 export default function ResumeMobile() {
   return (

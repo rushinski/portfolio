@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
 function SignalBars() {
   return (

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 const BOOT_MS = 2600;
 
 export default function MobileBootSequence({ onComplete }) {

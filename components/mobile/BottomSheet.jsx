@@ -16,7 +16,7 @@ import HelpMobile from "./apps/Help";
 import SettingsMobile from "./apps/Settings";
 import MinesweeperMobile from "./apps/Minesweeper";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
 const APP_COMPONENTS = {
   about:       AboutMobile,

@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { MOBILE_APPS } from "./mobileConstants";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 const LONG_PRESS_MS = 600;
 
 function AppIconTile({ app, index, onOpen, onLongPress, shakeMode, onDeleteAttempt, isDragging }) {

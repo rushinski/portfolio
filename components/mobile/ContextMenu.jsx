@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MOBILE_APP_MAP } from "./mobileConstants";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
 export default function ContextMenu({ appId, x, y, onOpen, onClose }) {
   const menuRef = useRef(null);

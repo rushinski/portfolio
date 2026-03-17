@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { VIDEO_LIBRARY } from "@/components/os/data";
+import { VIDEO_LIBRARY } from "@/components/shared/data";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
 export default function VideosMobile() {
   const [playing, setPlaying] = useState(null);

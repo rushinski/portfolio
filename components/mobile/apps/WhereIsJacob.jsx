@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
-import { LOCATIONS } from "@/components/os/data";
+import { LOCATIONS } from "@/components/shared/data";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
+
 const US_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json";
 const WORLD_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 const PA_FIPS = "42";

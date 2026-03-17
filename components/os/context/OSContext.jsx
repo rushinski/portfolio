@@ -82,6 +82,8 @@ export function OSProvider({ children }) {
   const sessionStartedAtRef = useRef(Date.now());
   const audioContextRef = useRef(null);
 
+  // ─── STATE ───────────────────────────────────────────────────────────────────
+
   const [settingsState, setSettingsState] = useState(() => {
     if (typeof window === "undefined") return DEFAULT_SETTINGS;
     try {
@@ -124,6 +126,8 @@ export function OSProvider({ children }) {
 
   const allSettings = settingsState;
 
+  // ─── SETTINGS ────────────────────────────────────────────────────────────────
+
   const setClockFormat = useCallback((clockFormat) => {
     setSettingsState((prev) => ({ ...prev, clockFormat }));
   }, []);
@@ -160,6 +164,8 @@ export function OSProvider({ children }) {
     setSettingsState((prev) => ({ ...prev, screensaverTimeout }));
   }, []);
 
+  // ─── COMPUTED ITEMS ──────────────────────────────────────────────────────────
+
   const systemDesktopIcons = useMemo(
     () => buildSystemDesktopIcons(renamedSystemIcons),
     [renamedSystemIcons],
@@ -187,6 +193,8 @@ export function OSProvider({ children }) {
     () => itemsById.get(activeTextDocId) || null,
     [itemsById, activeTextDocId],
   );
+
+  // ─── WINDOW UTILITIES ────────────────────────────────────────────────────────
 
   const nextZ = useCallback(() => ++topZRef.current, []);
 
@@ -254,6 +262,8 @@ export function OSProvider({ children }) {
     return changed ? next : currentWindows;
   }, [normalizeWindowRect]);
 
+  // ─── DIALOGS ─────────────────────────────────────────────────────────────────
+
   const showAlertDialog = useCallback((message, options = {}) => {
     setSystemDialog({
       title: options.title || "JacobOS",
@@ -299,6 +309,8 @@ export function OSProvider({ children }) {
 
     showAlertDialog(message, { title: "System Error", variant: "error" });
   }, [closeDialog, showAlertDialog]);
+
+  // ─── AUDIO ───────────────────────────────────────────────────────────────────
 
   const ensureAudioContext = useCallback(() => {
     if (typeof window === "undefined") {
@@ -392,6 +404,8 @@ export function OSProvider({ children }) {
     ]);
   }, [allSettings.masterSoundEnabled, allSettings.startupSoundEnabled, playToneSequence]);
 
+  // ─── DESKTOP / ICONS ─────────────────────────────────────────────────────────
+
   const registerDesktopElement = useCallback((node) => {
     desktopElementRef.current = node;
     if (!node) {
@@ -442,6 +456,8 @@ export function OSProvider({ children }) {
       y: clamp(clientY - rect.top, 0, Math.max(0, rect.height - 1)),
     };
   }, []);
+
+  // ─── FILE SYSTEM (read) ──────────────────────────────────────────────────────
 
   const getItemsInFolder = useCallback((folderId = null) => (
     allFileSystemItems.filter((item) => (item.parentId ?? null) === (folderId ?? null))
@@ -691,6 +707,8 @@ export function OSProvider({ children }) {
     return `File Explorer - ${itemsById.get(folderId)?.title || "Folder"}`;
   }, [itemsById]);
 
+  // ─── EXPLORER STATE ──────────────────────────────────────────────────────────
+
   const updateExplorerState = useCallback((updater) => {
     setExplorerState((prev) => {
       const next = typeof updater === "function" ? updater(prev) : updater;
@@ -718,6 +736,8 @@ export function OSProvider({ children }) {
       };
     });
   }, [getExplorerTitle]);
+
+  // ─── WINDOW OPEN / CLOSE / FOCUS ─────────────────────────────────────────────
 
   const openWindow = useCallback((id) => {
     setWindows((prev) => {
@@ -920,6 +940,8 @@ export function OSProvider({ children }) {
       openWindow(item.windowId);
     }
   }, [isContainerItem, nextZ, openFolderInExplorer, openWindow, playUiSound]);
+
+  // ─── FILE SYSTEM (write) ─────────────────────────────────────────────────────
 
   const createItem = useCallback((itemType, request = {}) => {
     const { clientX, clientY, parentId = null, title } = request;
@@ -1310,6 +1332,8 @@ export function OSProvider({ children }) {
     return true;
   }, [playUiSound, recycleBinItems.length]);
 
+  // ─── TEXT EDITOR / TASKBAR / MISC ────────────────────────────────────────────
+
   const updateTextContent = useCallback((id, content) => {
     setCustomItems((prev) => prev.map((item) => (
       item.id === id ? enrichItem({ ...item, content }) : item
@@ -1356,6 +1380,8 @@ export function OSProvider({ children }) {
   const unpinTaskbarItem = useCallback((id) => {
     setPinnedTaskbarAppIds((prev) => prev.filter((entryId) => entryId !== id));
   }, []);
+
+  // ─── WINDOW CLOSE / MINIMIZE / MAXIMIZE / DRAG / RESIZE ─────────────────────
 
   const closeWindow = useCallback((id) => {
     setWindows((prev) => ({
@@ -1560,6 +1586,8 @@ export function OSProvider({ children }) {
   useEffect(() => {
     syncExplorerWindowTitle(explorerState.currentFolderId);
   }, [explorerState.currentFolderId, desktopItems, syncExplorerWindowTitle]);
+
+  // ─── CONTEXT VALUE ───────────────────────────────────────────────────────────
 
   const value = useMemo(() => ({
     systemAlert: systemDialog?.message || "",

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PROJECTS, VIDEO_LIBRARY_BY_ID } from "@/components/os/data";
+import { PROJECTS, VIDEO_LIBRARY_BY_ID } from "@/components/shared/data";
 import { getSkillIconSrc } from "@/components/os/ui/skillIcon";
 
-const W95_FONT = '"MS Sans Serif", Tahoma, Geneva, sans-serif';
+import { W95_FONT } from "@/components/shared/constants";
 
 function SkillTag({ tech }) {
   const icon = getSkillIconSrc(tech);
