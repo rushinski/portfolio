@@ -37,9 +37,10 @@ function Clock() {
   useEffect(() => {
     const tick = () => {
       const now = new Date();
-      const h = String(now.getHours()).padStart(2, "0");
+      const h = now.getHours() % 12 || 12;
       const m = String(now.getMinutes()).padStart(2, "0");
-      setTime(`${h}:${m}`);
+      const ampm = now.getHours() < 12 ? "AM" : "PM";
+      setTime(`${h}:${m} ${ampm}`);
     };
     tick();
     const id = setInterval(tick, 1000);

@@ -55,7 +55,7 @@ export default function WhereIsJacobMobile() {
   }, []);
 
   const estTime = now.toLocaleTimeString("en-US", {
-    hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "America/New_York",
+    hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true, timeZone: "America/New_York",
   });
   const estDate = now.toLocaleDateString("en-US", {
     weekday: "short", month: "short", day: "numeric", timeZone: "America/New_York",
