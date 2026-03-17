@@ -1,6 +1,6 @@
-import Desktop from "@/components/os/Desktop";
-import MobileView from "@/components/MobileView";
-import { OSProvider } from "@/components/os/context/OSContext";
+import Desktop from "@/components/desktop/Desktop";
+import MobileOS from "@/components/mobile/MobileOS";
+import { OSProvider } from "@/components/desktop/context/OSContext";
 import { getGitHubData } from "@/lib/github";
 
 export default async function Home() {
@@ -22,7 +22,7 @@ export default async function Home() {
       </div>
       {/* Mobile OS — shown only on mobile */}
       <div className="block md:hidden">
-        <MobileView />
+        <MobileOS />
       </div>
     </main>
   );

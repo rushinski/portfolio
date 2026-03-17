@@ -1,6 +1,6 @@
 "use client";
 
-import { EXPERIENCE } from "../data";
+import { EXPERIENCE } from "@/components/shared/data";
 import { APP_BODY_STYLE, APP_CONTENT_STYLE } from "../ui/retro";
 import { getSkillIconSrc } from "../ui/skillIcon";
 

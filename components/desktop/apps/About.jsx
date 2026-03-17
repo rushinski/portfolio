@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { PERSONAL } from "../data";
+import { PERSONAL } from "@/components/shared/data";
 import { useWindowManager } from "../hooks/useWindowManager";
 import { APP_BODY_STYLE, APP_CONTENT_STYLE, APP_PANEL_STYLE, APP_SECTION_HEADER_STYLE, getWin95ButtonStyle } from "../ui/retro";
 import { DonutChart, LANG_COLORS, TOP_SKILL_ICONS, TOP_SKILLS } from "@/components/shared/GitHubStats";

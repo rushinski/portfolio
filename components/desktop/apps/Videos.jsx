@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { clamp } from "../constants";
-import { VIDEO_LIBRARY, VIDEO_LIBRARY_BY_ID } from "../data";
+import { VIDEO_LIBRARY, VIDEO_LIBRARY_BY_ID } from "@/components/shared/data";
 import { useWindowManager } from "../hooks/useWindowManager";
 import Tooltip from "../ui/Tooltip";
 import { APP_BODY_STYLE, APP_CONTENT_STYLE, INSET_BORDER } from "../ui/retro";

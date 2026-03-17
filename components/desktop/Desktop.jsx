@@ -8,7 +8,7 @@ import SystemDialog from "./SystemDialog";
 import Taskbar from "./Taskbar";
 import WindowFrame from "./WindowFrame";
 import { DRAG_ITEM_MIME, ICON_VIEW_MODES, MENU_TEXT_COLOR, WALLPAPER_PATTERN_BACKGROUNDS, canPinItemToTaskbar, clamp } from "./constants";
-import { PERSONAL } from "./data";
+import { PERSONAL } from "@/components/shared/data";
 import { useDialogs } from "./hooks/useDialogs";
 import { useFileSystem } from "./hooks/useFileSystem";
 import { useSettings } from "./hooks/useSettings";

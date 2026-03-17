@@ -14,7 +14,7 @@ import { useAudio } from "../hooks/useAudio";
 import { useDialogs } from "../hooks/useDialogs";
 import { useSettings } from "../hooks/useSettings";
 import { useSystem } from "../hooks/useSystem";
-import { Icons } from "../icons";
+import { Icons } from "@/components/shared/icons";
 import {
   ETCHED_SEPARATOR_STYLE,
   INSET_BORDER,

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { canPinItemToTaskbar, MENU_TEXT_COLOR } from "./constants";
-import { PERSONAL } from "./data";
+import { PERSONAL } from "@/components/shared/data";
 import { useFileSystem } from "./hooks/useFileSystem";
 import { useSettings } from "./hooks/useSettings";
 import { useWindowManager } from "./hooks/useWindowManager";

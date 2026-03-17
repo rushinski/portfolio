@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { EXPERIENCE, PERSONAL, PROJECTS, SKILLS } from "../data";
+import { EXPERIENCE, PERSONAL, PROJECTS, SKILLS } from "@/components/shared/data";
 import { useFileSystem } from "../hooks/useFileSystem";
 import { useSystem } from "../hooks/useSystem";
 

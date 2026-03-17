@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { MOBILE_APPS } from "./mobileConstants";
+import { MOBILE_APP_REGISTRY } from "@/components/shared/apps";
 
 import { W95_FONT } from "@/components/shared/constants";
 const LONG_PRESS_MS = 600;
@@ -99,7 +99,7 @@ function AppIconTile({ app, index, onOpen, onLongPress, shakeMode, onDeleteAttem
       )}
 
       <div style={{ width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        {app.icon}
+        {app.glyph}
       </div>
 
       <span
@@ -115,7 +115,7 @@ function AppIconTile({ app, index, onOpen, onLongPress, shakeMode, onDeleteAttem
           display: "block",
         }}
       >
-        {app.label}
+        {app.iconLabel}
       </span>
     </div>
   );
@@ -123,12 +123,12 @@ function AppIconTile({ app, index, onOpen, onLongPress, shakeMode, onDeleteAttem
 
 export default function HomeScreen({ onOpen, onLongPress, shakeMode, onDeleteAttempt, onExitShake, onBackgroundTap }) {
   // Ordered list of app IDs (drag-to-reorder mutates this)
-  const [iconOrder, setIconOrder] = useState(() => MOBILE_APPS.map((a) => a.id));
+  const [iconOrder, setIconOrder] = useState(() => MOBILE_APP_REGISTRY.map((a) => a.id));
   const [draggingIdx, setDraggingIdx] = useState(null);
   const [ghostPos, setGhostPos] = useState({ x: 0, y: 0 });
 
   // Map id → app object for quick lookup
-  const appById = Object.fromEntries(MOBILE_APPS.map((a) => [a.id, a]));
+  const appById = Object.fromEntries(MOBILE_APP_REGISTRY.map((a) => [a.id, a]));
   const orderedApps = iconOrder.map((id) => appById[id]).filter(Boolean);
 
   const dragRef = useRef({ active: false, idx: null });
@@ -256,7 +256,7 @@ export default function HomeScreen({ onOpen, onLongPress, shakeMode, onDeleteAtt
             filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.6))",
           }}
         >
-          {orderedApps[draggingIdx].icon}
+          {orderedApps[draggingIdx].glyph}
         </div>
       )}
     </div>

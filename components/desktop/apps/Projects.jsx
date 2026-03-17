@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { PROJECTS, VIDEO_LIBRARY_BY_ID } from "../data";
+import { PROJECTS, VIDEO_LIBRARY_BY_ID } from "@/components/shared/data";
 import { useWindowManager } from "../hooks/useWindowManager";
 import { APP_BODY_STYLE, APP_CONTENT_STYLE } from "../ui/retro";
 import { getSkillIconSrc } from "../ui/skillIcon";

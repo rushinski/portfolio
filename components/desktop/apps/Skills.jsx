@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { SKILLS, SKILL_PROFICIENCY } from "../data";
+import { SKILLS, SKILL_PROFICIENCY } from "@/components/shared/data";
 import Tooltip from "../ui/Tooltip";
 import {
   APP_BODY_STYLE,

@@ -22,8 +22,8 @@ import {
   clamp,
   snapIconToGrid,
 } from "../constants";
-import { VIDEO_LIBRARY, VIDEO_LIBRARY_BY_ID } from "../data";
-import { Icons } from "../icons";
+import { VIDEO_LIBRARY, VIDEO_LIBRARY_BY_ID } from "@/components/shared/data";
+import { Icons } from "@/components/shared/icons";
 
 const OSContext = createContext(null);
 

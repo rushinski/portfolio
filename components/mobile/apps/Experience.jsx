@@ -1,7 +1,7 @@
 "use client";
 
 import { EXPERIENCE } from "@/components/shared/data";
-import { getSkillIconSrc } from "@/components/os/ui/skillIcon";
+import { getSkillIconSrc } from "@/components/desktop/ui/skillIcon";
 
 import { W95_FONT } from "@/components/shared/constants";
 

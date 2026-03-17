@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 
-import { LOCATIONS } from "../data";
+import { LOCATIONS } from "@/components/shared/data";
 import { APP_BODY_STYLE, APP_CONTENT_STYLE, APP_PANEL_STYLE } from "../ui/retro";
 
 // US states atlas (for PA highlight + state borders)

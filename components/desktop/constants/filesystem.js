@@ -1,6 +1,6 @@
 "use client";
 
-import { Icons } from "../icons";
+import { Icons } from "@/components/shared/icons";
 
 export const INITIAL_CUSTOM_ITEMS = [
 

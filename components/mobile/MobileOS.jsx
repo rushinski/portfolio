@@ -11,13 +11,13 @@ import ExperienceMobile from "./apps/Experience";
 import ProjectsMobile from "./apps/Projects";
 import ContactMobile from "./apps/Contact";
 import ResumeMobile from "./apps/Resume";
-import WhereIsJacobMobile from "./apps/WhereIsJacob";
+import LocationMobile from "./apps/Location";
 import VideosMobile from "./apps/Videos";
 import HelpMobile from "./apps/Help";
 import SettingsMobile from "./apps/Settings";
 import MinesweeperMobile from "./apps/Minesweeper";
 
-import { APP_TITLES, MOBILE_APP_MAP } from "./mobileConstants";
+import { APP_MAP } from "@/components/shared/apps";
 import MobileBootSequence from "./MobileBootSequence";
 
 import { W95_FONT } from "@/components/shared/constants";
@@ -29,7 +29,7 @@ const APP_COMPONENTS = {
   projects:    ProjectsMobile,
   contact:     ContactMobile,
   resume:      ResumeMobile,
-  location:    WhereIsJacobMobile,
+  location:    LocationMobile,
   videos:      VideosMobile,
   help:        HelpMobile,
   settings:    SettingsMobile,
@@ -309,7 +309,7 @@ export default function MobileOS() {
 
           {deleteAlert && (
             <DeleteAlert
-              appLabel={MOBILE_APP_MAP[deleteAlert]?.label ?? deleteAlert}
+              appLabel={APP_MAP[deleteAlert]?.title ?? deleteAlert}
               onClose={handleDeleteAlertClose}
             />
           )}

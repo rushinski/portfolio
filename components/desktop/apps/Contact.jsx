@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { PERSONAL } from "../data";
+import { PERSONAL } from "@/components/shared/data";
 import {
   APP_BODY_STYLE,
   APP_CONTENT_STYLE,
