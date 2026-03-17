@@ -142,7 +142,7 @@ export default function BootSequence({ onComplete, embedded = false }) {
             animation: "bsFadeIn 300ms ease-out 600ms both",
           }}
         >
-          © 2025 Jacob Rushinski. All rights reserved.
+          © 2026 Jacob Rushinski. All rights reserved.
         </div>
       </div>
     </>
