@@ -19,9 +19,9 @@ export const LANG_COLORS = {
 
 export const TOP_SKILL_ICONS = {
   JavaScript: "/skills/javascript.png",
-  Python: "/skills/Python.png",
+  Python: "/skills/python.png",
   PostgreSQL: "/skills/PostgresSQL.png",
-  "Next.js": "/skills/Nextjs.png",
+  "Next.js": "/skills/nextjs.png",
 };
 
 export const TOP_SKILLS = ["JavaScript", "Python", "PostgreSQL", "Next.js"];
