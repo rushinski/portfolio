@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { SKILLS, SKILL_PROFICIENCY } from "@/components/shared/data";
-import { getSkillIconSrc } from "@/components/desktop/ui/skillIcon";
+import { getSkillIconSrc } from "@/components/shared/skillIcon";
 
 import { W95_FONT } from "@/components/shared/constants";
 

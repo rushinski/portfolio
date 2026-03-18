@@ -2,7 +2,7 @@
 
 import { EXPERIENCE } from "@/components/shared/data";
 import { APP_BODY_STYLE, APP_CONTENT_STYLE } from "../ui/retro";
-import { getSkillIconSrc } from "../ui/skillIcon";
+import { getSkillIconSrc } from "@/components/shared/skillIcon";
 
 export default function ExperienceApp() {
   return (

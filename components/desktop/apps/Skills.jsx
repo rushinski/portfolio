@@ -13,7 +13,7 @@ import {
   WIN95_COLORS,
 } from "../ui/retro";
 
-import { SKILL_ICON_FILES } from "../ui/skillIcon";
+import { SKILL_ICON_FILES } from "@/components/shared/skillIcon";
 
 const PROFICIENCY_LABELS = {
   1: "Foundational",
