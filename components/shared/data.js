@@ -24,30 +24,35 @@ export const SKILLS = {
   "Developer Tools": ["Git", "GitHub", "Vercel", "Upstash", "Claude Code", "Codex"],
 };
 
+// Order within each tier controls display order on skills page when scores tie.
+// Earlier = higher priority within the same score.
 export const SKILL_PROFICIENCY = {
   JavaScript: 4,
   "Node.js": 4,
   TypeScript: 3,
   "Next.js": 3,
   PostgreSQL: 3,
-  SQL: 3,
   Git: 3,
   GitHub: 3,
+  SQL: 3,
   "Claude Code": 3,
   Codex: 3,
   Python: 2,
-  HTML: 2,
-  CSS: 2,
   React: 2,
   Docker: 2,
-  "AWS (SES)": 2,
   "GitHub Actions": 2,
+  "AWS (SES)": 2,
   Vercel: 2,
   Upstash: 2,
+  HTML: 2,
+  CSS: 2,
   MongoDB: 1,
   Redis: 1,
   "Tailwind CSS": 1,
 };
+
+// Explicit top-4 shown on the About page — edit this to change what appears there.
+export const TOP_SKILLS = ["JavaScript", "Node.js", "PostgreSQL", "TypeScript"];
 
 export const EXPERIENCE = [
   {

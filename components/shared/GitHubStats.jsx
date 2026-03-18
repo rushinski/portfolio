@@ -2,7 +2,7 @@
 
 // Shared GitHub stats constants and components used by both desktop and mobile About apps.
 
-import { SKILL_PROFICIENCY } from "@/components/shared/data";
+import { TOP_SKILLS } from "@/components/shared/data";
 import { SKILL_ICON_FILES } from "@/components/shared/skillIcon";
 
 export const LANG_COLORS = {
@@ -20,11 +20,7 @@ export const LANG_COLORS = {
   "Node.js": "#68a063",
 };
 
-// Top 4 skills by proficiency score, derived from shared/data.js — no hardcoding needed
-export const TOP_SKILLS = Object.entries(SKILL_PROFICIENCY)
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 4)
-  .map(([name]) => name);
+export { TOP_SKILLS };
 
 export const TOP_SKILL_ICONS = Object.fromEntries(
   TOP_SKILLS.map((name) => [name, `/skills/${SKILL_ICON_FILES[name]}`]).filter(([, src]) => src !== "/skills/undefined"),

@@ -247,9 +247,11 @@ export default function SkillsApp() {
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", gap: 12 }}>
           <div style={{ flex: "1 1 520px", minWidth: 0 }}>
             {Object.entries(SKILLS).map(([category, items]) => {
+              const proficiencyKeys = Object.keys(SKILL_PROFICIENCY);
               const sortedItems = [...items].sort((a, b) => {
                 const levelDiff = getSkillLevel(b) - getSkillLevel(a);
-                return levelDiff !== 0 ? levelDiff : a.localeCompare(b);
+                if (levelDiff !== 0) return levelDiff;
+                return proficiencyKeys.indexOf(a) - proficiencyKeys.indexOf(b);
               });
 
               return (

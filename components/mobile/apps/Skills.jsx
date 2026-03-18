@@ -66,7 +66,12 @@ export default function SkillsMobile() {
 
       {/* Skill categories */}
       {Object.entries(SKILLS).map(([category, skills]) => {
-        const sorted = [...skills].sort((a, b) => (SKILL_PROFICIENCY[b] ?? 1) - (SKILL_PROFICIENCY[a] ?? 1));
+        const proficiencyKeys = Object.keys(SKILL_PROFICIENCY);
+        const sorted = [...skills].sort((a, b) => {
+          const levelDiff = (SKILL_PROFICIENCY[b] ?? 1) - (SKILL_PROFICIENCY[a] ?? 1);
+          if (levelDiff !== 0) return levelDiff;
+          return proficiencyKeys.indexOf(a) - proficiencyKeys.indexOf(b);
+        });
         return (
           <div key={category} style={{ marginBottom: 14 }}>
             <div style={{ fontSize: 10, fontWeight: 700, background: "#000080", color: "#fff", padding: "2px 8px", marginBottom: 4, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
