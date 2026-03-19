@@ -24,31 +24,22 @@ export default function ExperienceMobile() {
           <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "8px 10px" }}>
             <div style={{ fontWeight: 700, fontSize: 13, color: "#000080" }}>{exp.company}</div>
             <div style={{ fontSize: 11, color: "#444", marginTop: 2, fontStyle: "italic" }}>{exp.role}</div>
-            <div style={{ display: "flex", gap: 8, marginTop: 4, flexWrap: "wrap" }}>
+            <div style={{ marginTop: 4 }}>
               <span style={{ fontSize: 9, color: "#555" }}>{exp.period}</span>
-              <span style={{ fontSize: 9, fontWeight: 700, background: "#c0c0c0", color: "#111", border: "1px solid #808080", padding: "0 5px" }}>{exp.type}</span>
             </div>
           </div>
 
           {/* Body */}
           <div style={{ padding: "8px 10px" }}>
-            <div style={{ fontSize: 11, color: "#444", marginBottom: 8, lineHeight: 1.6, fontStyle: "italic" }}>
-              {exp.desc}
-            </div>
-            {exp.bullets.map((bullet, j) => (
-              <div key={j} style={{ fontSize: 11, color: "#222", lineHeight: 1.6, paddingLeft: 14, position: "relative", marginBottom: 3 }}>
-                <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>{">"}</span>
-                {bullet}
-              </div>
-            ))}
+            <div style={{ fontSize: 11, color: "#333", lineHeight: 1.6, marginBottom: exp.stack.length > 0 ? 8 : 0, fontFamily: W95_FONT }}>{exp.paragraph}</div>
             {exp.stack.length > 0 && (
-              <div style={{ display: "flex", gap: 3, flexWrap: "wrap", marginTop: 8 }}>
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                 {exp.stack.map((tech) => {
                   const icon = getSkillIconSrc(tech);
                   return (
-                    <span key={tech} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "0 5px 0 3px", fontSize: 9, color: "#111", background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", fontFamily: W95_FONT }}>
-                      {icon && <img src={icon} alt="" width={11} height={11} style={{ objectFit: "contain", display: "block", flexShrink: 0 }} />}
-                      {tech}
+                    <span key={tech} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "2px 8px 2px 5px", fontSize: 11, lineHeight: 1, color: "#111", background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", fontFamily: W95_FONT }}>
+                      {icon && <img src={icon} alt="" width={14} height={14} style={{ objectFit: "contain", display: "block", flexShrink: 0, verticalAlign: "middle" }} />}
+                      <span style={{ verticalAlign: "middle" }}>{tech}</span>
                     </span>
                   );
                 })}

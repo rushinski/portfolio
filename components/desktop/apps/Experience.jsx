@@ -15,27 +15,18 @@ export default function ExperienceApp() {
                 <div style={{ fontWeight: 700, fontSize: 12, color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{experience.company}</div>
                 <div style={{ fontSize: 10, color: "#555", fontStyle: "italic", marginTop: 1 }}>{experience.role}</div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                <span style={{ fontSize: 9, color: "#555" }}>{experience.period}</span>
-                <span style={{ padding: "0 5px", fontSize: 9, fontWeight: 700, background: "#c0c0c0", color: "#111", border: "1px solid #808080" }}>{experience.type}</span>
-              </div>
+              <span style={{ fontSize: 9, color: "#555", flexShrink: 0 }}>{experience.period}</span>
             </div>
             <div style={{ padding: "6px 10px 8px" }}>
-              <div style={{ fontSize: 11, color: "#444", marginBottom: 6, lineHeight: 1.5, fontStyle: "italic" }}>{experience.desc}</div>
-              {experience.bullets.map((bullet, bulletIndex) => (
-                <div key={`${experience.company}-${bulletIndex}`} style={{ fontSize: 11, color: "#222", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.5 }}>
-                  <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>{">"}</span>
-                  {bullet}
-                </div>
-              ))}
+              <div style={{ fontSize: 11, color: "#333", lineHeight: 1.6, marginBottom: experience.stack.length > 0 ? 8 : 0 }}>{experience.paragraph}</div>
               {experience.stack.length > 0 && (
-                <div style={{ display: "flex", gap: 3, flexWrap: "wrap", marginTop: 7 }}>
+                <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                   {experience.stack.map((tech) => {
                     const icon = getSkillIconSrc(tech);
                     return (
-                      <span key={tech} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "0 5px 0 3px", fontSize: 9, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff" }}>
-                        {icon && <img src={icon} alt="" width={11} height={11} style={{ objectFit: "contain", display: "block", flexShrink: 0 }} />}
-                        {tech}
+                      <span key={tech} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "2px 8px 2px 5px", fontSize: 11, lineHeight: 1, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff" }}>
+                        {icon && <img src={icon} alt="" width={14} height={14} style={{ objectFit: "contain", display: "block", flexShrink: 0, verticalAlign: "middle" }} />}
+                        <span style={{ verticalAlign: "middle" }}>{tech}</span>
                       </span>
                     );
                   })}
