@@ -34,6 +34,10 @@ export const SKILL_ICON_FILES = {
   Supabase:         "Supabase.webp",
   "Discord.js":     "Discordjs.png",
   ADBKit:           "Android.png",
+  "Tesseract.js":   "tesseract.png",
+  "C#":             "csharp.webp",
+  "ASP.NET":        "dotnet.png",
+  "Digital Ocean":  "digitalocean.webp",
 };
 
 export function getSkillIconSrc(name) {
