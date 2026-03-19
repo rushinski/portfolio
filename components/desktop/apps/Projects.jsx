@@ -10,52 +10,41 @@ import { getSkillIconSrc } from "@/components/shared/skillIcon";
 function SkillTag({ tech, size = "normal" }) {
   const icon = getSkillIconSrc(tech);
   const isSmall = size === "small";
+  const sz = isSmall ? 11 : 14;
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: isSmall ? 3 : 4, padding: isSmall ? "0 5px 0 3px" : "1px 6px 1px 4px", fontSize: isSmall ? 9 : 10, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff" }}>
-      {icon && <img src={icon} alt="" width={isSmall ? 11 : 12} height={isSmall ? 11 : 12} style={{ objectFit: "contain", display: "block", flexShrink: 0 }} />}
-      {tech}
+    <span style={{ display: "inline-flex", alignItems: "center", gap: isSmall ? 3 : 5, padding: isSmall ? "0 5px 0 3px" : "2px 8px 2px 5px", fontSize: isSmall ? 9 : 11, lineHeight: 1, background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff" }}>
+      {icon && <img src={icon} alt="" width={sz} height={sz} style={{ objectFit: "contain", display: "block", flexShrink: 0, verticalAlign: "middle" }} />}
+      <span style={{ verticalAlign: "middle" }}>{tech}</span>
     </span>
   );
 }
 
-function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
-  const ghRepo = project.links?.github ? repoData[project.links.github] : null;
-  const isInProgress = project.status === "IN_PROGRESS";
-  const hasProjectLinks = !!(project.links?.github || project.links?.live || project.links?.landing);
-  const hasVideoPreviews = (project.links?.videos?.length || 0) > 0;
-  const hasReflection = !!(project.highlight || project.differently || project.outcome);
+function LinkButton({ label, icon, onClick }) {
+  return (
+    <button onClick={onClick} style={{ padding: "3px 10px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
+      {icon && <img src={icon} alt="" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain", display: "block", verticalAlign: "middle" }} />}
+      <span style={{ verticalAlign: "middle" }}>{label}</span>
+    </button>
+  );
+}
 
-  const sectionLabel = {
-    fontSize: 10,
-    fontWeight: 700,
-    color: "#000080",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    borderBottom: "1px solid #808080",
-    paddingBottom: 3,
-    marginBottom: 7,
-    marginTop: 12,
+function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
+  const ghRepo = project.githubUrl && project.githubUrl !== "#" ? repoData[project.githubUrl] : null;
+  const inProgress = project.challenges?.startsWith("In active development");
+
+  const SL = {
+    fontSize: 10, fontWeight: 700, color: "#000080",
+    textTransform: "uppercase", letterSpacing: 1,
+    borderBottom: "1px solid #808080", paddingBottom: 3,
+    marginBottom: 7, marginTop: 12,
   };
 
-  const bullet = (text, key) => (
-    <div key={key} style={{ fontSize: 11, color: "#222", padding: "1px 0 2px 13px", position: "relative", lineHeight: 1.6 }}>
-      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>{">"}</span>
-      {text}
-    </div>
+  const prose = (text) => (
+    <div style={{ fontSize: 11, color: "#333", lineHeight: 1.6 }}>{text}</div>
   );
 
-  const architectureBullet = (text, key) => {
-    const colonIndex = text.indexOf(": ");
-    const hasPrefix = colonIndex > 0 && colonIndex < 55;
-    return (
-      <div key={key} style={{ fontSize: 11, color: "#222", padding: "1px 0 3px 13px", position: "relative", lineHeight: 1.6 }}>
-        <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>{">"}</span>
-        {hasPrefix
-          ? <><strong style={{ color: "#111" }}>{text.slice(0, colonIndex)}:</strong>{" "}{text.slice(colonIndex + 2)}</>
-          : text}
-      </div>
-    );
-  };
+  const hasLinks = !!(project.githubUrl && project.githubUrl !== "#") || !!project.liveUrl;
+  const hasVideos = (project.videos?.length || 0) > 0;
 
   return (
     <div style={{ ...APP_CONTENT_STYLE, padding: "10px 12px 14px" }}>
@@ -68,71 +57,57 @@ function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
       )}
 
       <div style={{ border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8" }}>
-        <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "7px 10px" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 3 }}>
-            <div style={{ fontWeight: 800, fontSize: 13, color: "#111", lineHeight: 1.2, flex: 1, minWidth: 0 }}>{project.title}</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-              <span style={{ fontSize: 9, color: "#555" }}>{project.date}</span>
-              <span style={{ padding: "1px 6px", fontSize: 9, fontWeight: 700, background: isInProgress ? "#ffff00" : "#00cc44", color: "#000", border: "1px solid #808080" }}>
-                {isInProgress ? "In Progress" : "Complete"}
-              </span>
-            </div>
+        {/* Header: title + date + overview + tags + links */}
+        <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "8px 10px 10px" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
+            <div style={{ fontWeight: 800, fontSize: 16, color: "#111", lineHeight: 1.2 }}>{project.title}</div>
+            <div style={{ fontSize: 10, color: "#555", flexShrink: 0, paddingTop: 3 }}>{project.date}</div>
           </div>
-          <div style={{ fontSize: 10, color: "#555", lineHeight: 1.4, fontStyle: "italic" }}>{project.desc}</div>
+          {project.overview && (
+            <div style={{ fontSize: 11, color: "#555", lineHeight: 1.5, fontStyle: "italic", marginBottom: 8 }}>{project.overview}</div>
+          )}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: hasLinks ? 8 : 0 }}>
+            {project.tech.map((t) => <SkillTag key={t} tech={t} size="normal" />)}
+          </div>
+          {hasLinks && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+              {project.githubUrl && project.githubUrl !== "#" && (
+                <LinkButton
+                  label={ghRepo?.name || project.githubUrl.split("/").pop()}
+                  icon="/skills/github.png"
+                  onClick={() => window.open(project.githubUrl, "_blank", "noopener,noreferrer")}
+                />
+              )}
+              {project.liveUrl && (
+                <LinkButton
+                  label="Live Site"
+                  onClick={() => window.open(project.liveUrl, "_blank", "noopener,noreferrer")}
+                />
+              )}
+            </div>
+          )}
         </div>
 
         <div style={{ padding: "4px 10px 12px" }}>
-          {project.impact?.length > 0 && (
+          {project.why && (
             <>
-              <div style={{ ...sectionLabel, marginTop: 8 }}>Impact</div>
-              {project.impact.map((item, index) => bullet(item, `impact-${index}`))}
+              <div style={{ ...SL, marginTop: 8 }}>Why I Built It</div>
+              {prose(project.why)}
             </>
           )}
-
-          <div style={sectionLabel}>Stack</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-            {project.stack.map((tech) => (
-              <SkillTag key={tech} tech={tech} size="normal" />
-            ))}
-          </div>
-
-          {hasProjectLinks && (
+          {hasVideos && (
             <>
-              <div style={sectionLabel}>Links</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                {project.links?.github && (
-                  <button onClick={() => window.open(project.links.github, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
-                    <img src="/skills/github.png" alt="github" width={11} height={11} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
-                    {ghRepo?.name || project.links.github.split("/").pop()}
-                  </button>
-                )}
-                {project.links?.live && (
-                  <button onClick={() => window.open(project.links.live, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
-                    Live Site
-                  </button>
-                )}
-                {project.links?.landing && (
-                  <button onClick={() => window.open(project.links.landing, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
-                    Landing Page
-                  </button>
-                )}
-              </div>
-            </>
-          )}
-
-          {hasVideoPreviews && (
-            <>
-              <div style={sectionLabel}>Media</div>
+              <div style={SL}>Media</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                {project.links.videos.map((video, index) => {
-                  const mappedVideo = VIDEO_LIBRARY_BY_ID[video.id] || { ...video, id: video.id || `preview-${index}`, projectTitle: project.title };
+                {project.videos.map((video, index) => {
+                  const v = VIDEO_LIBRARY_BY_ID[video.id] || { ...video, id: video.id || `preview-${index}`, projectTitle: project.title };
                   return (
-                    <button key={mappedVideo.id} onClick={() => onOpenVideo(mappedVideo.id)} style={{ border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#c0c0c0", padding: 0, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "stretch" }}>
+                    <button key={v.id} onClick={() => onOpenVideo(v.id)} style={{ border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#c0c0c0", padding: 0, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "stretch" }}>
                       <div style={{ width: 96, flexShrink: 0, background: "#000", margin: 3, border: "1px solid #606060", overflow: "hidden" }}>
-                        <video src={mappedVideo.src} muted preload="metadata" playsInline style={{ width: "100%", height: 54, objectFit: "cover", display: "block", pointerEvents: "none" }} />
+                        <video src={v.src} muted preload="metadata" playsInline style={{ width: "100%", height: 54, objectFit: "cover", display: "block", pointerEvents: "none" }} />
                       </div>
                       <div style={{ flex: 1, padding: "5px 8px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3 }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "#111" }}>{mappedVideo.label}</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "#111" }}>{v.label}</div>
                         <div style={{ fontSize: 9, color: "#000080", fontWeight: 700 }}>Open in Videos</div>
                       </div>
                     </button>
@@ -141,20 +116,28 @@ function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
               </div>
             </>
           )}
-
-          {project.architecture?.length > 0 && (
+          {!inProgress && project.challenges && (
             <>
-              <div style={sectionLabel}>How I Built It</div>
-              {project.architecture.map((item, index) => architectureBullet(item, `architecture-${index}`))}
+              <div style={SL}>Challenges</div>
+              {prose(project.challenges)}
             </>
           )}
-
-          {hasReflection && (
+          {!inProgress && project.takeaway && (
             <>
-              <div style={sectionLabel}>Reflection</div>
-              {project.highlight && bullet(project.highlight, "highlight")}
-              {project.differently && bullet(`Would do differently: ${project.differently}`, "differently")}
-              {project.outcome && bullet(project.outcome, "outcome")}
+              <div style={SL}>Key Takeaway</div>
+              {prose(project.takeaway)}
+            </>
+          )}
+          {!inProgress && project.differently && (
+            <>
+              <div style={SL}>What I'd Do Differently</div>
+              {prose(project.differently)}
+            </>
+          )}
+          {project.outcome && (
+            <>
+              <div style={SL}>Outcome</div>
+              {prose(project.outcome)}
             </>
           )}
         </div>
@@ -194,16 +177,12 @@ export default function ProjectsApp() {
 
   useEffect(() => {
     PROJECTS.forEach((project) => {
-      if (!project.links?.github) return;
-      const match = project.links.github.match(/github\.com\/([^/]+)\/([^/]+)/);
+      if (!project.githubUrl || project.githubUrl === "#") return;
+      const match = project.githubUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
       if (!match) return;
       fetch(`https://api.github.com/repos/${match[1]}/${match[2]}`)
-        .then((response) => (response.ok ? response.json() : null))
-        .then((data) => {
-          if (data) {
-            setRepoData((prev) => ({ ...prev, [project.links.github]: data }));
-          }
-        })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => { if (d) setRepoData((prev) => ({ ...prev, [project.githubUrl]: d })); })
         .catch(() => {});
     });
   }, []);
@@ -212,39 +191,22 @@ export default function ProjectsApp() {
     <div style={APP_BODY_STYLE}>
       {currentView.type === "list" ? (
         <div style={{ ...APP_CONTENT_STYLE, padding: "10px 12px" }}>
-          {PROJECTS.map((project, index) => {
-            const isInProgress = project.status === "IN_PROGRESS";
-            return (
-              <div key={`${project.title}-${index}`} onClick={() => openProjectDetail(index)} style={{ marginBottom: 10, cursor: "pointer", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8" }}>
-                <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "5px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                  <div style={{ fontWeight: 700, fontSize: 12, color: "#111", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.title}</div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                    <span style={{ fontSize: 9, color: "#555" }}>{project.date}</span>
-                    <span style={{ padding: "0 5px", fontSize: 9, fontWeight: 700, background: isInProgress ? "#ffff00" : "#00cc44", color: "#000", border: "1px solid #808080" }}>
-                      {isInProgress ? "In Progress" : "Complete"}
-                    </span>
+          {PROJECTS.map((project, index) => (
+            <div key={project.id} onClick={() => openProjectDetail(index)} style={{ marginBottom: 10, cursor: "pointer", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8" }}>
+              <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "5px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                <div style={{ fontWeight: 700, fontSize: 12, color: "#111", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.title}</div>
+                <span style={{ fontSize: 9, color: "#555", flexShrink: 0 }}>{project.date}</span>
+              </div>
+              <div style={{ padding: "6px 10px 8px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+                    {project.tech.map((t) => <SkillTag key={t} tech={t} size="small" />)}
                   </div>
-                </div>
-                <div style={{ padding: "6px 10px 8px" }}>
-                  <div style={{ fontSize: 11, color: "#444", marginBottom: 6, lineHeight: 1.5, fontStyle: "italic" }}>{project.desc}</div>
-                  {project.impact.slice(0, 2).map((item, impactIndex) => (
-                    <div key={`${project.title}-impact-${impactIndex}`} style={{ fontSize: 11, color: "#222", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.5 }}>
-                      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>{">"}</span>
-                      {item}
-                    </div>
-                  ))}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8, gap: 8, flexWrap: "wrap" }}>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-                      {project.stack.slice(0, 5).map((tech) => (
-                        <SkillTag key={tech} tech={tech} size="small" />
-                      ))}
-                    </div>
-                    <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>Open</span>
-                  </div>
+                  <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>Open</span>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       ) : currentProject ? (
         <ProjectDetailView project={currentProject} repoData={repoData} onOpenVideo={openVideoApp} onBackToList={() => navigate({ type: "list" })} />

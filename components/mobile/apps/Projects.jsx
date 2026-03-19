@@ -9,10 +9,19 @@ import { W95_FONT } from "@/components/shared/constants";
 function SkillTag({ tech }) {
   const icon = getSkillIconSrc(tech);
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "0 5px 0 3px", fontSize: 9, color: "#111", background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", fontFamily: W95_FONT }}>
-      {icon && <img src={icon} alt="" width={11} height={11} style={{ objectFit: "contain", display: "block", flexShrink: 0 }} />}
-      {tech}
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "0 5px 0 3px", fontSize: 9, lineHeight: 1, color: "#111", background: "#c0c0c0", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", fontFamily: W95_FONT }}>
+      {icon && <img src={icon} alt="" width={11} height={11} style={{ objectFit: "contain", display: "block", flexShrink: 0, verticalAlign: "middle" }} />}
+      <span style={{ verticalAlign: "middle" }}>{tech}</span>
     </span>
+  );
+}
+
+function LinkButton({ label, icon, onClick }) {
+  return (
+    <button onClick={onClick} style={{ padding: "3px 10px", fontSize: 10, color: "#111", background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5, touchAction: "manipulation" }}>
+      {icon && <img src={icon} alt="" width={12} height={12} style={{ objectFit: "contain", display: "block", verticalAlign: "middle" }} />}
+      <span style={{ verticalAlign: "middle" }}>{label}</span>
+    </button>
   );
 }
 
@@ -23,32 +32,15 @@ const SL = {
   marginBottom: 7, marginTop: 12,
 };
 
-function Bullet({ text }) {
-  return (
-    <div style={{ fontSize: 11, color: "#222", padding: "1px 0 2px 13px", position: "relative", lineHeight: 1.6 }}>
-      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>{">"}</span>
-      {text}
-    </div>
-  );
-}
-
-function ArchBullet({ text }) {
-  const ci = text.indexOf(": ");
-  const hp = ci > 0 && ci < 55;
-  return (
-    <div style={{ fontSize: 11, color: "#222", padding: "1px 0 3px 13px", position: "relative", lineHeight: 1.6 }}>
-      <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>{">"}</span>
-      {hp ? <><strong style={{ color: "#111" }}>{text.slice(0, ci)}:</strong>{" "}{text.slice(ci + 2)}</> : text}
-    </div>
-  );
-}
-
 function ProjectDetail({ project, repoData, onBack }) {
-  const inProg = project.status === "IN_PROGRESS";
-  const hasLinks = !!(project.links?.github || project.links?.live || project.links?.landing);
-  const hasVideos = (project.links?.videos?.length || 0) > 0;
-  const hasRef = !!(project.highlight || project.differently || project.outcome);
-  const ghRepo = project.links?.github ? repoData[project.links.github] : null;
+  const inProgress = project.challenges?.startsWith("In active development");
+  const hasLinks = !!(project.githubUrl && project.githubUrl !== "#") || !!project.liveUrl;
+  const hasVideos = (project.videos?.length || 0) > 0;
+  const ghRepo = project.githubUrl && project.githubUrl !== "#" ? repoData[project.githubUrl] : null;
+
+  const prose = (text) => (
+    <div style={{ fontSize: 11, color: "#333", lineHeight: 1.6, fontFamily: W95_FONT }}>{text}</div>
+  );
 
   return (
     <div style={{ padding: "12px 14px", background: "#f4f4f0", minHeight: "100%", fontFamily: W95_FONT }}>
@@ -58,57 +50,52 @@ function ProjectDetail({ project, repoData, onBack }) {
         </button>
       </div>
       <div style={{ border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8" }}>
-        <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "7px 10px" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 3 }}>
-            <div style={{ fontWeight: 800, fontSize: 13, color: "#111", lineHeight: 1.2, flex: 1, minWidth: 0 }}>{project.title}</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-              <span style={{ fontSize: 9, color: "#555" }}>{project.date}</span>
-              <span style={{ padding: "1px 6px", fontSize: 9, fontWeight: 700, background: inProg ? "#ffff00" : "#00cc44", color: "#000", border: "1px solid #808080" }}>
-                {inProg ? "In Progress" : "Complete"}
-              </span>
-            </div>
+        {/* Header: title + date + overview + tags + links */}
+        <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "8px 10px 10px" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
+            <div style={{ fontWeight: 800, fontSize: 15, color: "#111", lineHeight: 1.2, flex: 1, minWidth: 0 }}>{project.title}</div>
+            <div style={{ fontSize: 9, color: "#555", flexShrink: 0, paddingTop: 2 }}>{project.date}</div>
           </div>
-          <div style={{ fontSize: 10, color: "#555", lineHeight: 1.4, fontStyle: "italic" }}>{project.desc}</div>
-        </div>
-        <div style={{ padding: "4px 10px 14px" }}>
-          {project.impact?.length > 0 && (
-            <>
-              <div style={{ ...SL, marginTop: 8 }}>Impact</div>
-              {project.impact.map((item, i) => <Bullet key={i} text={item} />)}
-            </>
+          {project.overview && (
+            <div style={{ fontSize: 11, color: "#555", lineHeight: 1.5, fontStyle: "italic", marginBottom: 8, fontFamily: W95_FONT }}>{project.overview}</div>
           )}
-          <div style={SL}>Stack</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-            {project.stack.map((tech) => <SkillTag key={tech} tech={tech} />)}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginBottom: hasLinks ? 7 : 0 }}>
+            {project.tech.map((tech) => <SkillTag key={tech} tech={tech} />)}
           </div>
           {hasLinks && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+              {project.githubUrl && project.githubUrl !== "#" && (
+                <LinkButton
+                  label={ghRepo?.name || project.githubUrl.split("/").pop()}
+                  icon="/skills/github.png"
+                  onClick={() => window.open(project.githubUrl, "_blank", "noopener,noreferrer")}
+                />
+              )}
+              {project.liveUrl && (
+                <LinkButton
+                  label="Live Site"
+                  onClick={() => window.open(project.liveUrl, "_blank", "noopener,noreferrer")}
+                />
+              )}
+            </div>
+          )}
+        </div>
+
+        <div style={{ padding: "4px 10px 14px" }}>
+          {/* Why */}
+          {project.why && (
             <>
-              <div style={SL}>Links</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {project.links?.github && (
-                  <button onClick={() => window.open(project.links.github, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, color: "#111", background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5, touchAction: "manipulation" }}>
-                    <img src="/skills/github.png" alt="" width={11} height={11} style={{ objectFit: "contain" }} />
-                    {ghRepo?.name || project.links.github.split("/").pop()}
-                  </button>
-                )}
-                {project.links?.live && (
-                  <button onClick={() => window.open(project.links.live, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, color: "#111", background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", touchAction: "manipulation" }}>
-                    Live Site
-                  </button>
-                )}
-                {project.links?.landing && (
-                  <button onClick={() => window.open(project.links.landing, "_blank", "noopener,noreferrer")} style={{ padding: "3px 8px", fontSize: 10, color: "#111", background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", touchAction: "manipulation" }}>
-                    Landing Page
-                  </button>
-                )}
-              </div>
+              <div style={{ ...SL, marginTop: 8 }}>Why I Built It</div>
+              {prose(project.why)}
             </>
           )}
+
+          {/* Videos */}
           {hasVideos && (
             <>
               <div style={SL}>Media</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                {project.links.videos.map((video, i) => {
+                {project.videos.map((video, i) => {
                   const v = VIDEO_LIBRARY_BY_ID[video.id] || { ...video, id: video.id || ("v-" + i), projectTitle: project.title };
                   return (
                     <a key={v.id} href={v.src} target="_blank" rel="noopener noreferrer" style={{ border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#c0c0c0", padding: 0, textDecoration: "none", display: "flex", alignItems: "stretch", touchAction: "manipulation" }}>
@@ -125,18 +112,36 @@ function ProjectDetail({ project, repoData, onBack }) {
               </div>
             </>
           )}
-          {project.architecture?.length > 0 && (
+
+          {/* Challenges */}
+          {!inProgress && project.challenges && (
             <>
-              <div style={SL}>How I Built It</div>
-              {project.architecture.map((item, i) => <ArchBullet key={i} text={item} />)}
+              <div style={SL}>Challenges</div>
+              {prose(project.challenges)}
             </>
           )}
-          {hasRef && (
+
+          {/* Takeaway */}
+          {!inProgress && project.takeaway && (
             <>
-              <div style={SL}>Reflection</div>
-              {project.highlight && <Bullet text={project.highlight} />}
-              {project.differently && <Bullet text={"Would do differently: " + project.differently} />}
-              {project.outcome && <Bullet text={project.outcome} />}
+              <div style={SL}>Key Takeaway</div>
+              {prose(project.takeaway)}
+            </>
+          )}
+
+          {/* What I'd do differently */}
+          {!inProgress && project.differently && (
+            <>
+              <div style={SL}>What I'd Do Differently</div>
+              {prose(project.differently)}
+            </>
+          )}
+
+          {/* Outcome */}
+          {project.outcome && (
+            <>
+              <div style={SL}>Outcome</div>
+              {prose(project.outcome)}
             </>
           )}
         </div>
@@ -151,12 +156,12 @@ export default function ProjectsMobile() {
 
   useEffect(() => {
     PROJECTS.forEach((project) => {
-      if (!project.links?.github) return;
-      const m = project.links.github.match(/github\.com\/([^/]+)\/([^/]+)/);
+      if (!project.githubUrl || project.githubUrl === "#") return;
+      const m = project.githubUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
       if (!m) return;
       fetch("https://api.github.com/repos/" + m[1] + "/" + m[2])
         .then((r) => r.ok ? r.json() : null)
-        .then((d) => { if (d) setRepoData((prev) => ({ ...prev, [project.links.github]: d })); })
+        .then((d) => { if (d) setRepoData((prev) => ({ ...prev, [project.githubUrl]: d })); })
         .catch(() => {});
     });
   }, []);
@@ -167,37 +172,22 @@ export default function ProjectsMobile() {
 
   return (
     <div style={{ padding: "12px 14px", background: "#f4f4f0", minHeight: "100%", fontFamily: W95_FONT }}>
-      {PROJECTS.map((project, i) => {
-        const inProg = project.status === "IN_PROGRESS";
-        return (
-          <div key={i} onClick={() => setDetailIdx(i)} style={{ marginBottom: 10, cursor: "pointer", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8", touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
-            <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "5px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-              <div style={{ fontWeight: 700, fontSize: 12, color: "#111", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.title}</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                <span style={{ fontSize: 9, color: "#555" }}>{project.date}</span>
-                <span style={{ padding: "0 5px", fontSize: 9, fontWeight: 700, background: inProg ? "#ffff00" : "#00cc44", color: "#000", border: "1px solid #808080" }}>
-                  {inProg ? "In Progress" : "Complete"}
-                </span>
+      {PROJECTS.map((project, i) => (
+        <div key={project.id} onClick={() => setDetailIdx(i)} style={{ marginBottom: 10, cursor: "pointer", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8", touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
+          <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "5px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <div style={{ fontWeight: 700, fontSize: 12, color: "#111", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.title}</div>
+            <span style={{ fontSize: 9, color: "#555", flexShrink: 0 }}>{project.date}</span>
+          </div>
+          <div style={{ padding: "6px 10px 8px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+                {project.tech.map((tech) => <SkillTag key={tech} tech={tech} />)}
               </div>
-            </div>
-            <div style={{ padding: "6px 10px 8px" }}>
-              <div style={{ fontSize: 11, color: "#444", marginBottom: 6, lineHeight: 1.5, fontStyle: "italic" }}>{project.desc}</div>
-              {project.impact.slice(0, 2).map((item, j) => (
-                <div key={j} style={{ fontSize: 11, color: "#222", padding: "1px 0 1px 13px", position: "relative", lineHeight: 1.5 }}>
-                  <span style={{ position: "absolute", left: 0, color: "#000080", fontWeight: 700 }}>{">"}</span>
-                  {item}
-                </div>
-              ))}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8, gap: 8, flexWrap: "wrap" }}>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-                  {project.stack.slice(0, 5).map((tech) => <SkillTag key={tech} tech={tech} />)}
-                </div>
-                <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>Open</span>
-              </div>
+              <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>Open</span>
             </div>
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 }
