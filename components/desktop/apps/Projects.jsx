@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { PROJECTS, VIDEO_LIBRARY_BY_ID } from "@/components/shared/data";
 import { useWindowManager } from "../hooks/useWindowManager";
-import { APP_BODY_STYLE, APP_CONTENT_STYLE } from "../ui/retro";
+import { APP_BODY_STYLE, APP_CONTENT_STYLE, RAISED_BORDER, WIN95_COLORS, WIN95_FONT_FAMILY } from "../ui/retro";
 import { getSkillIconSrc } from "@/components/shared/skillIcon";
 
 function SkillTag({ tech, size = "normal" }) {
@@ -21,15 +21,14 @@ function SkillTag({ tech, size = "normal" }) {
 
 function LinkButton({ label, icon, onClick }) {
   return (
-    <button onClick={onClick} style={{ padding: "3px 10px", fontSize: 10, background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5 }}>
-      {icon && <img src={icon} alt="" width={12} height={12} style={{ imageRendering: "pixelated", objectFit: "contain", display: "block", verticalAlign: "middle" }} />}
-      <span style={{ verticalAlign: "middle" }}>{label}</span>
+    <button onClick={onClick} style={{ padding: "4px 10px", fontSize: 11, fontWeight: 700, color: "#000080", background: "#c0c0c0", fontFamily: "inherit", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>
+      {icon && <img src={icon} alt="" width={13} height={13} style={{ imageRendering: "pixelated", objectFit: "contain", display: "block", verticalAlign: "middle" }} />}
+      <span style={{ verticalAlign: "middle", textDecoration: "underline" }}>{label}</span>
     </button>
   );
 }
 
-function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
-  const ghRepo = project.githubUrl && project.githubUrl !== "#" ? repoData[project.githubUrl] : null;
+function ProjectDetailView({ project, onOpenVideo, onBackToList }) {
   const inProgress = project.challenges?.startsWith("In active development");
 
   const SL = {
@@ -73,8 +72,7 @@ function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
               {project.githubUrl && project.githubUrl !== "#" && (
                 <LinkButton
-                  label={ghRepo?.name || project.githubUrl.split("/").pop()}
-                  icon="/skills/github.png"
+                  label="Github"
                   onClick={() => window.open(project.githubUrl, "_blank", "noopener,noreferrer")}
                 />
               )}
@@ -93,27 +91,6 @@ function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
             <>
               <div style={{ ...SL, marginTop: 8 }}>Why I Built It</div>
               {prose(project.why)}
-            </>
-          )}
-          {hasVideos && (
-            <>
-              <div style={SL}>Media</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                {project.videos.map((video, index) => {
-                  const v = VIDEO_LIBRARY_BY_ID[video.id] || { ...video, id: video.id || `preview-${index}`, projectTitle: project.title };
-                  return (
-                    <button key={v.id} onClick={() => onOpenVideo(v.id)} style={{ border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#c0c0c0", padding: 0, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "stretch" }}>
-                      <div style={{ width: 96, flexShrink: 0, background: "#000", margin: 3, border: "1px solid #606060", overflow: "hidden" }}>
-                        <video src={v.src} muted preload="metadata" playsInline style={{ width: "100%", height: 54, objectFit: "cover", display: "block", pointerEvents: "none" }} />
-                      </div>
-                      <div style={{ flex: 1, padding: "5px 8px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3 }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "#111" }}>{v.label}</div>
-                        <div style={{ fontSize: 9, color: "#000080", fontWeight: 700 }}>Open in Videos</div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
             </>
           )}
           {!inProgress && project.challenges && (
@@ -140,6 +117,27 @@ function ProjectDetailView({ project, repoData, onOpenVideo, onBackToList }) {
               {prose(project.outcome)}
             </>
           )}
+          {hasVideos && (
+            <>
+              <div style={SL}>Media</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                {project.videos.map((video, index) => {
+                  const v = VIDEO_LIBRARY_BY_ID[video.id] || { ...video, id: video.id || `preview-${index}`, projectTitle: project.title };
+                  return (
+                    <button key={v.id} onClick={() => onOpenVideo(v.id)} style={{ border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#c0c0c0", padding: 0, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "stretch" }}>
+                      <div style={{ width: 96, flexShrink: 0, background: "#000", margin: 3, border: "1px solid #606060", overflow: "hidden" }}>
+                        <video src={v.src} muted preload="metadata" playsInline style={{ width: "100%", height: 54, objectFit: "cover", display: "block", pointerEvents: "none" }} />
+                      </div>
+                      <div style={{ flex: 1, padding: "5px 8px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 3 }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "#111" }}>{v.label}</div>
+                        <div style={{ fontSize: 9, color: "#000080", fontWeight: 700 }}>Open in Videos</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -153,7 +151,7 @@ export default function ProjectsApp() {
     backStack: [],
     forwardStack: [],
   });
-  const [repoData, setRepoData] = useState({});
+  const [tooltip, setTooltip] = useState({ idx: null, x: 0, y: 0 });
 
   const currentView = navigation.current || { type: "list" };
   const currentProject = currentView.type === "detail" ? PROJECTS[currentView.projectIdx] : null;
@@ -172,44 +170,47 @@ export default function ProjectsApp() {
 
   const openProjectDetail = useCallback((projectIdx) => {
     if (projectIdx == null || projectIdx < 0 || projectIdx >= PROJECTS.length) return;
+    setTooltip({ idx: null, x: 0, y: 0 });
     navigate({ type: "detail", projectIdx });
-  }, [navigate]);
-
-  useEffect(() => {
-    PROJECTS.forEach((project) => {
-      if (!project.githubUrl || project.githubUrl === "#") return;
-      const match = project.githubUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
-      if (!match) return;
-      fetch(`https://api.github.com/repos/${match[1]}/${match[2]}`)
-        .then((r) => (r.ok ? r.json() : null))
-        .then((d) => { if (d) setRepoData((prev) => ({ ...prev, [project.githubUrl]: d })); })
-        .catch(() => {});
-    });
-  }, []);
+  }, [navigate, setTooltip]);
 
   return (
     <div style={APP_BODY_STYLE}>
+      {tooltip.idx !== null && (
+        <span style={{ ...RAISED_BORDER, position: "fixed", left: tooltip.x + 14, top: tooltip.y + 14, background: "#fff8c6", color: WIN95_COLORS.text, fontFamily: WIN95_FONT_FAMILY, fontSize: 11, lineHeight: 1.2, padding: "3px 6px", whiteSpace: "nowrap", pointerEvents: "none", zIndex: 40000 }}>
+          Click to view more
+        </span>
+      )}
       {currentView.type === "list" ? (
         <div style={{ ...APP_CONTENT_STYLE, padding: "10px 12px" }}>
           {PROJECTS.map((project, index) => (
-            <div key={project.id} onClick={() => openProjectDetail(index)} style={{ marginBottom: 10, cursor: "pointer", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8" }}>
-              <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "5px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                <div style={{ fontWeight: 700, fontSize: 12, color: "#111", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.title}</div>
-                <span style={{ fontSize: 9, color: "#555", flexShrink: 0 }}>{project.date}</span>
+            <div
+              key={project.id}
+              onClick={() => openProjectDetail(index)}
+              onMouseEnter={(e) => setTooltip({ idx: index, x: e.clientX, y: e.clientY })}
+              onMouseMove={(e) => setTooltip((prev) => ({ ...prev, x: e.clientX, y: e.clientY }))}
+              onMouseLeave={() => setTooltip({ idx: null, x: 0, y: 0 })}
+              style={{ marginBottom: 10, cursor: "pointer", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8" }}
+            >
+              <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "5px 10px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: project.overview ? 3 : 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: 12, color: "#111", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.title}</div>
+                  <span style={{ fontSize: 9, color: "#555", flexShrink: 0 }}>{project.date}</span>
+                </div>
+                {project.overview && (
+                  <div style={{ fontSize: 10, color: "#555", fontStyle: "italic", lineHeight: 1.4 }}>{project.overview}</div>
+                )}
               </div>
               <div style={{ padding: "6px 10px 8px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-                    {project.tech.map((t) => <SkillTag key={t} tech={t} size="small" />)}
-                  </div>
-                  <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>Open</span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                  {project.tech.map((t) => <SkillTag key={t} tech={t} size="normal" />)}
                 </div>
               </div>
             </div>
           ))}
         </div>
       ) : currentProject ? (
-        <ProjectDetailView project={currentProject} repoData={repoData} onOpenVideo={openVideoApp} onBackToList={() => navigate({ type: "list" })} />
+        <ProjectDetailView project={currentProject} onOpenVideo={openVideoApp} onBackToList={() => navigate({ type: "list" })} />
       ) : (
         <div style={{ ...APP_CONTENT_STYLE, padding: "16px 20px", fontSize: 11, color: "#666" }}>
           Unable to load project details.

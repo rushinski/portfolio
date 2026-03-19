@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PROJECTS, VIDEO_LIBRARY_BY_ID } from "@/components/shared/data";
 import { getSkillIconSrc } from "@/components/shared/skillIcon";
 
@@ -18,9 +18,9 @@ function SkillTag({ tech }) {
 
 function LinkButton({ label, icon, onClick }) {
   return (
-    <button onClick={onClick} style={{ padding: "3px 10px", fontSize: 10, color: "#111", background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5, touchAction: "manipulation" }}>
-      {icon && <img src={icon} alt="" width={12} height={12} style={{ objectFit: "contain", display: "block", verticalAlign: "middle" }} />}
-      <span style={{ verticalAlign: "middle" }}>{label}</span>
+    <button onClick={onClick} style={{ padding: "4px 10px", fontSize: 11, fontWeight: 700, color: "#000080", background: "#c0c0c0", fontFamily: W95_FONT, border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6, touchAction: "manipulation" }}>
+      {icon && <img src={icon} alt="" width={13} height={13} style={{ objectFit: "contain", display: "block", verticalAlign: "middle" }} />}
+      <span style={{ verticalAlign: "middle", textDecoration: "underline" }}>{label}</span>
     </button>
   );
 }
@@ -32,11 +32,10 @@ const SL = {
   marginBottom: 7, marginTop: 12,
 };
 
-function ProjectDetail({ project, repoData, onBack }) {
+function ProjectDetail({ project, onBack }) {
   const inProgress = project.challenges?.startsWith("In active development");
   const hasLinks = !!(project.githubUrl && project.githubUrl !== "#") || !!project.liveUrl;
   const hasVideos = (project.videos?.length || 0) > 0;
-  const ghRepo = project.githubUrl && project.githubUrl !== "#" ? repoData[project.githubUrl] : null;
 
   const prose = (text) => (
     <div style={{ fontSize: 11, color: "#333", lineHeight: 1.6, fontFamily: W95_FONT }}>{text}</div>
@@ -66,8 +65,7 @@ function ProjectDetail({ project, repoData, onBack }) {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
               {project.githubUrl && project.githubUrl !== "#" && (
                 <LinkButton
-                  label={ghRepo?.name || project.githubUrl.split("/").pop()}
-                  icon="/skills/github.png"
+                  label="Github"
                   onClick={() => window.open(project.githubUrl, "_blank", "noopener,noreferrer")}
                 />
               )}
@@ -152,38 +150,28 @@ function ProjectDetail({ project, repoData, onBack }) {
 
 export default function ProjectsMobile() {
   const [detailIdx, setDetailIdx] = useState(null);
-  const [repoData, setRepoData] = useState({});
-
-  useEffect(() => {
-    PROJECTS.forEach((project) => {
-      if (!project.githubUrl || project.githubUrl === "#") return;
-      const m = project.githubUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
-      if (!m) return;
-      fetch("https://api.github.com/repos/" + m[1] + "/" + m[2])
-        .then((r) => r.ok ? r.json() : null)
-        .then((d) => { if (d) setRepoData((prev) => ({ ...prev, [project.githubUrl]: d })); })
-        .catch(() => {});
-    });
-  }, []);
 
   if (detailIdx !== null) {
-    return <ProjectDetail project={PROJECTS[detailIdx]} repoData={repoData} onBack={() => setDetailIdx(null)} />;
+    return <ProjectDetail project={PROJECTS[detailIdx]} onBack={() => setDetailIdx(null)} />;
   }
 
   return (
     <div style={{ padding: "12px 14px", background: "#f4f4f0", minHeight: "100%", fontFamily: W95_FONT }}>
       {PROJECTS.map((project, i) => (
-        <div key={project.id} onClick={() => setDetailIdx(i)} style={{ marginBottom: 10, cursor: "pointer", border: "1px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8", touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
-          <div style={{ background: "#d4d0c8", borderBottom: "1px solid #808080", padding: "5px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <div key={project.id} onClick={() => setDetailIdx(i)} style={{ marginBottom: 10, cursor: "pointer", border: "2px solid", borderColor: "#ffffff #808080 #808080 #ffffff", background: "#d4d0c8", touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}>
+          <div style={{ background: "#c0c0c0", borderBottom: "1px solid #808080", padding: "5px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
             <div style={{ fontWeight: 700, fontSize: 12, color: "#111", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.title}</div>
-            <span style={{ fontSize: 9, color: "#555", flexShrink: 0 }}>{project.date}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <span style={{ fontSize: 9, color: "#555" }}>{project.date}</span>
+              <span style={{ fontSize: 12, color: "#000080", fontWeight: 700, lineHeight: 1 }}>›</span>
+            </div>
           </div>
-          <div style={{ padding: "6px 10px 8px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-                {project.tech.map((tech) => <SkillTag key={tech} tech={tech} />)}
-              </div>
-              <span style={{ fontSize: 9, color: "#000080", fontWeight: 700, flexShrink: 0 }}>Open</span>
+          <div style={{ padding: "7px 10px 9px" }}>
+            {project.overview && (
+              <div style={{ fontSize: 11, color: "#555", fontStyle: "italic", lineHeight: 1.5, marginBottom: 7, fontFamily: W95_FONT }}>{project.overview}</div>
+            )}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+              {project.tech.map((tech) => <SkillTag key={tech} tech={tech} />)}
             </div>
           </div>
         </div>
