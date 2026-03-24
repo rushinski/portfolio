@@ -35,6 +35,52 @@ function formatItemsForListing(items, isContainerItem) {
     .join("\n");
 }
 
+function getProjectStatusLabel(project) {
+  if (project.status === "IN_PROGRESS") {
+    return "[WIP]";
+  }
+
+  if (project.status === "COMPLETE") {
+    return "[COMPLETE]";
+  }
+
+  const combinedStatusText = [project.challenges, project.outcome].filter(Boolean).join(" ").toLowerCase();
+  return combinedStatusText.includes("active development") ? "[WIP]" : "[COMPLETE]";
+}
+
+function formatProjectDetails(project, index) {
+  const summary = project.desc || project.overview || project.why || "No summary available.";
+  const detailLines = Array.isArray(project.impact)
+    ? project.impact
+    : [
+      project.outcome && `Outcome: ${project.outcome}`,
+      project.takeaway && `Takeaway: ${project.takeaway}`,
+      Array.isArray(project.tech) && project.tech.length ? `Tech: ${project.tech.join(", ")}` : null,
+    ].filter(Boolean);
+
+  return [
+    `${index + 1}. ${project.title} (${project.date}) ${getProjectStatusLabel(project)}`,
+    `   ${summary}`,
+    ...detailLines.map((line) => `   - ${line}`),
+  ].join("\n");
+}
+
+function formatExperienceDetails(experience, index) {
+  const summary = experience.desc || experience.paragraph || "No summary available.";
+  const detailLines = Array.isArray(experience.bullets)
+    ? experience.bullets
+    : [
+      experience.type,
+      Array.isArray(experience.stack) && experience.stack.length ? `Stack: ${experience.stack.join(", ")}` : null,
+    ].filter(Boolean);
+
+  return [
+    `${index + 1}. ${experience.role} @ ${experience.company} (${experience.period})`,
+    `   ${summary}`,
+    ...detailLines.map((line) => `   - ${line}`),
+  ].join("\n");
+}
+
 export default function TerminalApp() {
   const {
     canCreateInFolder,
@@ -87,21 +133,12 @@ export default function TerminalApp() {
   }, [currentFolderId, getFolderPathSegments]);
 
   const projectDetails = useMemo(
-    () => PROJECTS.map((project, index) => [
-      `${index + 1}. ${project.title} (${project.date}) ${project.status === "IN_PROGRESS" ? "[WIP]" : "[COMPLETE]"}`,
-      `   ${project.desc}`,
-      ...project.impact.map((line) => `   - ${line}`),
-    ].join("\n")).join("\n\n"),
+    () => PROJECTS.map((project, index) => formatProjectDetails(project, index)).join("\n\n"),
     [],
   );
 
   const experienceDetails = useMemo(
-    () => EXPERIENCE.map((experience, index) => [
-      `${index + 1}. ${experience.role} @ ${experience.company} (${experience.period})`,
-      `   ${experience.type}`,
-      `   ${experience.desc}`,
-      ...experience.bullets.map((line) => `   - ${line}`),
-    ].join("\n")).join("\n\n"),
+    () => EXPERIENCE.map((experience, index) => formatExperienceDetails(experience, index)).join("\n\n"),
     [],
   );
 
