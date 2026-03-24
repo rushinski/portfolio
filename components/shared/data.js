@@ -76,7 +76,7 @@ export const PROJECTS = [
     id: "sneaker-marketplace",
     title: "Multi-Tenant Sneaker Marketplace",
     date: "Feb 2026 – Present",
-    tech: ["C#", "ASP.NET", "Next.js", "TypeScript", "PostgreSQL", "Digital Ocean", "Upstash Redis"],
+    tech: ["TypeScript", "Next.js", "PostgreSQL", "Digital Ocean", "Upstash Redis"],
     overview: "While contracting on a single-tenant sneaker marketplace, 5 other resellers expressed interest in their own platforms. Rather than building and maintaining 5 separate backends and infrastructure stacks, I decided to build a proper multi-tenant SaaS. I'm also a sneakerhead myself, so this is a problem space I genuinely care about.",
     why: "The contract taught me what the problem actually was. By the end I had a clear picture of what a proper multi-tenant version should look like — and 5 people already asking for it.",
     challenges: "In active development — will be updated as the project progresses.",
